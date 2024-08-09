@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: webprotege-postcoordination-service
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    password: guest
+    username: guest
+  data:
+    mongodb:
+      host: mongo
+      port: 27017
+      database: webprotege
+      auto-index-creation: true
+      uri: mongodb://${spring.data.mongodb.host}:${spring.data.mongodb.port}/${spring.data.mongodb.database}
+
+webprotege:
+  minio:
+    access-key: webprotege
+    end-point: http://localhost:9000
+    secret-key: webprotege
+    bucket-name: webprotege-uploads
+    revision-history-documents-bucket-name: webprotege-revision-history-documents
+  rabbitmq:
+    requestqueue: webprotege-postcoordination-service-queue
+    responsequeue: webprotege-postcoordination-service-response-queue
+    timeout: 60000
+  readWriteLock:
+    timeoutInMillies: 1000
+    maxRetries: 5
