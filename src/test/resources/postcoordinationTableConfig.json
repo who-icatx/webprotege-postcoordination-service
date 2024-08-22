@@ -1,0 +1,150 @@
+[
+  {
+    "entityType": "ICD",
+    "postcoordinationAxes": [
+      "http://id.who.int/icd/schema/hasSeverity",
+      "http://id.who.int/icd/schema/hasAlternativeSeverity1",
+      "http://id.who.int/icd/schema/hasAlternativeSeverity2",
+      "http://id.who.int/icd/schema/course",
+      "http://id.who.int/icd/schema/temporalPatternAndOnset",
+      "http://id.who.int/icd/schema/timeInLife",
+      "http://id.who.int/icd/schema/causality",
+      "http://id.who.int/icd/schema/infectiousAgent",
+      "http://id.who.int/icd/schema/chemicalAgent",
+      "http://id.who.int/icd/schema/medication",
+      "http://id.who.int/icd/schema/hasCausingCondition",
+      "http://id.who.int/icd/schema/histopathology",
+      "http://id.who.int/icd/schema/laterality",
+      "http://id.who.int/icd/schema/relational",
+      "http://id.who.int/icd/schema/distribution",
+      "http://id.who.int/icd/schema/regional",
+      "http://id.who.int/icd/schema/specificAnatomy",
+      "http://id.who.int/icd/schema/serotype",
+      "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
+      "http://id.who.int/icd/schema/fractureSubtype",
+      "http://id.who.int/icd/schema/fractureOpenOrClosed",
+      "http://id.who.int/icd/schema/jointInvolvementInFracture",
+      "http://id.who.int/icd/schema/typeOfInjury",
+      "http://id.who.int/icd/schema/extentOfBurnByBodySurface",
+      "http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
+      "http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
+      "http://id.who.int/icd/schema/durationOfComa",
+      "http://id.who.int/icd/schema/levelOfConsciousness",
+      "http://id.who.int/icd/schema/diagnosisConfirmedBy",
+      "http://id.who.int/icd/schema/hasManifestation",
+      "http://id.who.int/icd/schema/associatedWith"
+    ],
+    "compositePostcoordinationAxes": [
+      {
+        "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
+        "replacedBySubaxes": [
+          "http://id.who.int/icd/schema/hasGCSScore",
+          "http://id.who.int/icd/schema/hasGCSEyeScore",
+          "http://id.who.int/icd/schema/hasGCSMotorScore",
+          "http://id.who.int/icd/schema/hasGCSVerbalScore",
+          "http://id.who.int/icd/schema/hasPupilReactionScore"
+        ]
+      }
+    ]
+  },
+  {
+    "entityType": "ExternalCauses",
+    "postcoordinationAxes": [
+      "http://id.who.int/icd/schema/activityWhenInjured",
+      "http://id.who.int/icd/schema/occupationalDescriptor",
+      "http://id.who.int/icd/schema/mechanismOfInjury",
+      "http://id.who.int/icd/schema/transportEventDescriptor",
+      "http://id.who.int/icd/schema/objectOrSubstanceProducingInjury",
+      "http://id.who.int/icd/schema/sportsActivityDescriptor",
+      "http://id.who.int/icd/schema/placeOfOccurrence",
+      "http://id.who.int/icd/schema/alcoholUseInInjury",
+      "http://id.who.int/icd/schema/psychoactiveDrugUseInInjury",
+      "http://id.who.int/icd/schema/aspectsOfAssaultAndMaltreatment",
+      "http://id.who.int/icd/schema/aspectsOfIntentionalSelfHarm",
+      "http://id.who.int/icd/schema/aspectsOfArmedConflict",
+      "http://id.who.int/icd/schema/typeOfLegalIntervention",
+      "http://id.who.int/icd/schema/hasSeverity",
+      "http://id.who.int/icd/schema/hasAlternativeSeverity1",
+      "http://id.who.int/icd/schema/hasAlternativeSeverity2",
+      "http://id.who.int/icd/schema/course",
+      "http://id.who.int/icd/schema/temporalPatternAndOnset",
+      "http://id.who.int/icd/schema/timeInLife",
+      "http://id.who.int/icd/schema/causality",
+      "http://id.who.int/icd/schema/infectiousAgent",
+      "http://id.who.int/icd/schema/chemicalAgent",
+      "http://id.who.int/icd/schema/medication",
+      "http://id.who.int/icd/schema/hasCausingCondition",
+      "http://id.who.int/icd/schema/histopathology",
+      "http://id.who.int/icd/schema/laterality",
+      "http://id.who.int/icd/schema/relational",
+      "http://id.who.int/icd/schema/distribution",
+      "http://id.who.int/icd/schema/regional",
+      "http://id.who.int/icd/schema/specificAnatomy",
+      "http://id.who.int/icd/schema/serotype",
+      "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
+      "http://id.who.int/icd/schema/fractureSubtype",
+      "http://id.who.int/icd/schema/fractureOpenOrClosed",
+      "http://id.who.int/icd/schema/jointInvolvementInFracture",
+      "http://id.who.int/icd/schema/typeOfInjury",
+      "http://id.who.int/icd/schema/extentOfBurnByBodySurface",
+      "http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
+      "http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
+      "http://id.who.int/icd/schema/durationOfComa",
+      "http://id.who.int/icd/schema/levelOfConsciousness",
+      "http://id.who.int/icd/schema/diagnosisConfirmedBy",
+      "http://id.who.int/icd/schema/hasManifestation",
+      "http://id.who.int/icd/schema/associatedWith"
+    ],
+    "compositePostcoordinationAxes": [
+      {
+        "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
+        "replacedBySubaxes": [
+          "http://id.who.int/icd/schema/hasGCSScore",
+          "http://id.who.int/icd/schema/hasGCSEyeScore",
+          "http://id.who.int/icd/schema/hasGCSMotorScore",
+          "http://id.who.int/icd/schema/hasGCSVerbalScore",
+          "http://id.who.int/icd/schema/hasPupilReactionScore"
+        ]
+      }
+    ]
+  },
+  {
+    "entityType": "ICHIIntervention",
+    "postcoordinationAxes": [
+      "http://id.who.int/icd/schema/hasTarget",
+      "http://id.who.int/icd/schema/hasAction",
+      "http://id.who.int/icd/schema/hasMeans",
+      "http://id.who.int/icd/schema/additionalTarget",
+      "http://id.who.int/icd/schema/specificAnatomicDetail",
+      "http://id.who.int/icd/schema/laterality",
+      "http://id.who.int/icd/schema/relational",
+      "http://id.who.int/icd/schema/measurement",
+      "http://id.who.int/icd/schema/medicament",
+      "http://id.who.int/icd/schema/therapeuticProduct",
+      "http://id.who.int/icd/schema/assistiveProduct",
+      "http://id.who.int/icd/schema/essentialPathologyTest",
+      "http://id.who.int/icd/schema/quantifier",
+      "http://id.who.int/icd/schema/telehealth",
+      "http://id.who.int/icd/schema/initiatingOrMaintainingOrDiscontinuingOrResuming",
+      "http://id.who.int/icd/schema/relationshipToOtherInterventions",
+      "http://id.who.int/icd/schema/natureOfIntervention",
+      "http://id.who.int/icd/schema/useOfEquipmentOrChallenge",
+      "http://id.who.int/icd/schema/recipient",
+      "http://id.who.int/icd/schema/creativeTherapy",
+      "http://id.who.int/icd/schema/specificSkillsAndTechnique",
+      "http://id.who.int/icd/schema/tissueFlap",
+      "http://id.who.int/icd/schema/tissueGraft"
+    ],
+    "compositePostcoordinationAxes": [
+      {
+        "postcoordinationAxis": "http://id.who.int/icd/schema/quantifier",
+        "replacedBySubaxes": [
+          "http://id.who.int/icd/schema/quantifier",
+          "http://id.who.int/icd/schema/numberOfAnatomicalStructuresAnInterventionIsPerformedOn",
+          "http://id.who.int/icd/schema/numberOfInterventionsPerformed",
+          "http://id.who.int/icd/schema/numberOfTherapeuticProductsInserted"
+        ]
+      }
+    ]
+  }
+]
