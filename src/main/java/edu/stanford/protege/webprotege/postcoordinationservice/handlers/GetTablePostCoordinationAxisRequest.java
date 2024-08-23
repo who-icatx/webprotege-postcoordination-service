@@ -1,7 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
 import edu.stanford.protege.webprotege.common.Request;
 
 @JsonTypeName(GetTablePostCoordinationAxisRequest.CHANNEL)
@@ -11,7 +11,7 @@ public class GetTablePostCoordinationAxisRequest implements Request<GetTablePost
     private final String entityType;
 
 
-    public GetTablePostCoordinationAxisRequest(String entityType) {
+    public GetTablePostCoordinationAxisRequest(@JsonProperty("entityType") String entityType) {
         this.entityType = entityType;
     }
 
