@@ -1,9 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
 import edu.stanford.protege.webprotege.common.Request;
 
 @JsonTypeName(GetTablePostCoordinationAxisRequest.CHANNEL)
