@@ -4,8 +4,12 @@ package edu.stanford.protege.webprotege.postcoordinationservice.config;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import edu.stanford.protege.webprotege.common.UserId;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
+import edu.stanford.protege.webprotege.ipc.impl.CommandExecutorImpl;
 import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinitionRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinitionResponse;
 import org.semanticweb.owlapi.model.IRI;
 import org.springframework.context.annotation.*;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
@@ -47,4 +51,10 @@ public class ApplicationBeans {
     public ReadWriteLock readWriteLock() {
         return new ReentrantReadWriteLock(true);
     }
+
+    @Bean
+    CommandExecutor<LinearizationDefinitionRequest, LinearizationDefinitionResponse> executorForLinearizationDefinitions() {
+        return new CommandExecutorImpl<>(LinearizationDefinitionResponse.class);
+    }
+
 }

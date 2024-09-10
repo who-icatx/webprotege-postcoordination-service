@@ -1,4 +1,4 @@
-package edu.stanford.protege.webprotege.postcoordinationservice;
+package edu.stanford.protege.webprotege.postcoordinationservice.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
