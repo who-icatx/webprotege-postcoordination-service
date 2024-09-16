@@ -6,6 +6,6 @@ import edu.stanford.protege.webprotege.common.Response;
 import static edu.stanford.protege.webprotege.postcoordinationservice.handlers.UploadPostCoordinationRequest.CHANNEL;
 
 @JsonTypeName(CHANNEL)
-public class UploadPostCoordinationResponse implements Response {
+public record UploadPostCoordinationResponse() implements Response {
 
 }

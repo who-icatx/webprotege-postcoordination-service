@@ -9,7 +9,6 @@ import edu.stanford.protege.webprotege.postcoordinationservice.repositories.Post
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,7 +36,7 @@ public class GetTablePostCoordinationAxisHandler implements CommandHandler<GetTa
 
     @Override
     public Mono<GetTablePostCoordinationAxisResponse> handleRequest(GetTablePostCoordinationAxisRequest request, ExecutionContext executionContext) {
-        TableConfiguration tableConfiguration = tableConfigRepository.getTableConfigurationByEntityType(request.getEntityType());
+        TableConfiguration tableConfiguration = tableConfigRepository.getTableConfigurationByEntityType(request.entityType());
         List<TableAxisLabel> labels = tableConfigRepository.getTableAxisLabels();
 
         return Mono.just(new GetTablePostCoordinationAxisResponse(tableConfiguration, labels));

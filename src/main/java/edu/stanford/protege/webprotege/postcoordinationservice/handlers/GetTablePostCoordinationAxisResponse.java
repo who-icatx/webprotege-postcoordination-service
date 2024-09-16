@@ -9,22 +9,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfig
 import java.util.List;
 
 @JsonTypeName(GetTablePostCoordinationAxisRequest.CHANNEL)
-public class GetTablePostCoordinationAxisResponse implements Response {
+public record GetTablePostCoordinationAxisResponse(TableConfiguration tableConfiguration,
+                                                   List<TableAxisLabel> labels) implements Response {
 
-    private final TableConfiguration tableConfiguration;
-
-    private final List<TableAxisLabel> labels;
-
-    public GetTablePostCoordinationAxisResponse(TableConfiguration tableConfiguration, List<TableAxisLabel> labels) {
-        this.tableConfiguration = tableConfiguration;
-        this.labels = labels;
-    }
-
-    public TableConfiguration getTableConfiguration() {
-        return tableConfiguration;
-    }
-
-    public List<TableAxisLabel> getLabels() {
-        return labels;
-    }
 }

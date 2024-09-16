@@ -49,7 +49,7 @@ public abstract class PostCoordinationEvent {
 
     @Field("postCoordinationAxis")
     @JsonProperty("postCoordinationAxis")
-    String getPostCoordinationAxis() {
+    public String getPostCoordinationAxis() {
         return postCoordinationAxis;
     };
     @Field("linearizationView")

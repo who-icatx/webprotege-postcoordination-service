@@ -6,19 +6,11 @@ import edu.stanford.protege.webprotege.change.OntologyDocumentId;
 import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.common.Request;
 
-public class UploadPostCoordinationRequest implements Request<UploadPostCoordinationResponse> {
+public record UploadPostCoordinationRequest( @JsonProperty("documentId") OntologyDocumentId documentId,@JsonProperty("projectId") ProjectId projectId) implements Request<UploadPostCoordinationResponse> {
     public static final String CHANNEL = "webprotege.postcoordination.ProcessUploadedPostCoordination";
 
-    @JsonProperty("documentId")
-    private  final OntologyDocumentId documentId;
-    @JsonProperty("projectId")
-    private final ProjectId projectId;
-
-
     @JsonCreator
-    public UploadPostCoordinationRequest(@JsonProperty("documentId") OntologyDocumentId documentId, @JsonProperty("projectId") ProjectId projectId) {
-        this.documentId = documentId;
-        this.projectId = projectId;
+    public UploadPostCoordinationRequest {
     }
 
     public OntologyDocumentId getDocumentId() {
