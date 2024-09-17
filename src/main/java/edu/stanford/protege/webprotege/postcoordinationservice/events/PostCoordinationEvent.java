@@ -20,8 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 })
 public abstract class PostCoordinationEvent {
 
-
-
     @Field("postCoordinationAxis")
     private final String postCoordinationAxis;
 

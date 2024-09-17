@@ -17,6 +17,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.repositories.Post
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
 import org.bson.Document;
+import org.semanticweb.owlapi.model.IRI;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -62,9 +63,20 @@ public class PostCoordinationService {
             stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
         });
     }
+    Optional<EntityPostCoordinationHistory> getExistingHistoryOrderedByRevision(IRI entityIri, ProjectId projectId) {
+        return specRepository.findHistoryByEntityIriAndProjectId(entityIri.toString(), projectId)
+                .map(history -> {
+                    Set<PostCoordinationRevision> sortedRevisions = history.getPostCoordinationRevisions()
+                            .stream()
+                            .sorted(Comparator.comparingLong(PostCoordinationRevision::timestamp))
+                            .collect(Collectors.toCollection(TreeSet::new));
+                    // Return a new EntityLinearizationHistory object with the sorted revisions
+                    return new EntityPostCoordinationHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
+                });
 
+    }
 
-    public Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId , List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
+    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId , List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
         return page -> {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
@@ -83,7 +95,7 @@ public class PostCoordinationService {
         };
     }
 
-    public void saveMultipleEntityPostCoordinationHistories(Set<EntityPostCoordinationHistory> historiesToBeSaved) {
+    private void saveMultipleEntityPostCoordinationHistories(Set<EntityPostCoordinationHistory> historiesToBeSaved) {
         var documents = historiesToBeSaved.stream()
                 .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
                 .toList();
@@ -92,7 +104,7 @@ public class PostCoordinationService {
     }
 
 
-    public PostCoordinationSpecificationRequest enrichWithMissingAxis(String entityType, PostCoordinationSpecificationRequest specification, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
+    PostCoordinationSpecificationRequest enrichWithMissingAxis(String entityType, PostCoordinationSpecificationRequest specification, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
         LinearizationDefinition definition = definitionList.stream()
                 .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equalsIgnoreCase(specification.getLinearizationView()))
                 .findFirst()

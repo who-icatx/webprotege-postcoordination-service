@@ -11,7 +11,6 @@ public class PostCoordinationSpecificationRequest extends EventProcessableParame
 
     private final String linearizationView;
 
-
     private final List<String> allowedAxes;
 
     private final List<String> defaultAxes;

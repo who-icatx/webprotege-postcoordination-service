@@ -12,7 +12,6 @@ import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostC
 import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
 import org.bson.Document;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,8 +133,8 @@ public class PostCoordinationServiceTest {
                                 .findFirst().orElse(null);
         assertNotNull(history);
         assertEquals(1, history.getPostCoordinationRevisions().size());
-        assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().getUserId());
-        assertNotNull(history.getPostCoordinationRevisions().iterator().next().getPostCoordinationEventList());
+        assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().userId());
+        assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList());
 
     }
 }
