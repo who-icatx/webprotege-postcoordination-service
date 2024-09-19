@@ -50,8 +50,8 @@ public class PostCoordinationService {
     }
 
 
-    public void createFirstImport(String documentLocation, ProjectId projectId, UserId userId) {
-        var stream = documentRepository.fetchFromDocument(documentLocation);
+    public void createFirstSpecificationImport(String documentLocation, ProjectId projectId, UserId userId) {
+        var stream = documentRepository.fetchPostCoordinationSpecifications(documentLocation);
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         readWriteLock.executeWriteLock(() -> {

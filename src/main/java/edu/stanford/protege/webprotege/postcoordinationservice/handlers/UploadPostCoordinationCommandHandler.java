@@ -35,7 +35,7 @@ public class UploadPostCoordinationCommandHandler implements CommandHandler<Uplo
     @Override
     public Mono<UploadPostCoordinationResponse> handleRequest(UploadPostCoordinationRequest request, ExecutionContext executionContext) {
         try {
-            postCoordinationService.createFirstImport(request.getDocumentId().id(), request.getProjectId(), executionContext.userId());
+            postCoordinationService.createFirstSpecificationImport(request.getDocumentId().id(), request.getProjectId(), executionContext.userId());
             return Mono.just(new UploadPostCoordinationResponse());
         } catch (Exception e) {
             LOGGER.error("Error uploading postcoordinations", e);
