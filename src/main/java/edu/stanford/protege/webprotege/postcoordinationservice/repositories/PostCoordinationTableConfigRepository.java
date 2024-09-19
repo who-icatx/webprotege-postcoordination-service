@@ -3,6 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.repositories;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.TableAxisLabel;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -23,6 +24,12 @@ public class PostCoordinationTableConfigRepository {
     public PostCoordinationTableConfigRepository(MongoTemplate mongoTemplate, ObjectMapper objectMapper) {
         this.mongoTemplate = mongoTemplate;
         this.objectMapper = objectMapper;
+    }
+
+
+    @Cacheable("postCoordTableConfigs")
+    public List<TableConfiguration> getALlTableConfiguration(){
+        return mongoTemplate.findAll(TableConfiguration.class);
     }
 
 

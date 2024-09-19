@@ -1,6 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice;
 
 import edu.stanford.protege.webprotege.common.BlobLocation;
+import edu.stanford.protege.webprotege.postcoordinationservice.config.MinioProperties;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;

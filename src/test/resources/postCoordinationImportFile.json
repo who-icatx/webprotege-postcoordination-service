@@ -1,0 +1,125 @@
+{
+  "whoficEntityPostcoordinationSpecification": [
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/257068234",
+      "entityType": "ICD",
+      "postcoordinationSpecifications": [
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mnh"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/env"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/rar"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ped"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ner"
+        },
+        {
+          "allowedAxes": [
+            "http://id.who.int/icd/schema/associatedWith",
+            "http://id.who.int/icd/schema/infectiousAgent"
+          ],
+          "linearizationView": "http://id.who.int/icd/release/11/mms"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/research"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/der"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/oph"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ocu"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mus"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/741162165",
+      "entityType": "ICD",
+      "postcoordinationSpecifications": [
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mnh"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/env"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/rar"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ped"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ner"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mms"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/research"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/der"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/oph"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ocu"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mus"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/2042704797",
+      "entityType": "ICD",
+      "postcoordinationSpecifications": [
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mnh"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/env"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/rar"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ped"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ner"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mms"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/research"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/der"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/oph"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/ocu"
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mus"
+        }
+      ]
+    }
+  ]
+}

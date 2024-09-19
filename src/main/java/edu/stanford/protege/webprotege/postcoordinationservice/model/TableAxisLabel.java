@@ -18,7 +18,7 @@ public class TableAxisLabel {
     @Field("scaleLabel")
     private final String scaleLabel;
 
-    public final static String AXIS_LABELS_COLLECTION = "tableAxisLabels";
+    public final static String AXIS_LABELS_COLLECTION = "PostCoordinationTableAxisLabels";
 
 
     @JsonCreator
