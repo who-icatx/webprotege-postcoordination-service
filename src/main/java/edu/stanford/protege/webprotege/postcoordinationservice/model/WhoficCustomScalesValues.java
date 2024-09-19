@@ -6,11 +6,8 @@ import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinat
 
 import java.util.List;
 
-public class WhoficCustomScalesValues {
-
-    private final String whoficEntityIri;
-
-    private final List<PostCoordinationCustomScalesRequest> scaleCustomizations;
+public record WhoficCustomScalesValues(String whoficEntityIri,
+                                       List<PostCoordinationCustomScalesRequest> scaleCustomizations) {
 
     @JsonCreator
     public WhoficCustomScalesValues(@JsonProperty("whoficEntityIri") String whoficEntityIri,
@@ -18,4 +15,6 @@ public class WhoficCustomScalesValues {
         this.whoficEntityIri = whoficEntityIri;
         this.scaleCustomizations = scaleCustomizations;
     }
+
+
 }

@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
         @JsonSubTypes.Type(value = AddToNotAllowedAxisEvent.class, name = AddToNotAllowedAxisEvent.TYPE),
         @JsonSubTypes.Type(value = AddToAllowedAxisEvent.class, name = AddToAllowedAxisEvent.TYPE)
 })
-public abstract class PostCoordinationEvent {
+public abstract class PostCoordinationSpecificationEvent {
 
     @Field("postCoordinationAxis")
     private final String postCoordinationAxis;
@@ -26,7 +26,7 @@ public abstract class PostCoordinationEvent {
     @Field("linearizationView")
     private final String linearizationView;
 
-    protected PostCoordinationEvent(String postCoordinationAxis, String linearizationView) {
+    protected PostCoordinationSpecificationEvent(String postCoordinationAxis, String linearizationView) {
         this.postCoordinationAxis = postCoordinationAxis;
         this.linearizationView = linearizationView;
     }

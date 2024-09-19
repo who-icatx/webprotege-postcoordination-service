@@ -6,6 +6,7 @@ import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
@@ -19,6 +20,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.POSTCOORDINATION_CUSTOM_SCALES_COLLECTION;
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 @Service
@@ -59,6 +62,14 @@ public class PostCoordinationService {
         });
     }
 
+
+    public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
+        var stream = documentRepository.fetchCustomScalesValues(documentLocation);
+        readWriteLock.executeWriteLock(() -> {
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+        });
+    }
+
     public Optional<EntityPostCoordinationHistory> getExistingHistoryOrderedByRevision(String entityIri, ProjectId projectId) {
         return specRepository.findHistoryByEntityIriAndProjectId(entityIri, projectId)
                 .map(history -> {
@@ -71,6 +82,28 @@ public class PostCoordinationService {
                 });
 
     }
+
+    private Consumer<List<WhoficCustomScalesValues>> createBatchProcessorForSavingPaginatedCustomScales(ProjectId projectId,
+                                                                                                                         UserId userId) {
+        return page -> {
+            if (isNotEmpty(page)) {
+                Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
+                for (WhoficCustomScalesValues specification : page) {
+                    Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.convertToFirstImportEvents(specification);
+                    PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId.id(), new Date().getTime(), events);
+                    EntityCustomScalesValuesHistory history = new EntityCustomScalesValuesHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
+                    histories.add(history);
+                }
+                var documents = histories.stream()
+                        .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
+                        .toList();
+
+                specRepository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
+
+            }
+        };
+    }
+
 
     private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
         return page -> {
@@ -98,7 +131,7 @@ public class PostCoordinationService {
                 .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
                 .toList();
 
-        specRepository.bulkWriteDocuments(documents);
+        specRepository.bulkWriteDocuments(documents, POSTCOORDINATION_HISTORY_COLLECTION);
     }
 
 

@@ -24,7 +24,7 @@ public class SpecificationToEventsMapperTest {
                 Collections.singletonList("requiredAxes")
         );
 
-        List<PostCoordinationEvent> eventList = SpecificationToEventsMapper.convertFromSpecification(request);
+        List<PostCoordinationSpecificationEvent> eventList = SpecificationToEventsMapper.convertFromSpecification(request);
         assertNotNull(eventList);
         assertEquals(4, eventList.size());
 

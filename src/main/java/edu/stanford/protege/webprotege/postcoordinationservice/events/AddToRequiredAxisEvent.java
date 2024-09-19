@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 
-public class AddToRequiredAxisEvent extends PostCoordinationEvent {
+public class AddToRequiredAxisEvent extends PostCoordinationSpecificationEvent {
 
     public final static String TYPE = "AddToRequiredAxis";
 

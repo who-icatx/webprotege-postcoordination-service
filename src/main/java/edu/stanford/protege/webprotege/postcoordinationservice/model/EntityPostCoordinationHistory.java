@@ -17,7 +17,6 @@ public class EntityPostCoordinationHistory {
 
     public static final String POSTCOORDINATION_HISTORY_COLLECTION = "EntityPostCoordinationHistory";
 
-
     @Field("whoficEntityIri")
     private final String whoficEntityIri;
 

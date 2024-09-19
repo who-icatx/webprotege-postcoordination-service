@@ -1,7 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationEvent;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationRevision;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
@@ -21,7 +21,7 @@ public class PostCoordinationEventProcessor {
         for(PostCoordinationRevision revision: postCoordinationHistory.getPostCoordinationRevisions()) {
             for(PostCoordinationViewEvent viewEvent: revision.postCoordinationEventList()) {
                 PostCoordinationSpecification specification = findSpecificationWithLinearizationView(viewEvent.linearizationView(), postCoordinationSpecification);
-                for(PostCoordinationEvent event : viewEvent.axisEvents()) {
+                for(PostCoordinationSpecificationEvent event : viewEvent.axisEvents()) {
                     event.applyEvent(specification);
                 }
                 postCoordinationSpecification.add(specification);

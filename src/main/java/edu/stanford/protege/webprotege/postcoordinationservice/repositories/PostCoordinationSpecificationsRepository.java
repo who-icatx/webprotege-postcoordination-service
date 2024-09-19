@@ -32,12 +32,13 @@ public class PostCoordinationSpecificationsRepository {
         this.readWriteLock = readWriteLock;
     }
 
-    public void bulkWriteDocuments(List<InsertOneModel<Document>> listOfInsertOneModelDocument) {
+    public void bulkWriteDocuments(List<InsertOneModel<Document>> listOfInsertOneModelDocument, String collectionName) {
         readWriteLock.executeWriteLock(() -> {
-            var collection = mongoTemplate.getCollection(POSTCOORDINATION_HISTORY_COLLECTION);
+            var collection = mongoTemplate.getCollection(collectionName);
             collection.bulkWrite(listOfInsertOneModelDocument);
         });
     }
+
 
     public void writeDocument(Document document) {
         readWriteLock.executeWriteLock(() -> {

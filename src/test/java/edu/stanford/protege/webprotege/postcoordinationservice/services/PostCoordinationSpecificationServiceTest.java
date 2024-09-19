@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @ExtendWith({SpringExtension.class, IntegrationTest.class})
 @ActiveProfiles("test")
-public class PostCoordinationServiceTest {
+public class PostCoordinationSpecificationServiceTest {
 
 
     @Autowired
