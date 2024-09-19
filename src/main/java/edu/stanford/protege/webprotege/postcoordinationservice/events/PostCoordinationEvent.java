@@ -3,7 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 
 import com.fasterxml.jackson.annotation.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -34,7 +34,7 @@ public abstract class PostCoordinationEvent {
     @JsonProperty("@type")
     abstract String getType();
 
-    public PostCoordinationSpecificationRequest applyEvent(PostCoordinationSpecificationRequest input) {
+    public PostCoordinationSpecification applyEvent(PostCoordinationSpecification input) {
         input.getAllowedAxes().remove(this.postCoordinationAxis);
         input.getDefaultAxes().remove(this.postCoordinationAxis);
         input.getNotAllowedAxes().remove(this.postCoordinationAxis);
@@ -42,7 +42,7 @@ public abstract class PostCoordinationEvent {
         return applySpecificEvent(input);
     }
 
-    abstract PostCoordinationSpecificationRequest applySpecificEvent(PostCoordinationSpecificationRequest input);
+    abstract PostCoordinationSpecification applySpecificEvent(PostCoordinationSpecification input);
 
 
     @Field("postCoordinationAxis")

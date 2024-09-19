@@ -1,0 +1,354 @@
+{
+  "whoficEntityIri": "http://id.who.int/icd/entity/2042704797",
+  "projectId": "b717d9a3-f265-46f5-bd15-9f1cf4b132c8",
+  "postCoordinationRevisions": [
+    {
+      "userId": "alexsilaghi",
+      "timestamp": 1726558923593,
+      "postCoordinationEventList": [
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/env",
+          "axisEvents": [
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasSeverity",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasAlternativeSeverity1",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasAlternativeSeverity2",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/course",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/temporalPatternAndOnset",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/timeInLife",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/causality",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/chemicalAgent",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/medication",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasCausingCondition",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/histopathology",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/laterality",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/relational",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/distribution",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/regional",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/specificAnatomy",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/serotype",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/fractureSubtype",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/fractureOpenOrClosed",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/jointInvolvementInFracture",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/typeOfInjury",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/extentOfBurnByBodySurface",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/durationOfComa",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/diagnosisConfirmedBy",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasManifestation",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            },
+            {
+              "@type": "AddToDefaultAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
+              "linearizationView": "http://id.who.int/icd/release/11/env"
+            }
+          ]
+        },
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mms",
+          "axisEvents": [
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasSeverity",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasAlternativeSeverity1",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasAlternativeSeverity2",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/course",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/temporalPatternAndOnset",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/timeInLife",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/causality",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/chemicalAgent",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/medication",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasCausingCondition",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/histopathology",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/laterality",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/relational",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/distribution",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/regional",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/specificAnatomy",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/serotype",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/fractureSubtype",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/fractureOpenOrClosed",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/jointInvolvementInFracture",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/typeOfInjury",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/extentOfBurnByBodySurface",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/durationOfComa",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/diagnosisConfirmedBy",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasManifestation",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+            {
+              "@type": "AddToNotAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "userId": "alexsilaghi",
+      "timestamp": 1726958923593,
+      "postCoordinationEventList": [
+        {
+          "linearizationView": "http://id.who.int/icd/release/11/mms",
+          "axisEvents": [
+            {
+              "@type": "AddToAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasSeverity",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            },
+
+            {
+              "@type": "AddToAllowedAxis",
+              "postCoordinationAxis": "http://id.who.int/icd/schema/hasAlternativeSeverity1",
+              "linearizationView": "http://id.who.int/icd/release/11/mms"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,13 +25,13 @@ public class EntityPostCoordinationHistory {
     private final String projectId;
 
     @Field("postCoordinationRevisions")
-    private final Set<PostCoordinationRevision> postCoordinationRevisions;
+    private final List<PostCoordinationRevision> postCoordinationRevisions;
 
 
     @JsonCreator
     public EntityPostCoordinationHistory(@JsonProperty("whoficEntityIri") String whoficEntityIri,
                                          @JsonProperty("projectId") String projectId,
-                                         @JsonProperty("postCoordinationRevisions") Set<PostCoordinationRevision> postCoordinationRevisions) {
+                                         @JsonProperty("postCoordinationRevisions") List<PostCoordinationRevision> postCoordinationRevisions) {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationRevisions = postCoordinationRevisions;
@@ -44,7 +45,7 @@ public class EntityPostCoordinationHistory {
         return projectId;
     }
 
-    public Set<PostCoordinationRevision> getPostCoordinationRevisions() {
+    public List<PostCoordinationRevision> getPostCoordinationRevisions() {
         return postCoordinationRevisions;
     }
 

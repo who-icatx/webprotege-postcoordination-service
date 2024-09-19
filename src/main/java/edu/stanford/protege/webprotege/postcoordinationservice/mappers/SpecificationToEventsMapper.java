@@ -1,7 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.mappers;
 
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 public class SpecificationToEventsMapper {
 
 
-    public static List<PostCoordinationEvent> convertFromSpecification(PostCoordinationSpecificationRequest specification) {
+    public static List<PostCoordinationEvent> convertFromSpecification(PostCoordinationSpecification specification) {
         List<PostCoordinationEvent> response = new ArrayList<>();
 
         response.addAll(specification.getAllowedAxes().stream().map(axis -> new AddToAllowedAxisEvent(axis, specification.getLinearizationView())).toList());

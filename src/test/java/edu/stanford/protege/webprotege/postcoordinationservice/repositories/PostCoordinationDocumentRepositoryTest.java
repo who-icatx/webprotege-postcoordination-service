@@ -59,12 +59,12 @@ public class PostCoordinationDocumentRepositoryTest {
         assertEquals(3, postCoordinationSpecifications.size());
 
         WhoficEntityPostCoordinationSpecification specification = postCoordinationSpecifications.stream()
-                .filter(specification1 -> specification1.getWhoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
+                .filter(specification1 -> specification1.whoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("missing specification"));
 
-        assertEquals("ICD", specification.getEntityType());
-        assertEquals(11, specification.getPostCoordinationSpecifications().size());
+        assertEquals("ICD", specification.entityType());
+        assertEquals(11, specification.postCoordinationSpecifications().size());
     }
 
 }

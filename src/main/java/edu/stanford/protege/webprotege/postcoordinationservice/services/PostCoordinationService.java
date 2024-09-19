@@ -6,18 +6,13 @@ import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationRevision;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationDocumentRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
 import org.bson.Document;
-import org.semanticweb.owlapi.model.IRI;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -63,30 +58,33 @@ public class PostCoordinationService {
             stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
         });
     }
-    Optional<EntityPostCoordinationHistory> getExistingHistoryOrderedByRevision(IRI entityIri, ProjectId projectId) {
-        return specRepository.findHistoryByEntityIriAndProjectId(entityIri.toString(), projectId)
+
+    public Optional<EntityPostCoordinationHistory> getExistingHistoryOrderedByRevision(String entityIri, ProjectId projectId) {
+        return specRepository.findHistoryByEntityIriAndProjectId(entityIri, projectId)
                 .map(history -> {
-                    Set<PostCoordinationRevision> sortedRevisions = history.getPostCoordinationRevisions()
+                    List<PostCoordinationRevision> sortedRevisions = history.getPostCoordinationRevisions()
                             .stream()
                             .sorted(Comparator.comparingLong(PostCoordinationRevision::timestamp))
-                            .collect(Collectors.toCollection(TreeSet::new));
+                            .collect(Collectors.toList());
                     // Return a new EntityLinearizationHistory object with the sorted revisions
                     return new EntityPostCoordinationHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
                 });
 
     }
 
-    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId , List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
+    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
         return page -> {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
-                for(WhoficEntityPostCoordinationSpecification specification: page) {
-                    Set<PostCoordinationEvent> events = specification.getPostCoordinationSpecifications().stream()
-                            .map(spec -> enrichWithMissingAxis(specification.getEntityType(), spec, definitionList, configurations))
-                            .flatMap(spec -> SpecificationToEventsMapper.convertFromSpecification(spec).stream())
+                for (WhoficEntityPostCoordinationSpecification specification : page) {
+                    Set<PostCoordinationViewEvent> events = specification.postCoordinationSpecifications().stream()
+                            .map(spec -> enrichWithMissingAxis(specification.entityType(), spec, definitionList, configurations))
+                            .map(spec ->
+                                    new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
+                            )
                             .collect(Collectors.toSet());
                     PostCoordinationRevision revision = new PostCoordinationRevision(userId.id(), new Date().getTime(), events);
-                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.getWhoficEntityIri(), projectId.id(), new HashSet<>(List.of(revision)));
+                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }
 
@@ -104,7 +102,7 @@ public class PostCoordinationService {
     }
 
 
-    PostCoordinationSpecificationRequest enrichWithMissingAxis(String entityType, PostCoordinationSpecificationRequest specification, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
+    PostCoordinationSpecification enrichWithMissingAxis(String entityType, PostCoordinationSpecification specification, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
         LinearizationDefinition definition = definitionList.stream()
                 .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equalsIgnoreCase(specification.getLinearizationView()))
                 .findFirst()
@@ -115,13 +113,13 @@ public class PostCoordinationService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Couldn't find the equivalent entity type " + entityType));
 
-        for(String availableAxis : tableConfiguration.getPostCoordinationAxes()) {
+        for (String availableAxis : tableConfiguration.getPostCoordinationAxes()) {
             boolean isAlreadySet = specification.getRequiredAxes().contains(availableAxis) ||
-                                   specification.getAllowedAxes().contains(availableAxis) ||
-                                   specification.getNotAllowedAxes().contains(availableAxis) ||
-                                   specification.getDefaultAxes().contains(availableAxis);
-            if(!isAlreadySet) {
-                if(definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
+                    specification.getAllowedAxes().contains(availableAxis) ||
+                    specification.getNotAllowedAxes().contains(availableAxis) ||
+                    specification.getDefaultAxes().contains(availableAxis);
+            if (!isAlreadySet) {
+                if (definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
                     specification.getDefaultAxes().add(availableAxis);
                 } else {
                     specification.getNotAllowedAxes().add(availableAxis);

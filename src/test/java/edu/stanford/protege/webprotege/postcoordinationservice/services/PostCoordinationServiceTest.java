@@ -7,8 +7,9 @@ import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.WebprotegePostcoordinationServiceServiceApplication;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
 import org.bson.Document;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -86,7 +88,7 @@ public class PostCoordinationServiceTest {
         List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
 
-        PostCoordinationSpecificationRequest specification = new PostCoordinationSpecificationRequest(
+        PostCoordinationSpecification specification = new PostCoordinationSpecification(
                 "http://id.who.int/icd/release/11/mms",
                 Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
                 new ArrayList<>(),
@@ -109,7 +111,7 @@ public class PostCoordinationServiceTest {
         List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
 
-        PostCoordinationSpecificationRequest specification = new PostCoordinationSpecificationRequest(
+        PostCoordinationSpecification specification = new PostCoordinationSpecification(
                 "http://id.who.int/icd/release/11/ocu",
                 Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
                 new ArrayList<>(),
@@ -135,6 +137,10 @@ public class PostCoordinationServiceTest {
         assertEquals(1, history.getPostCoordinationRevisions().size());
         assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().userId());
         assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList());
+        Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList();
+        assertEquals(11, viewEventSet.size());
+        assertEquals(31, viewEventSet.iterator().next().axisEvents().size());
+        assertNotNull(viewEventSet.iterator().next().linearizationView());
 
     }
 }

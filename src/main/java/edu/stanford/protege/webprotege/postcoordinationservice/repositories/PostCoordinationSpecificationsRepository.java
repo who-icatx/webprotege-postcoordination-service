@@ -38,6 +38,13 @@ public class PostCoordinationSpecificationsRepository {
             collection.bulkWrite(listOfInsertOneModelDocument);
         });
     }
+
+    public void writeDocument(Document document) {
+        readWriteLock.executeWriteLock(() -> {
+            var collection = mongoTemplate.getCollection(POSTCOORDINATION_HISTORY_COLLECTION);
+            collection.insertOne(document);
+        });
+    }
     public Optional<EntityPostCoordinationHistory> findHistoryByEntityIriAndProjectId(String entityIri, ProjectId projectId) {
 
         Query query = new Query();
