@@ -1,11 +1,9 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationRevision;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -39,4 +37,13 @@ public class PostCoordinationEventProcessor {
     }
 
 
+    public WhoficCustomScalesValues processCustomScaleHistory(EntityCustomScalesValuesHistory entityCustomScalesValuesHistory) {
+        WhoficCustomScalesValues response = new WhoficCustomScalesValues(entityCustomScalesValuesHistory.getWhoficEntityIri(), new ArrayList<>());
+        for(PostCoordinationCustomScalesRevision revision: entityCustomScalesValuesHistory.getPostCoordinationCustomScalesRevisions()) {
+            for(PostCoordinationCustomScalesValueEvent event: revision.postCoordinationEventList()) {
+                event.applyEvent(response);
+            }
+        }
+        return response;
+    }
 }

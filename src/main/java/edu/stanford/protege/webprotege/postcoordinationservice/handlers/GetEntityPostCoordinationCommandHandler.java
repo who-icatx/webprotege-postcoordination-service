@@ -7,6 +7,7 @@ import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityPostCoordinationRequest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityPostCoordinationResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +18,13 @@ import java.util.Collections;
 @WebProtegeHandler
 public class GetEntityPostCoordinationCommandHandler implements CommandHandler<GetEntityPostCoordinationRequest, GetEntityPostCoordinationResponse> {
 
-    private final PostCoordinationService postCoordinationService;
-
     private final PostCoordinationEventProcessor postCoordinationEventProcessor;
 
-    public GetEntityPostCoordinationCommandHandler(PostCoordinationService postCoordinationService, PostCoordinationEventProcessor postCoordinationEventProcessor) {
-        this.postCoordinationService = postCoordinationService;
+    private final PostCoordinationSpecificationsRepository repository;
+
+    public GetEntityPostCoordinationCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor, PostCoordinationSpecificationsRepository repository) {
         this.postCoordinationEventProcessor = postCoordinationEventProcessor;
+        this.repository = repository;
     }
 
     @NotNull
@@ -41,7 +42,7 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
     public Mono<GetEntityPostCoordinationResponse> handleRequest(GetEntityPostCoordinationRequest request, ExecutionContext executionContext) {
 
         WhoficEntityPostCoordinationSpecification processedSpec =
-                this.postCoordinationService.getExistingHistoryOrderedByRevision(request.entityIRI(), request.projectId())
+                this.repository.getExistingHistoryOrderedByRevision(request.entityIRI(), request.projectId())
                         .map(postCoordinationEventProcessor::processHistory)
                         .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(request.entityIRI(), null, Collections.emptyList()));
 

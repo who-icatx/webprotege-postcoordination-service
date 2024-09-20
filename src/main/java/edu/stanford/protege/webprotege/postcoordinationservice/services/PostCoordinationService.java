@@ -70,19 +70,6 @@ public class PostCoordinationService {
         });
     }
 
-    public Optional<EntityPostCoordinationHistory> getExistingHistoryOrderedByRevision(String entityIri, ProjectId projectId) {
-        return specRepository.findHistoryByEntityIriAndProjectId(entityIri, projectId)
-                .map(history -> {
-                    List<PostCoordinationRevision> sortedRevisions = history.getPostCoordinationRevisions()
-                            .stream()
-                            .sorted(Comparator.comparingLong(PostCoordinationRevision::timestamp))
-                            .collect(Collectors.toList());
-                    // Return a new EntityLinearizationHistory object with the sorted revisions
-                    return new EntityPostCoordinationHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
-                });
-
-    }
-
     private Consumer<List<WhoficCustomScalesValues>> createBatchProcessorForSavingPaginatedCustomScales(ProjectId projectId,
                                                                                                                          UserId userId) {
         return page -> {
