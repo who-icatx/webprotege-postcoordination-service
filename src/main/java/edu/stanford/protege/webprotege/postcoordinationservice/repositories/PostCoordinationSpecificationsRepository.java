@@ -66,7 +66,7 @@ public class PostCoordinationSpecificationsRepository {
                 .map(history -> {
                     List<PostCoordinationRevision> sortedRevisions = history.getPostCoordinationRevisions()
                             .stream()
-                            .sorted(Comparator.comparingLong(PostCoordinationRevision::timestamp))
+                            .sorted(Comparator.comparingLong(PostCoordinationRevision::timestamp).reversed())
                             .collect(Collectors.toList());
                     // Return a new EntityLinearizationHistory object with the sorted revisions
                     return new EntityPostCoordinationHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
@@ -85,7 +85,7 @@ public class PostCoordinationSpecificationsRepository {
        ).map(history -> {
            List<PostCoordinationCustomScalesRevision> sortedRevisions = history.getPostCoordinationCustomScalesRevisions()
                    .stream()
-                   .sorted(Comparator.comparingLong(PostCoordinationCustomScalesRevision::timestamp))
+                   .sorted(Comparator.comparingLong(PostCoordinationCustomScalesRevision::timestamp).reversed())
                    .collect(Collectors.toList());
            return new EntityCustomScalesValuesHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
        });
