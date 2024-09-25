@@ -2,7 +2,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationCustomScalesRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationScaleCustomization;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class RemoveCustomScaleValueEvent extends PostCoordinationCustomScalesVal
 
     @Override
     public void applyEvent(WhoficCustomScalesValues whoficCustomScalesValues) {
-        Optional<PostCoordinationCustomScalesRequest> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
+        Optional<PostCoordinationScaleCustomization> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
                 .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
                 .findFirst();
         if(existingRequest.isEmpty()) {

@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION)
@@ -24,13 +23,13 @@ public class EntityPostCoordinationHistory {
     private final String projectId;
 
     @Field("postCoordinationRevisions")
-    private final List<PostCoordinationRevision> postCoordinationRevisions;
+    private final List<PostCoordinationSpecificationRevision> postCoordinationRevisions;
 
 
     @JsonCreator
     public EntityPostCoordinationHistory(@JsonProperty("whoficEntityIri") String whoficEntityIri,
                                          @JsonProperty("projectId") String projectId,
-                                         @JsonProperty("postCoordinationRevisions") List<PostCoordinationRevision> postCoordinationRevisions) {
+                                         @JsonProperty("postCoordinationRevisions") List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationRevisions = postCoordinationRevisions;
@@ -44,7 +43,7 @@ public class EntityPostCoordinationHistory {
         return projectId;
     }
 
-    public List<PostCoordinationRevision> getPostCoordinationRevisions() {
+    public List<PostCoordinationSpecificationRevision> getPostCoordinationRevisions() {
         return postCoordinationRevisions;
     }
 

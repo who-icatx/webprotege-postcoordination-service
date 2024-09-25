@@ -43,9 +43,7 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
 
     @Override
     public Mono<GetEntityCustomScaleValueResponse> handleRequest(GetEntityCustomScaleValuesRequest request, ExecutionContext executionContext) {
-        WhoficCustomScalesValues processedScales = this.repository.getExistingCustomScaleHistoryOrderedByRevision(request.entityIRI(), request.projectId())
-                        .map(postCoordinationEventProcessor::processCustomScaleHistory)
-                        .orElseGet(() -> new WhoficCustomScalesValues(request.entityIRI(), Collections.emptyList()));
+        WhoficCustomScalesValues processedScales = postCoordinationEventProcessor.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
 
         return Mono.just(new GetEntityCustomScaleValueResponse(request.entityIRI(), processedScales));
     }

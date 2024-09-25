@@ -6,15 +6,15 @@ import edu.stanford.protege.webprotege.postcoordinationservice.events.EventProce
 
 import java.util.List;
 
-public class PostCoordinationCustomScalesRequest extends EventProcessableParameter {
+public class PostCoordinationScaleCustomization extends EventProcessableParameter {
 
     private final List<String> postCoordinationScalesValues;
     private final String postCoordinationAxis;
 
 
     @JsonCreator
-    public PostCoordinationCustomScalesRequest(@JsonProperty("postcoordinationScaleValues") List<String> postCoordinationScalesValues,
-                                               @JsonProperty("postcoordinationAxis") String postCoordinationAxis) {
+    public PostCoordinationScaleCustomization(@JsonProperty("postcoordinationScaleValues") List<String> postCoordinationScalesValues,
+                                              @JsonProperty("postcoordinationAxis") String postCoordinationAxis) {
         this.postCoordinationScalesValues = postCoordinationScalesValues;
         this.postCoordinationAxis = postCoordinationAxis;
     }
