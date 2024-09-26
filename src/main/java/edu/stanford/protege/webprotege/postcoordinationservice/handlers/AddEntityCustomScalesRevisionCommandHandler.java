@@ -20,7 +20,7 @@ public class AddEntityCustomScalesRevisionCommandHandler implements CommandHandl
     @NotNull
     @Override
     public String getChannelName() {
-        return AddEntitySpecificationRevisionRequest.CHANNEL;
+        return AddEntityCustomScalesRevisionRequest.CHANNEL;
     }
 
     @Override

@@ -5,10 +5,7 @@ import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.result.UpdateResult;
 import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationCustomScalesRevision;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationSpecificationRevision;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.ReadWriteLockService;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -61,9 +59,8 @@ public class PostCoordinationSpecificationsRepository {
         readWriteLock.executeWriteLock(() -> {
             UpdateResult result = mongoTemplate.updateFirst(query, update, EntityPostCoordinationHistory.class, POSTCOORDINATION_HISTORY_COLLECTION);
             if (result.getMatchedCount() == 0) {
-                throw new IllegalArgumentException(POSTCOORDINATION_HISTORY_COLLECTION + " not found for the given " +
-                        WHOFIC_ENTITY_IRI + ":" + whoficEntityIri + " and " + PROJECT_ID +
-                        ":" + projectId + ".");
+                EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(whoficEntityIri,projectId.id(), Arrays.asList(specificationRevision));
+                mongoTemplate.save(history);
             }
         });
     }

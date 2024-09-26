@@ -4,6 +4,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -17,6 +18,7 @@ public class EntityCustomScalesValuesHistory {
 
     public static final String POSTCOORDINATION_CUSTOM_SCALES_COLLECTION = "EntityPostCoordinationCustomScales";
     @Field("whoficEntityIri")
+    @Indexed(name = "entityIriScales")
     private final String whoficEntityIri;
 
     @Field("projectId")
