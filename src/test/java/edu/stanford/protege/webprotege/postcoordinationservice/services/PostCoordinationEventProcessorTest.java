@@ -3,15 +3,12 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
-import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
-import edu.stanford.protege.webprotege.postcoordinationservice.WebprotegePostcoordinationServiceServiceApplication;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationScaleCustomization;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
 import org.bson.Document;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +23,6 @@ import java.util.*;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 
 @SpringBootTest
 @Import({WebprotegePostcoordinationServiceServiceApplication.class})
@@ -56,12 +52,12 @@ public class PostCoordinationEventProcessorTest {
     }
 
     @Test
-    public void GIVEN_savedDocument_WHEN_processingEvents_THEN_correctResponseIsGiven() throws IOException {
+    public void GIVEN_savedDocument_WHEN_processingEvents_THEN_correctResponseIsGiven() {
         WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 
         Optional<PostCoordinationSpecification> envSpec = specification.postCoordinationSpecifications().stream()
                 .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/env"))
-                        .findFirst();
+                .findFirst();
         Optional<PostCoordinationSpecification> mmsSpec = specification.postCoordinationSpecifications().stream()
                 .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/mms"))
                 .findFirst();
@@ -83,29 +79,29 @@ public class PostCoordinationEventProcessorTest {
 
 
     @Test
-    public void GIVEN_savedCustomScaleEvents_WHEN_processing_THEN_eventsAreCorrectlyProcessed() throws IOException {
+    public void GIVEN_savedCustomScaleEvents_WHEN_processing_THEN_eventsAreCorrectlyProcessed() {
 
         WhoficCustomScalesValues response = postCoordinationEventProcessor.fetchCustomScalesHistory(customScalesValuesHistory.getWhoficEntityIri(), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
         assertNotNull(response);
         assertEquals(2, response.scaleCustomizations().size());
 
         Optional<PostCoordinationScaleCustomization> infectiousAgent = response.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/infectiousAgent"))
-                        .findFirst();
+                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/infectiousAgent"))
+                .findFirst();
         assertTrue(infectiousAgent.isPresent());
-        assertEquals(2, infectiousAgent.get().getPostCoordinationScalesValues().size());
+        assertEquals(2, infectiousAgent.get().getPostcoordinationScaleValues().size());
 
         Optional<PostCoordinationScaleCustomization> associatedWith = response.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/associatedWith"))
+                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/associatedWith"))
                 .findFirst();
         assertTrue(associatedWith.isPresent());
-        assertEquals(1, associatedWith.get().getPostCoordinationScalesValues().size());
+        assertEquals(1, associatedWith.get().getPostcoordinationScaleValues().size());
     }
 
     @Test
-    public void test(){
+    public void test() {
         PostCoordinationScaleCustomization postCoordinationScaleCustomization = new
-                PostCoordinationScaleCustomization(Arrays.asList("http://id.who.int/icd/entity/194483911", "http://id.who.int/icd/entity/5555555"),"http://id.who.int/icd/schema/infectiousAgent");
+                PostCoordinationScaleCustomization(Arrays.asList("http://id.who.int/icd/entity/194483911", "http://id.who.int/icd/entity/5555555"), "http://id.who.int/icd/schema/infectiousAgent");
         WhoficCustomScalesValues customScalesValues = new WhoficCustomScalesValues(customScalesValuesHistory.getWhoficEntityIri(), Collections.singletonList(postCoordinationScaleCustomization));
 
         postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, "alexsilaghi", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
@@ -114,7 +110,7 @@ public class PostCoordinationEventProcessorTest {
     }
 
     @Test
-    public void WHEN_addingNewRevision_WHEN_fetchingTheProcessedData_THEN_revisionIsApplied() throws IOException {
+    public void WHEN_addingNewRevision_WHEN_fetchingTheProcessedData_THEN_revisionIsApplied() {
 
         PostCoordinationSpecification postCoordinationSpecification = new PostCoordinationSpecification("http://id.who.int/icd/release/11/mms",
                 new ArrayList<>(),

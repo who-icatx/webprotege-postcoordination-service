@@ -70,7 +70,7 @@ public class PostCoordinationEventProcessor {
             }
         }
         List<PostCoordinationScaleCustomization> nonEmptyCustomizations = response.scaleCustomizations().stream()
-                .filter(scale -> !scale.getPostCoordinationScalesValues().isEmpty())
+                .filter(scale -> !scale.getPostcoordinationScaleValues().isEmpty())
                 .toList();
         return new WhoficCustomScalesValues(entityCustomScalesValuesHistory.getWhoficEntityIri(), nonEmptyCustomizations);
     }

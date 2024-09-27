@@ -8,22 +8,25 @@ import java.util.List;
 
 public class PostCoordinationScaleCustomization extends EventProcessableParameter {
 
-    private final List<String> postCoordinationScalesValues;
-    private final String postCoordinationAxis;
+    private final List<String> postcoordinationScaleValues;
+    private final String postcoordinationAxis;
 
 
     @JsonCreator
-    public PostCoordinationScaleCustomization(@JsonProperty("postcoordinationScaleValues") List<String> postCoordinationScalesValues,
-                                              @JsonProperty("postcoordinationAxis") String postCoordinationAxis) {
-        this.postCoordinationScalesValues = postCoordinationScalesValues;
-        this.postCoordinationAxis = postCoordinationAxis;
+    public PostCoordinationScaleCustomization(@JsonProperty("postcoordinationScaleValues") List<String> postcoordinationScaleValues,
+                                              @JsonProperty("postcoordinationAxis") String postcoordinationAxis) {
+        this.postcoordinationScaleValues = postcoordinationScaleValues;
+        this.postcoordinationAxis = postcoordinationAxis;
     }
 
-    public List<String> getPostCoordinationScalesValues() {
-        return postCoordinationScalesValues;
+
+    @JsonProperty("postcoordinationScaleValues")
+    public List<String> getPostcoordinationScaleValues() {
+        return postcoordinationScaleValues;
     }
 
-    public String getPostCoordinationAxis() {
-        return postCoordinationAxis;
+    @JsonProperty("postcoordinationAxis")
+    public String getPostcoordinationAxis() {
+        return postcoordinationAxis;
     }
 }
