@@ -97,6 +97,20 @@ public class PostCoordinationService {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
                 for (WhoficEntityPostCoordinationSpecification specification : page) {
+
+                    for(LinearizationDefinition linearizationDefinition: definitionList) {
+                        boolean linearizationExists = specification.postCoordinationSpecifications().stream().anyMatch(spec ->
+                                spec.getLinearizationView().equalsIgnoreCase(linearizationDefinition.getWhoficEntityIri()));
+                        if(!linearizationExists) {
+                            specification.postCoordinationSpecifications().add(new PostCoordinationSpecification(linearizationDefinition.getWhoficEntityIri(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>()));
+                        }
+
+                    }
+
                     Set<PostCoordinationViewEvent> events = specification.postCoordinationSpecifications().stream()
                             .map(spec -> enrichWithMissingAxis(specification.entityType(), spec, definitionList, configurations))
                             .map(spec ->
