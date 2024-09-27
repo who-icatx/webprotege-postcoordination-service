@@ -1,14 +1,10 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.mappers;
 
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationScaleCustomization;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class SpecificationToEventsMapper {
@@ -28,10 +24,10 @@ public class SpecificationToEventsMapper {
     public static Set<PostCoordinationCustomScalesValueEvent> convertToFirstImportEvents(WhoficCustomScalesValues whoficCustomScalesValues) {
         Set<PostCoordinationCustomScalesValueEvent> response = new HashSet<>();
 
-        for(PostCoordinationScaleCustomization request : whoficCustomScalesValues.scaleCustomizations()) {
-            response.addAll(request.getPostCoordinationScalesValues()
+        for (PostCoordinationScaleCustomization request : whoficCustomScalesValues.scaleCustomizations()) {
+            response.addAll(request.getPostcoordinationScaleValues()
                     .stream()
-                    .map(scaleValue -> new AddCustomScaleValueEvent(request.getPostCoordinationAxis(), scaleValue)).toList());
+                    .map(scaleValue -> new AddCustomScaleValueEvent(request.getPostcoordinationAxis(), scaleValue)).toList());
         }
 
         return response;
@@ -42,13 +38,13 @@ public class SpecificationToEventsMapper {
 
         Set<PostCoordinationViewEvent> response = new HashSet<>();
 
-        for(PostCoordinationSpecification spec: newSpecification.postCoordinationSpecifications()) {
+        for (PostCoordinationSpecification spec : newSpecification.postCoordinationSpecifications()) {
             List<PostCoordinationSpecificationEvent> events = new ArrayList<>();
             Optional<PostCoordinationSpecification> oldSpec = existingSpecification.postCoordinationSpecifications().stream()
                     .filter(s -> s.getLinearizationView().equalsIgnoreCase(spec.getLinearizationView()))
                     .findFirst();
 
-            if(oldSpec.isPresent()) {
+            if (oldSpec.isPresent()) {
 
                 List<String> newAllowedAxis = new ArrayList<>(spec.getAllowedAxes());
                 newAllowedAxis.removeAll(oldSpec.get().getAllowedAxes());
@@ -72,7 +68,7 @@ public class SpecificationToEventsMapper {
                 events.addAll(spec.getDefaultAxes().stream().map(axis -> new AddToDefaultAxisEvent(axis, spec.getLinearizationView())).toList());
             }
 
-            if(!events.isEmpty()) {
+            if (!events.isEmpty()) {
                 response.add(new PostCoordinationViewEvent(spec.getLinearizationView(), events));
             }
         }
@@ -86,26 +82,26 @@ public class SpecificationToEventsMapper {
 
         for (PostCoordinationScaleCustomization scalesCustomization : newScales.scaleCustomizations()) {
 
-            PostCoordinationScaleCustomization oldScaleCustomization = oldScales.scaleCustomizations().stream().filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(scalesCustomization.getPostCoordinationAxis()))
-                    .findFirst().orElse(new PostCoordinationScaleCustomization(new ArrayList<>(), scalesCustomization.getPostCoordinationAxis()));
+            PostCoordinationScaleCustomization oldScaleCustomization = oldScales.scaleCustomizations().stream().filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase(scalesCustomization.getPostcoordinationAxis()))
+                    .findFirst().orElse(new PostCoordinationScaleCustomization(new ArrayList<>(), scalesCustomization.getPostcoordinationAxis()));
 
-            List<String> addScales = new ArrayList<>(scalesCustomization.getPostCoordinationScalesValues());
-            addScales.removeAll(oldScaleCustomization.getPostCoordinationScalesValues());
+            List<String> addScales = new ArrayList<>(scalesCustomization.getPostcoordinationScaleValues());
+            addScales.removeAll(oldScaleCustomization.getPostcoordinationScaleValues());
 
-            events.addAll(addScales.stream().map(scale -> new AddCustomScaleValueEvent(scalesCustomization.getPostCoordinationAxis(), scale)).toList());
+            events.addAll(addScales.stream().map(scale -> new AddCustomScaleValueEvent(scalesCustomization.getPostcoordinationAxis(), scale)).toList());
 
 
-            List<String> removeScales = new ArrayList<>(oldScaleCustomization.getPostCoordinationScalesValues());
-            removeScales.removeAll(scalesCustomization.getPostCoordinationScalesValues());
-            events.addAll(removeScales.stream().map(scale -> new RemoveCustomScaleValueEvent(scalesCustomization.getPostCoordinationAxis(), scale)).toList());
+            List<String> removeScales = new ArrayList<>(oldScaleCustomization.getPostcoordinationScaleValues());
+            removeScales.removeAll(scalesCustomization.getPostcoordinationScaleValues());
+            events.addAll(removeScales.stream().map(scale -> new RemoveCustomScaleValueEvent(scalesCustomization.getPostcoordinationAxis(), scale)).toList());
 
         }
 
-        for(PostCoordinationScaleCustomization scalesCustomization: oldScales.scaleCustomizations()) {
-            Optional<PostCoordinationScaleCustomization> newScaleCustomization = newScales.scaleCustomizations().stream().filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(scalesCustomization.getPostCoordinationAxis()))
+        for (PostCoordinationScaleCustomization scalesCustomization : oldScales.scaleCustomizations()) {
+            Optional<PostCoordinationScaleCustomization> newScaleCustomization = newScales.scaleCustomizations().stream().filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase(scalesCustomization.getPostcoordinationAxis()))
                     .findFirst();
-            if(newScaleCustomization.isEmpty()) {
-                events.addAll(scalesCustomization.getPostCoordinationScalesValues().stream().map(scale -> new RemoveCustomScaleValueEvent(scalesCustomization.getPostCoordinationAxis(), scale)).toList());
+            if (newScaleCustomization.isEmpty()) {
+                events.addAll(scalesCustomization.getPostcoordinationScaleValues().stream().map(scale -> new RemoveCustomScaleValueEvent(scalesCustomization.getPostcoordinationAxis(), scale)).toList());
             }
         }
 

@@ -1,32 +1,21 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityCustomScaleValueResponse;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityCustomScaleValuesRequest;
+import edu.stanford.protege.webprotege.ipc.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 
 @WebProtegeHandler
 public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<GetEntityCustomScaleValuesRequest, GetEntityCustomScaleValueResponse> {
 
 
-    private final PostCoordinationSpecificationsRepository repository;
-
     private final PostCoordinationEventProcessor postCoordinationEventProcessor;
 
-    public GetEntityCustomScaleValuesCommandHandler(PostCoordinationSpecificationsRepository repository, PostCoordinationEventProcessor postCoordinationEventProcessor) {
-        this.repository = repository;
+    public GetEntityCustomScaleValuesCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor) {
         this.postCoordinationEventProcessor = postCoordinationEventProcessor;
     }
 
@@ -45,6 +34,6 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
     public Mono<GetEntityCustomScaleValueResponse> handleRequest(GetEntityCustomScaleValuesRequest request, ExecutionContext executionContext) {
         WhoficCustomScalesValues processedScales = postCoordinationEventProcessor.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
 
-        return Mono.just(new GetEntityCustomScaleValueResponse(request.entityIRI(), processedScales));
+        return Mono.just(new GetEntityCustomScaleValueResponse(processedScales));
     }
 }

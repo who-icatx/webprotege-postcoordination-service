@@ -25,12 +25,12 @@ public class RemoveCustomScaleValueEvent extends PostCoordinationCustomScalesVal
     @Override
     public void applyEvent(WhoficCustomScalesValues whoficCustomScalesValues) {
         Optional<PostCoordinationScaleCustomization> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
+                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
                 .findFirst();
         if(existingRequest.isEmpty()) {
             throw new RuntimeException("Removing scale value from missing postCoordinationAxis " + this.getPostCoordinationAxis());
         } else {
-            existingRequest.get().getPostCoordinationScalesValues().remove(this.getPostCoordinationScaleValue());
+            existingRequest.get().getPostcoordinationScaleValues().remove(this.getPostCoordinationScaleValue());
         }
     }
 }

@@ -25,10 +25,10 @@ public class AddCustomScaleValueEvent extends PostCoordinationCustomScalesValueE
     @Override
     public void applyEvent(WhoficCustomScalesValues whoficCustomScalesValues) {
         Optional<PostCoordinationScaleCustomization> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
+                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
                 .findFirst();
         if(existingRequest.isPresent()) {
-            existingRequest.get().getPostCoordinationScalesValues().add(this.getPostCoordinationScaleValue());
+            existingRequest.get().getPostcoordinationScaleValues().add(this.getPostCoordinationScaleValue());
         } else {
             List<String> scaleValues = new ArrayList<>();
             scaleValues.add(this.getPostCoordinationScaleValue());
