@@ -38,9 +38,9 @@ public class SpecificationToEventsMapper {
 
         Set<PostCoordinationViewEvent> response = new HashSet<>();
 
-        for (PostCoordinationSpecification spec : newSpecification.postCoordinationSpecifications()) {
+        for (PostCoordinationSpecification spec : newSpecification.postcoordinationSpecifications()) {
             List<PostCoordinationSpecificationEvent> events = new ArrayList<>();
-            Optional<PostCoordinationSpecification> oldSpec = existingSpecification.postCoordinationSpecifications().stream()
+            Optional<PostCoordinationSpecification> oldSpec = existingSpecification.postcoordinationSpecifications().stream()
                     .filter(s -> s.getLinearizationView().equalsIgnoreCase(spec.getLinearizationView()))
                     .findFirst();
 

@@ -55,10 +55,10 @@ public class PostCoordinationEventProcessorTest {
     public void GIVEN_savedDocument_WHEN_processingEvents_THEN_correctResponseIsGiven() {
         WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 
-        Optional<PostCoordinationSpecification> envSpec = specification.postCoordinationSpecifications().stream()
+        Optional<PostCoordinationSpecification> envSpec = specification.postcoordinationSpecifications().stream()
                 .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/env"))
                 .findFirst();
-        Optional<PostCoordinationSpecification> mmsSpec = specification.postCoordinationSpecifications().stream()
+        Optional<PostCoordinationSpecification> mmsSpec = specification.postcoordinationSpecifications().stream()
                 .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/mms"))
                 .findFirst();
 
@@ -128,7 +128,7 @@ public class PostCoordinationEventProcessorTest {
 
         assertNotNull(specification);
 
-        Optional<PostCoordinationSpecification> mms = specification.postCoordinationSpecifications().stream()
+        Optional<PostCoordinationSpecification> mms = specification.postcoordinationSpecifications().stream()
                 .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/mms"))
                 .findFirst();
 
