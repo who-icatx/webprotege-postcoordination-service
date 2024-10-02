@@ -53,18 +53,18 @@ public class PostCoordinationDocumentRepositoryTest {
 
     @Test
     public void GIVEN_existingFile_WHEN_fetchTheSpecifications_THEN_specificationsAreCorrectlyMapped(){
-        List<WhoficEntityPostCoordinationSpecification> postCoordinationSpecifications = documentRepository.fetchFromDocument("dummy").toList();
+        List<WhoficEntityPostCoordinationSpecification> postcoordinationSpecifications = documentRepository.fetchPostCoordinationSpecifications("dummy").toList();
 
-        assertNotNull(postCoordinationSpecifications);
-        assertEquals(3, postCoordinationSpecifications.size());
+        assertNotNull(postcoordinationSpecifications);
+        assertEquals(3, postcoordinationSpecifications.size());
 
-        WhoficEntityPostCoordinationSpecification specification = postCoordinationSpecifications.stream()
-                .filter(specification1 -> specification1.getWhoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
+        WhoficEntityPostCoordinationSpecification specification = postcoordinationSpecifications.stream()
+                .filter(specification1 -> specification1.whoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("missing specification"));
 
-        assertEquals("ICD", specification.getEntityType());
-        assertEquals(11, specification.getPostCoordinationSpecifications().size());
+        assertEquals("ICD", specification.entityType());
+        assertEquals(11, specification.postcoordinationSpecifications().size());
     }
 
 }

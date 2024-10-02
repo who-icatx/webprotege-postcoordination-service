@@ -3,7 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 
 import com.fasterxml.jackson.annotation.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,9 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
         @JsonSubTypes.Type(value = AddToNotAllowedAxisEvent.class, name = AddToNotAllowedAxisEvent.TYPE),
         @JsonSubTypes.Type(value = AddToAllowedAxisEvent.class, name = AddToAllowedAxisEvent.TYPE)
 })
-public abstract class PostCoordinationEvent {
-
-
+public abstract class PostCoordinationSpecificationEvent {
 
     @Field("postCoordinationAxis")
     private final String postCoordinationAxis;
@@ -28,7 +26,7 @@ public abstract class PostCoordinationEvent {
     @Field("linearizationView")
     private final String linearizationView;
 
-    protected PostCoordinationEvent(String postCoordinationAxis, String linearizationView) {
+    protected PostCoordinationSpecificationEvent(String postCoordinationAxis, String linearizationView) {
         this.postCoordinationAxis = postCoordinationAxis;
         this.linearizationView = linearizationView;
     }
@@ -36,7 +34,7 @@ public abstract class PostCoordinationEvent {
     @JsonProperty("@type")
     abstract String getType();
 
-    public PostCoordinationSpecificationRequest applyEvent(PostCoordinationSpecificationRequest input) {
+    public PostCoordinationSpecification applyEvent(PostCoordinationSpecification input) {
         input.getAllowedAxes().remove(this.postCoordinationAxis);
         input.getDefaultAxes().remove(this.postCoordinationAxis);
         input.getNotAllowedAxes().remove(this.postCoordinationAxis);
@@ -44,7 +42,7 @@ public abstract class PostCoordinationEvent {
         return applySpecificEvent(input);
     }
 
-    abstract PostCoordinationSpecificationRequest applySpecificEvent(PostCoordinationSpecificationRequest input);
+    abstract PostCoordinationSpecification applySpecificEvent(PostCoordinationSpecification input);
 
 
     @Field("postCoordinationAxis")

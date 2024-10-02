@@ -3,11 +3,12 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION)
@@ -16,21 +17,21 @@ public class EntityPostCoordinationHistory {
 
     public static final String POSTCOORDINATION_HISTORY_COLLECTION = "EntityPostCoordinationHistory";
 
-
     @Field("whoficEntityIri")
+    @Indexed(name = "entityIriSpec")
     private final String whoficEntityIri;
 
     @Field("projectId")
     private final String projectId;
 
     @Field("postCoordinationRevisions")
-    private final Set<PostCoordinationRevision> postCoordinationRevisions;
+    private final List<PostCoordinationSpecificationRevision> postCoordinationRevisions;
 
 
     @JsonCreator
     public EntityPostCoordinationHistory(@JsonProperty("whoficEntityIri") String whoficEntityIri,
                                          @JsonProperty("projectId") String projectId,
-                                         @JsonProperty("postCoordinationRevisions") Set<PostCoordinationRevision> postCoordinationRevisions) {
+                                         @JsonProperty("postCoordinationRevisions") List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationRevisions = postCoordinationRevisions;
@@ -44,7 +45,7 @@ public class EntityPostCoordinationHistory {
         return projectId;
     }
 
-    public Set<PostCoordinationRevision> getPostCoordinationRevisions() {
+    public List<PostCoordinationSpecificationRevision> getPostCoordinationRevisions() {
         return postCoordinationRevisions;
     }
 

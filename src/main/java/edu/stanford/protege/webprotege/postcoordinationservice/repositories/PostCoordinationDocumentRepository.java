@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +30,15 @@ public class PostCoordinationDocumentRepository {
         this.objectMapper = objectMapper;
     }
 
-    public Stream<WhoficEntityPostCoordinationSpecification> fetchFromDocument(String location) {
+    public Stream<WhoficEntityPostCoordinationSpecification> fetchPostCoordinationSpecifications(String location) {
+        return fetchDataStream(location, "whoficEntityPostcoordinationSpecification", WhoficEntityPostCoordinationSpecification.class);
+    }
 
+    public Stream<WhoficCustomScalesValues> fetchCustomScalesValues(String location) {
+        return fetchDataStream(location, "postcoordinationScaleCustomization", WhoficCustomScalesValues.class);
+    }
+
+    private <T> Stream<T> fetchDataStream(String location, String expectedArrayName, Class<T> targetType) {
         try {
             JsonFactory jsonFactory = new JsonFactory();
             JsonParser jsonParser = jsonFactory.createParser(documentLoader.fetchPostCoordinationDocument(location));
@@ -41,25 +49,23 @@ public class PostCoordinationDocumentRepository {
 
             jsonParser.nextToken();
 
-            if (!jsonParser.getCurrentName().equals("whoficEntityPostcoordinationSpecification") && jsonParser.nextToken() != JsonToken.START_ARRAY) {
-                throw new IllegalStateException("Expected the array of postCoordination specifications");
+            if (!jsonParser.getCurrentName().equals(expectedArrayName) && jsonParser.nextToken() != JsonToken.START_ARRAY) {
+                throw new IllegalStateException("Expected the array of " + expectedArrayName);
             }
 
             jsonParser.nextToken();
 
             return StreamSupport.stream(
-                    new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
+                    new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED) {
                         @Override
-                        public boolean tryAdvance(Consumer<? super WhoficEntityPostCoordinationSpecification> action) {
+                        public boolean tryAdvance(Consumer<? super T> action) {
                             try {
-
                                 if (jsonParser.nextToken() == JsonToken.END_ARRAY) {
                                     return false;
                                 }
-
                                 JsonNode node = objectMapper.readTree(jsonParser);
-                                WhoficEntityPostCoordinationSpecification person = objectMapper.treeToValue(node, WhoficEntityPostCoordinationSpecification.class);
-                                action.accept(person);
+                                T element = objectMapper.treeToValue(node, targetType);
+                                action.accept(element);
                                 return true;
                             } catch (IOException e) {
                                 throw new UncheckedIOException(e);
@@ -67,10 +73,9 @@ public class PostCoordinationDocumentRepository {
                         }
                     }, false);
 
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
 }

@@ -7,10 +7,9 @@ import edu.stanford.protege.webprotege.postcoordinationservice.events.EventProce
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostCoordinationSpecificationRequest extends EventProcessableParameter {
+public class PostCoordinationSpecification extends EventProcessableParameter {
 
     private final String linearizationView;
-
 
     private final List<String> allowedAxes;
 
@@ -21,11 +20,11 @@ public class PostCoordinationSpecificationRequest extends EventProcessableParame
     private final List<String> requiredAxes;
 
     @JsonCreator
-    public PostCoordinationSpecificationRequest(@JsonProperty("linearizationView") String linearizationView,
-                                                @JsonProperty("allowedAxes") List<String> allowedAxes,
-                                                @JsonProperty("defaultAxes") List<String> defaultAxes,
-                                                @JsonProperty("notAllowedAxes") List<String> notAllowedAxes,
-                                                @JsonProperty("requiredAxes") List<String> requiredAxes) {
+    public PostCoordinationSpecification(@JsonProperty("linearizationView") String linearizationView,
+                                         @JsonProperty("allowedAxes") List<String> allowedAxes,
+                                         @JsonProperty("defaultAxes") List<String> defaultAxes,
+                                         @JsonProperty("notAllowedAxes") List<String> notAllowedAxes,
+                                         @JsonProperty("requiredAxes") List<String> requiredAxes) {
         this.linearizationView = linearizationView;
         this.allowedAxes = allowedAxes == null ? new ArrayList<>() : allowedAxes;
         this.defaultAxes = defaultAxes == null ? new ArrayList<>() : defaultAxes;

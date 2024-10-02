@@ -7,12 +7,12 @@ import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.WebprotegePostcoordinationServiceServiceApplication;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
 import org.bson.Document;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,7 +44,7 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @ExtendWith({SpringExtension.class, IntegrationTest.class})
 @ActiveProfiles("test")
-public class PostCoordinationServiceTest {
+public class PostCoordinationSpecificationServiceTest {
 
 
     @Autowired
@@ -87,7 +88,7 @@ public class PostCoordinationServiceTest {
         List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
 
-        PostCoordinationSpecificationRequest specification = new PostCoordinationSpecificationRequest(
+        PostCoordinationSpecification specification = new PostCoordinationSpecification(
                 "http://id.who.int/icd/release/11/mms",
                 Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
                 new ArrayList<>(),
@@ -110,7 +111,7 @@ public class PostCoordinationServiceTest {
         List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
 
-        PostCoordinationSpecificationRequest specification = new PostCoordinationSpecificationRequest(
+        PostCoordinationSpecification specification = new PostCoordinationSpecification(
                 "http://id.who.int/icd/release/11/ocu",
                 Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
                 new ArrayList<>(),
@@ -125,7 +126,7 @@ public class PostCoordinationServiceTest {
 
     @Test
     public void GIVEN_existingFile_WHEN_firstImport_THEN_allEventsAreGenerated() {
-        postCoordinationService.createFirstImport("postCoordinationImportFile.json", ProjectId.generate(), new UserId("alexsilaghi"));
+        postCoordinationService.createFirstSpecificationImport("postCoordinationImportFile.json", ProjectId.generate(), new UserId("alexsilaghi"));
         List<EntityPostCoordinationHistory> histories = mongoTemplate.findAll(EntityPostCoordinationHistory.class);
         assertNotNull(histories);
         assertEquals(3, histories.size());
@@ -134,8 +135,12 @@ public class PostCoordinationServiceTest {
                                 .findFirst().orElse(null);
         assertNotNull(history);
         assertEquals(1, history.getPostCoordinationRevisions().size());
-        assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().getUserId());
-        assertNotNull(history.getPostCoordinationRevisions().iterator().next().getPostCoordinationEventList());
+        assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().userId());
+        assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList());
+        Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList();
+        assertEquals(16, viewEventSet.size());
+        assertEquals(31, viewEventSet.iterator().next().axisEvents().size());
+        assertNotNull(viewEventSet.iterator().next().linearizationView());
 
     }
 }

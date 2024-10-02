@@ -1,0 +1,59 @@
+{
+  "whoficEntityIri": "http://id.who.int/icd/entity/257068234",
+  "projectId": "b717d9a3-f265-46f5-bd15-9f1cf4b132c8",
+  "postCoordinationCustomScalesRevisions": [
+    {
+      "userId": "alexsilaghi",
+      "timestamp": 1726752697105,
+      "postCoordinationEventList": [
+        {
+          "@type": "AddCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/802386629"
+        },
+        {
+          "@type": "AddCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/194483911"
+        },
+        {
+          "@type": "AddCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/1882742628"
+        },
+        {
+          "@type": "AddCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/21927667"
+        }
+      ]
+    },
+    {
+      "userId": "alexsilaghi",
+      "timestamp": 1726752699105,
+      "postCoordinationEventList": [
+        {
+          "@type": "RemoveCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/802386629"
+        },
+        {
+          "@type": "RemoveCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/1882742628"
+        }
+      ]
+    },
+    {
+      "userId": "alexsilaghi",
+      "timestamp": 1726752699905,
+      "postCoordinationEventList": [
+        {
+          "@type": "AddCustomScaleValue",
+          "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
+          "postCoordinationScaleValue": "http://id.who.int/icd/entity/9999999"
+        }
+      ]
+    }
+  ]
+}
