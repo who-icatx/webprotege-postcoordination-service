@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @WebProtegeHandler
-public class GetPostCoordinationAxisToGenericScaleCommandHandler implements CommandHandler<GetPostCoordinationAxisToGenericScaleRequest, GetPostCoordinationAxisToGenericScaleResponse> {
+public class GetPostCoordinationAxisToGenericScaleCommandHandler implements CommandHandler<GetPostcoordinationAxisToGenericScaleRequest, GetPostcoordinationAxisToGenericScaleResponse> {
 
     private final PostcoordinationAxisToGenericScaleRepository axisToGenericScaleRepository;
 
@@ -20,18 +20,18 @@ public class GetPostCoordinationAxisToGenericScaleCommandHandler implements Comm
     @NotNull
     @Override
     public String getChannelName() {
-        return GetPostCoordinationAxisToGenericScaleRequest.CHANNEL;
+        return GetPostcoordinationAxisToGenericScaleRequest.CHANNEL;
     }
 
     @Override
-    public Class<GetPostCoordinationAxisToGenericScaleRequest> getRequestClass() {
-        return GetPostCoordinationAxisToGenericScaleRequest.class;
+    public Class<GetPostcoordinationAxisToGenericScaleRequest> getRequestClass() {
+        return GetPostcoordinationAxisToGenericScaleRequest.class;
     }
 
     @Override
-    public Mono<GetPostCoordinationAxisToGenericScaleResponse> handleRequest(GetPostCoordinationAxisToGenericScaleRequest request, ExecutionContext executionContext) {
-        List<AxisToGenericScale> axisToGenericScales = axisToGenericScaleRepository.getPostCoordAxisToGenericScale();
+    public Mono<GetPostcoordinationAxisToGenericScaleResponse> handleRequest(GetPostcoordinationAxisToGenericScaleRequest request, ExecutionContext executionContext) {
+        List<PostcoordinationAxisToGenericScale> postcoordinationAxisToGenericScales = axisToGenericScaleRepository.getPostCoordAxisToGenericScale();
 
-        return Mono.just(GetPostCoordinationAxisToGenericScaleResponse.create(axisToGenericScales));
+        return Mono.just(GetPostcoordinationAxisToGenericScaleResponse.create(postcoordinationAxisToGenericScales));
     }
 }
