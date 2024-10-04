@@ -13,8 +13,7 @@ public record GetPostcoordinationAxisToGenericScaleResponse(
         @JsonProperty("postcoordinationAxisToGenericScales") List<PostcoordinationAxisToGenericScale> postcoordinationAxisToGenericScales
 ) implements Response {
 
-    @JsonCreator
-    public static GetPostcoordinationAxisToGenericScaleResponse create(@JsonProperty("postcoordinationAxisToGenericScales") List<PostcoordinationAxisToGenericScale> postcoordinationAxisToGenericScales) {
+    public static GetPostcoordinationAxisToGenericScaleResponse create(List<PostcoordinationAxisToGenericScale> postcoordinationAxisToGenericScales){
         return new GetPostcoordinationAxisToGenericScaleResponse(postcoordinationAxisToGenericScales);
     }
 }
