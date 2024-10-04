@@ -12,8 +12,8 @@ import static edu.stanford.protege.webprotege.postcoordinationservice.handlers.A
 @JsonTypeName(CHANNEL)
 public record AddEntityCustomScalesRevisionRequest(@JsonProperty("projectId")
                                                    ProjectId projectId,
-                                                   @JsonProperty("entitySpecification")
-                                                   WhoficCustomScalesValues customScalesValues) implements Request<AddEntityCustomScalesRevisionResponse> {
+                                                   @JsonProperty("entityCustomScaleValues")
+                                                   WhoficCustomScalesValues entityCustomScaleValues) implements Request<AddEntityCustomScalesRevisionResponse> {
 
     public final static String CHANNEL = "webprotege.postcoordination.AddEntityCustomScalesRevision";
 

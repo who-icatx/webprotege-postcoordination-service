@@ -31,7 +31,7 @@ public class AddEntityCustomScalesRevisionCommandHandler implements CommandHandl
     @Override
     public Mono<AddEntityCustomScalesRevisionResponse> handleRequest(AddEntityCustomScalesRevisionRequest request, ExecutionContext executionContext) {
 
-        eventProcessor.saveNewCustomScalesRevision(request.customScalesValues(), executionContext.userId().id(), request.projectId());
+        eventProcessor.saveNewCustomScalesRevision(request.entityCustomScaleValues(), executionContext.userId().id(), request.projectId());
 
         return Mono.just(new AddEntityCustomScalesRevisionResponse());
     }
