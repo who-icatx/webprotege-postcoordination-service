@@ -1,10 +1,8 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import edu.stanford.protege.webprotege.common.ProjectId;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationScaleCustomization;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
@@ -37,18 +35,20 @@ public class PostCoordinationEventProcessor {
 
         Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldScales, newScales);
 
-        PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
+        if (events.isEmpty()) {
+            PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
 
-        repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, revision);
+            repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, revision);
+        }
     }
 
     public WhoficEntityPostCoordinationSpecification fetchHistory(String entityIri, ProjectId projectId) {
         return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
-                        .map(this::processHistory)
-                        .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList()));
+                .map(this::processHistory)
+                .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList()));
     }
 
-    private PostCoordinationSpecification findSpecificationWithLinearizationView(String linearizationView,  HashSet<PostCoordinationSpecification> postCoordinationSpecification) {
+    private PostCoordinationSpecification findSpecificationWithLinearizationView(String linearizationView, HashSet<PostCoordinationSpecification> postCoordinationSpecification) {
         return postCoordinationSpecification.stream().filter(spec -> spec.getLinearizationView().equalsIgnoreCase(linearizationView))
                 .findFirst()
                 .orElse(new PostCoordinationSpecification(linearizationView, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
@@ -64,8 +64,8 @@ public class PostCoordinationEventProcessor {
 
     private WhoficCustomScalesValues processCustomScaleHistory(EntityCustomScalesValuesHistory entityCustomScalesValuesHistory) {
         WhoficCustomScalesValues response = new WhoficCustomScalesValues(entityCustomScalesValuesHistory.getWhoficEntityIri(), new ArrayList<>());
-        for(PostCoordinationCustomScalesRevision revision: entityCustomScalesValuesHistory.getPostCoordinationCustomScalesRevisions()) {
-            for(PostCoordinationCustomScalesValueEvent event: revision.postCoordinationEventList()) {
+        for (PostCoordinationCustomScalesRevision revision : entityCustomScalesValuesHistory.getPostCoordinationCustomScalesRevisions()) {
+            for (PostCoordinationCustomScalesValueEvent event : revision.postCoordinationEventList()) {
                 event.applyEvent(response);
             }
         }
@@ -78,10 +78,10 @@ public class PostCoordinationEventProcessor {
     private WhoficEntityPostCoordinationSpecification processHistory(@Nonnull EntityPostCoordinationHistory postCoordinationHistory) {
 
         var postCoordinationSpecification = new HashSet<PostCoordinationSpecification>();
-        for(PostCoordinationSpecificationRevision revision: postCoordinationHistory.getPostCoordinationRevisions()) {
-            for(PostCoordinationViewEvent viewEvent: revision.postCoordinationEventList()) {
+        for (PostCoordinationSpecificationRevision revision : postCoordinationHistory.getPostCoordinationRevisions()) {
+            for (PostCoordinationViewEvent viewEvent : revision.postCoordinationEventList()) {
                 PostCoordinationSpecification specification = findSpecificationWithLinearizationView(viewEvent.linearizationView(), postCoordinationSpecification);
-                for(PostCoordinationSpecificationEvent event : viewEvent.axisEvents()) {
+                for (PostCoordinationSpecificationEvent event : viewEvent.axisEvents()) {
                     event.applyEvent(specification);
                 }
                 postCoordinationSpecification.add(specification);
