@@ -41,7 +41,9 @@ public class ApplicationBeans {
         return new MongoCustomConversions(
                 List.of(
                         new PostcoordinationEventReadingConverter(objectMapper),
-                        new PostcoordinationEventWritingConverter(objectMapper)
+                        new PostcoordinationEventWritingConverter(objectMapper),
+                        new PostCoordinationCustomScalesReadingConverter(objectMapper),
+                        new PostCoordinationCustomScalesWritingConverter(objectMapper)
                 )
         );
     }

@@ -2,9 +2,9 @@ package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 
-public class AddToDefaultAxisEvent extends PostCoordinationEvent {
+public class AddToDefaultAxisEvent extends PostCoordinationSpecificationEvent {
 
     public final static String TYPE = "AddToDefaultAxis";
 
@@ -20,7 +20,8 @@ public class AddToDefaultAxisEvent extends PostCoordinationEvent {
     }
 
     @Override
-    PostCoordinationSpecificationRequest applySpecificEvent(PostCoordinationSpecificationRequest input) {
-        return null;
+    PostCoordinationSpecification applySpecificEvent(PostCoordinationSpecification input) {
+        input.getDefaultAxes().add(this.getPostCoordinationAxis());
+        return input;
     }
 }

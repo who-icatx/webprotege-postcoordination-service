@@ -1,0 +1,317 @@
+{
+  "postcoordinationScaleCustomization": [
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/135352227",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1882742628"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1434326374"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/83217129"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/250688797",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1122666181",
+            "http://id.who.int/icd/entity/1721353160"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/temporalPatternAndOnset"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1158914813",
+            "http://id.who.int/icd/entity/1323892810"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1434326374"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1851734799",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/578694909"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/specificAnatomy"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1561949126",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1780040028",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1472717853",
+            "http://id.who.int/icd/entity/1763821141",
+            "http://id.who.int/icd/entity/1370972705"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/77655243",
+            "http://id.who.int/icd/entity/1423652218",
+            "http://id.who.int/icd/entity/833038527"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/515117475",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/216184590",
+            "http://id.who.int/icd/entity/684930313",
+            "http://id.who.int/icd/entity/2058491071",
+            "http://id.who.int/icd/entity/1210263011",
+            "http://id.who.int/icd/entity/1323682030",
+            "http://id.who.int/icd/entity/293771399"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1520312138",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1528414070",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1763821141",
+            "http://id.who.int/icd/entity/1472717853",
+            "http://id.who.int/icd/entity/554373034",
+            "http://id.who.int/icd/entity/2058491071",
+            "http://id.who.int/icd/entity/512128824",
+            "http://id.who.int/icd/entity/1323682030",
+            "http://id.who.int/icd/entity/1370972705",
+            "http://id.who.int/icd/entity/654702340"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/364534567",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1837021781"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/794462570",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1929872537"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1000894786",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/578694909",
+            "http://id.who.int/icd/entity/1928625572"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/specificAnatomy"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/554373034"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/257068234",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1882742628"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/194483911",
+            "http://id.who.int/icd/entity/802386629",
+            "http://id.who.int/icd/entity/21927667"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/2080365623",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1385347061"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1683090852",
+            "http://id.who.int/icd/entity/622600769"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1095665982",
+            "http://id.who.int/icd/entity/1527363560",
+            "http://id.who.int/icd/entity/512546847",
+            "http://id.who.int/icd/entity/80471749"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/344162786",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/916407020"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        },
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1292092042"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/1828273122",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/916407020"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/162723448",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/916407020"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/2099226249",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/916407020"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/408185629",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/916407020"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith"
+        }
+      ]
+    },
+    {
+      "whoficEntityIri": "http://id.who.int/icd/entity/416025325",
+      "scaleCustomizations": [
+        {
+          "postcoordinationScaleValues": [
+            "http://id.who.int/icd/entity/1860930306",
+            "http://id.who.int/icd/entity/1808959816"
+          ],
+          "postcoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent"
+        }
+      ]
+    }
+  ]
+}

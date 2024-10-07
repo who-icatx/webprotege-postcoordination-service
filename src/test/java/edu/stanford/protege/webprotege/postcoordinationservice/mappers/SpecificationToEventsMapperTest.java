@@ -1,6 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.mappers;
 
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecificationRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +17,14 @@ public class SpecificationToEventsMapperTest {
 
     @Test
     public void GIVEN_PostCoordinationSpecificationRequest_WHEN_map_THEN_fieldsAreTurnedIntoEvents() {
-        PostCoordinationSpecificationRequest request = new PostCoordinationSpecificationRequest("view",
+        PostCoordinationSpecification request = new PostCoordinationSpecification("view",
                 Collections.singletonList("allowedAxes"),
                 Collections.singletonList("defaultAxes"),
                 Collections.singletonList("notAllowedAxes"),
                 Collections.singletonList("requiredAxes")
         );
 
-        List<PostCoordinationEvent> eventList = SpecificationToEventsMapper.convertFromSpecification(request);
+        List<PostCoordinationSpecificationEvent> eventList = SpecificationToEventsMapper.convertFromSpecification(request);
         assertNotNull(eventList);
         assertEquals(4, eventList.size());
 
