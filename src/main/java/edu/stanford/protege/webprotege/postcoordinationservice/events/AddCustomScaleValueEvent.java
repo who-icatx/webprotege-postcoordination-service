@@ -2,8 +2,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationCustomScalesRequest;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationCustomScalesRevision;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationScaleCustomization;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
 
 import java.util.ArrayList;
@@ -25,15 +24,15 @@ public class AddCustomScaleValueEvent extends PostCoordinationCustomScalesValueE
 
     @Override
     public void applyEvent(WhoficCustomScalesValues whoficCustomScalesValues) {
-        Optional<PostCoordinationCustomScalesRequest> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostCoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
+        Optional<PostCoordinationScaleCustomization> existingRequest = whoficCustomScalesValues.scaleCustomizations().stream()
+                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase(this.getPostCoordinationAxis()))
                 .findFirst();
         if(existingRequest.isPresent()) {
-            existingRequest.get().getPostCoordinationScalesValues().add(this.getPostCoordinationScaleValue());
+            existingRequest.get().getPostcoordinationScaleValues().add(this.getPostCoordinationScaleValue());
         } else {
             List<String> scaleValues = new ArrayList<>();
             scaleValues.add(this.getPostCoordinationScaleValue());
-            PostCoordinationCustomScalesRequest request = new PostCoordinationCustomScalesRequest(scaleValues, this.getPostCoordinationAxis());
+            PostCoordinationScaleCustomization request = new PostCoordinationScaleCustomization(scaleValues, this.getPostCoordinationAxis());
             whoficCustomScalesValues.scaleCustomizations().add(request);
         }
     }

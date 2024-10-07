@@ -1,6 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.repositories;
 
-import edu.stanford.protege.webprotege.postcoordinationservice.model.AxisToGenericScale;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.PostcoordinationAxisToGenericScale;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,8 +20,8 @@ public class PostcoordinationAxisToGenericScaleRepository {
     }
 
     @Cacheable("postCoordAxisToGenericScale")
-    public List<AxisToGenericScale> getPostCoordAxisToGenericScale() {
-        return mongoTemplate.findAll(AxisToGenericScale.class);
+    public List<PostcoordinationAxisToGenericScale> getPostCoordAxisToGenericScale() {
+        return mongoTemplate.findAll(PostcoordinationAxisToGenericScale.class);
     }
 
 }

@@ -20,11 +20,9 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
 
     private final PostCoordinationEventProcessor postCoordinationEventProcessor;
 
-    private final PostCoordinationSpecificationsRepository repository;
 
-    public GetEntityPostCoordinationCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor, PostCoordinationSpecificationsRepository repository) {
+    public GetEntityPostCoordinationCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor) {
         this.postCoordinationEventProcessor = postCoordinationEventProcessor;
-        this.repository = repository;
     }
 
     @NotNull
@@ -41,10 +39,7 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
     @Override
     public Mono<GetEntityPostCoordinationResponse> handleRequest(GetEntityPostCoordinationRequest request, ExecutionContext executionContext) {
 
-        WhoficEntityPostCoordinationSpecification processedSpec =
-                this.repository.getExistingHistoryOrderedByRevision(request.entityIRI(), request.projectId())
-                        .map(postCoordinationEventProcessor::processHistory)
-                        .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(request.entityIRI(), null, Collections.emptyList()));
+        WhoficEntityPostCoordinationSpecification processedSpec = postCoordinationEventProcessor.fetchHistory(request.entityIRI(), request.projectId());
 
         return Mono.just(new GetEntityPostCoordinationResponse(request.entityIRI(), processedSpec));
     }

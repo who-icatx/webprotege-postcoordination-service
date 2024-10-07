@@ -3,8 +3,8 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 import com.fasterxml.jackson.annotation.*;
 import org.springframework.data.mongodb.core.mapping.*;
 
-@Document(collection = AxisToGenericScale.AXIS_TO_GENERIC_SCALE)
-public class AxisToGenericScale {
+@Document(collection = PostcoordinationAxisToGenericScale.AXIS_TO_GENERIC_SCALE)
+public class PostcoordinationAxisToGenericScale {
 
     @Field("postcoordinationAxis")
     private final String postcoordinationAxis;
@@ -17,9 +17,9 @@ public class AxisToGenericScale {
     public final static String AXIS_TO_GENERIC_SCALE = "PostcoordinationAxisToGenericScale";
 
     @JsonCreator
-    public AxisToGenericScale(@JsonProperty("postcoordinationAxis") String postcoordinationAxis,
-                              @JsonProperty("genericPostcoordinationScaleTopClass") String genericPostcoordinationScaleTopClass,
-                              @JsonProperty("allowMultiValue") String allowMultiValue) {
+    public PostcoordinationAxisToGenericScale(@JsonProperty("postcoordinationAxis") String postcoordinationAxis,
+                                              @JsonProperty("genericPostcoordinationScaleTopClass") String genericPostcoordinationScaleTopClass,
+                                              @JsonProperty("allowMultiValue") String allowMultiValue) {
         this.postcoordinationAxis = postcoordinationAxis;
         this.genericPostcoordinationScaleTopClass = genericPostcoordinationScaleTopClass;
         this.allowMultiValue = allowMultiValue;

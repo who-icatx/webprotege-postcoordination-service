@@ -30,12 +30,9 @@ public class PostCoordinationService {
 
     private final PostCoordinationSpecificationsRepository specRepository;
     private final PostCoordinationTableConfigRepository configRepository;
-
     private final LinearizationService linearizationService;
     private final ReadWriteLockService readWriteLock;
-
     private final PostCoordinationDocumentRepository documentRepository;
-
     private final ObjectMapper objectMapper;
 
     public PostCoordinationService(PostCoordinationSpecificationsRepository specRepository,
@@ -97,13 +94,27 @@ public class PostCoordinationService {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
                 for (WhoficEntityPostCoordinationSpecification specification : page) {
-                    Set<PostCoordinationViewEvent> events = specification.postCoordinationSpecifications().stream()
+
+                    for(LinearizationDefinition linearizationDefinition: definitionList) {
+                        boolean linearizationExists = specification.postcoordinationSpecifications().stream().anyMatch(spec ->
+                                spec.getLinearizationView().equalsIgnoreCase(linearizationDefinition.getWhoficEntityIri()));
+                        if(!linearizationExists) {
+                            specification.postcoordinationSpecifications().add(new PostCoordinationSpecification(linearizationDefinition.getWhoficEntityIri(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>(),
+                                    new ArrayList<>()));
+                        }
+
+                    }
+
+                    Set<PostCoordinationViewEvent> events = specification.postcoordinationSpecifications().stream()
                             .map(spec -> enrichWithMissingAxis(specification.entityType(), spec, definitionList, configurations))
                             .map(spec ->
                                     new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
                             )
                             .collect(Collectors.toSet());
-                    PostCoordinationRevision revision = new PostCoordinationRevision(userId.id(), new Date().getTime(), events);
+                    PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId.id(), new Date().getTime(), events);
                     EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }
@@ -112,7 +123,6 @@ public class PostCoordinationService {
             }
         };
     }
-
     private void saveMultipleEntityPostCoordinationHistories(Set<EntityPostCoordinationHistory> historiesToBeSaved) {
         var documents = historiesToBeSaved.stream()
                 .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))

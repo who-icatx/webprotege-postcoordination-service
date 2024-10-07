@@ -3,7 +3,7 @@
     {
       "whoficEntityIri": "http://id.who.int/icd/entity/257068234",
       "entityType": "ICD",
-      "postCoordinationSpecifications": [
+      "postcoordinationSpecifications": [
         {
           "linearizationView": "http://id.who.int/icd/release/11/mnh"
         },
