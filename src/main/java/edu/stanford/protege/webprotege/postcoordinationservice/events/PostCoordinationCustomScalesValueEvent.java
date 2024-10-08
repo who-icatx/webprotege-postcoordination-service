@@ -1,12 +1,14 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.events;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
+import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes.CustomScaleChangeVisitor;
+import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.diff.ChangeOperationVisitorEx;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import javax.annotation.Nonnull;
 
 @BsonDiscriminator(key = "type")
 @JsonTypeInfo(
@@ -38,11 +40,15 @@ public abstract class PostCoordinationCustomScalesValueEvent {
     @JsonProperty("postCoordinationAxis")
     public String getPostCoordinationAxis() {
         return postCoordinationAxis;
-    };
+    }
 
     @Field("postCoordinationScaleValue")
     @JsonProperty("postCoordinationScaleValue")
     public String getPostCoordinationScaleValue() {
         return postCoordinationScaleValue;
     }
+
+    public abstract <R> R accept(@Nonnull ChangeOperationVisitorEx<R> visitor);
+
+    public abstract <R> R accept(@Nonnull CustomScaleChangeVisitor<R> visitor);
 }

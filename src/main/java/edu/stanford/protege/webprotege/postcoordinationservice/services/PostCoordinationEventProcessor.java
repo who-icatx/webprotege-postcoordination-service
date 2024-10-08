@@ -1,6 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
-import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
@@ -16,8 +16,12 @@ public class PostCoordinationEventProcessor {
 
     private final PostCoordinationSpecificationsRepository repository;
 
-    public PostCoordinationEventProcessor(PostCoordinationSpecificationsRepository repository) {
+    private final NewRevisionsEventEmitterService newRevisionsEventEmitter;
+
+    public PostCoordinationEventProcessor(PostCoordinationSpecificationsRepository repository,
+                                          NewRevisionsEventEmitterService newRevisionsEventEmitter) {
         this.repository = repository;
+        this.newRevisionsEventEmitter = newRevisionsEventEmitter;
     }
 
     public void saveNewSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, String userId, ProjectId projectId) {
@@ -30,7 +34,7 @@ public class PostCoordinationEventProcessor {
         repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, revision);
     }
 
-    public void saveNewCustomScalesRevision(WhoficCustomScalesValues newScales, String userId, ProjectId projectId) {
+    public void saveNewCustomScalesRevision(WhoficCustomScalesValues newScales, UserId userId, ProjectId projectId) {
         WhoficCustomScalesValues oldScales = fetchCustomScalesHistory(newScales.whoficEntityIri(), projectId);
 
         Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldScales, newScales);
@@ -39,6 +43,7 @@ public class PostCoordinationEventProcessor {
             PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
 
             repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, revision);
+            newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision);
         }
     }
 

@@ -34,19 +34,23 @@ public class PostCoordinationService {
     private final ReadWriteLockService readWriteLock;
     private final PostCoordinationDocumentRepository documentRepository;
     private final ObjectMapper objectMapper;
+    private final NewRevisionsEventEmitterService newRevisionsEventEmitter;
+
 
     public PostCoordinationService(PostCoordinationSpecificationsRepository specRepository,
                                    PostCoordinationTableConfigRepository configRepository,
                                    LinearizationService linearizationService,
                                    ReadWriteLockService readWriteLock,
                                    PostCoordinationDocumentRepository documentRepository,
-                                   ObjectMapper objectMapper) {
+                                   ObjectMapper objectMapper,
+                                   NewRevisionsEventEmitterService newRevisionsEventEmitter) {
         this.specRepository = specRepository;
         this.configRepository = configRepository;
         this.linearizationService = linearizationService;
         this.readWriteLock = readWriteLock;
         this.documentRepository = documentRepository;
         this.objectMapper = objectMapper;
+        this.newRevisionsEventEmitter = newRevisionsEventEmitter;
     }
 
 
@@ -74,7 +78,7 @@ public class PostCoordinationService {
                 Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
                 for (WhoficCustomScalesValues specification : page) {
                     Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.convertToFirstImportEvents(specification);
-                    PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId.id(), new Date().getTime(), events);
+                    PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
                     EntityCustomScalesValuesHistory history = new EntityCustomScalesValuesHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }
@@ -84,6 +88,7 @@ public class PostCoordinationService {
 
                 specRepository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
 
+                newRevisionsEventEmitter.emitNewRevisionsEventForScaleHistory(projectId, new ArrayList<>(histories));
             }
         };
     }

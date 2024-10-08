@@ -1,7 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
 import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
@@ -104,7 +104,7 @@ public class PostCoordinationEventProcessorTest {
                 PostCoordinationScaleCustomization(Arrays.asList("http://id.who.int/icd/entity/194483911", "http://id.who.int/icd/entity/5555555"), "http://id.who.int/icd/schema/infectiousAgent");
         WhoficCustomScalesValues customScalesValues = new WhoficCustomScalesValues(customScalesValuesHistory.getWhoficEntityIri(), Collections.singletonList(postCoordinationScaleCustomization));
 
-        postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, "alexsilaghi", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
+        postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
         WhoficCustomScalesValues response = postCoordinationEventProcessor.fetchCustomScalesHistory(customScalesValuesHistory.getWhoficEntityIri(), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
         System.out.println(response);
     }
