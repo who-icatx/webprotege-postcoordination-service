@@ -122,7 +122,7 @@ public class PostCoordinationEventProcessorTest {
                 "ICD",
                 Collections.singletonList(postCoordinationSpecification));
 
-        postCoordinationEventProcessor.saveNewSpecificationRevision(newSpec, "alexsilaghi", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
+        postCoordinationEventProcessor.saveNewSpecificationRevision(newSpec, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 
         WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 

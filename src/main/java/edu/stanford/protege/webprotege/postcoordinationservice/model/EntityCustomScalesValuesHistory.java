@@ -29,25 +29,25 @@ public class EntityCustomScalesValuesHistory {
     private final List<PostCoordinationCustomScalesRevision> postCoordinationCustomScalesRevisions;
 
     @JsonCreator
-    public EntityCustomScalesValuesHistory(@JsonProperty("whoficEntityIri") String whoficEntityIri,
-                                           @JsonProperty("projectId") String projectId,
-                                           @JsonProperty("postCoordinationCustomScalesRevisions") List<PostCoordinationCustomScalesRevision> postCoordinationCustomScalesRevisions) {
+    public EntityCustomScalesValuesHistory(@JsonProperty(WHOFIC_ENTITY_IRI) String whoficEntityIri,
+                                           @JsonProperty(PROJECT_ID) String projectId,
+                                           @JsonProperty(CUSTOM_SCALE_REVISIONS) List<PostCoordinationCustomScalesRevision> postCoordinationCustomScalesRevisions) {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationCustomScalesRevisions = postCoordinationCustomScalesRevisions;
     }
 
-    @JsonProperty("whoficEntityIri")
+    @JsonProperty(WHOFIC_ENTITY_IRI)
     public String getWhoficEntityIri() {
         return whoficEntityIri;
     }
 
-    @JsonProperty("projectId")
+    @JsonProperty(PROJECT_ID)
     public String getProjectId() {
         return projectId;
     }
 
-    @JsonProperty("postCoordinationCustomScalesRevisions")
+    @JsonProperty(CUSTOM_SCALE_REVISIONS)
     public List<PostCoordinationCustomScalesRevision> getPostCoordinationCustomScalesRevisions() {
         return postCoordinationCustomScalesRevisions;
     }

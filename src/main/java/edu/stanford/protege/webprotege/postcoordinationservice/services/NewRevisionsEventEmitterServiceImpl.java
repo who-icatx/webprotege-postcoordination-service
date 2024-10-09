@@ -29,7 +29,9 @@ public class NewRevisionsEventEmitterServiceImpl implements NewRevisionsEventEmi
 
     @Override
     public void emitNewRevisionsEventForSpecHistory(ProjectId projectId, List<EntityPostCoordinationHistory> entitySpecHistories) {
-
+        Set<ProjectChangeForEntity> changeList = projectChangesManager.getProjectChangesForSpecHistories(projectId, entitySpecHistories);
+        NewRevisionsEvent revisionsEvent = NewRevisionsEvent.create(EventId.generate(), projectId, changeList);
+        eventDispatcher.dispatchEvent(revisionsEvent);
     }
 
     @Override

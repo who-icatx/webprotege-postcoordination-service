@@ -24,7 +24,7 @@ public class PostCoordinationEventProcessor {
         this.newRevisionsEventEmitter = newRevisionsEventEmitter;
     }
 
-    public void saveNewSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, String userId, ProjectId projectId) {
+    public void saveNewSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId) {
         WhoficEntityPostCoordinationSpecification existingSpecification = fetchHistory(newSpecification.whoficEntityIri(), projectId);
         Set<PostCoordinationViewEvent> events = SpecificationToEventsMapper.createEventsFromDiff(existingSpecification, newSpecification);
 

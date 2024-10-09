@@ -2,9 +2,11 @@ package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern
 
 
 import edu.stanford.protege.webprotege.diff.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableAxisLabel;
-import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes.CustomScaleDocumentChange;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.services.LinearizationService;
+import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,7 +17,11 @@ public class Revision2DiffElementsTranslator {
 
     private final ChangeOperationVisitorEx<DiffOperation> changeOperationVisitor;
 
-    public Revision2DiffElementsTranslator() {
+    private final LinearizationService linearizationService;
+
+
+    public Revision2DiffElementsTranslator(LinearizationService linearizationService) {
+        this.linearizationService = linearizationService;
         this.changeOperationVisitor = new ChangeOperationVisitorEx<>() {
             @Override
             public DiffOperation visit(AddCustomScaleValueEvent addScaleValueEvent) {
@@ -29,12 +35,12 @@ public class Revision2DiffElementsTranslator {
         };
     }
 
-    public List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> getDiffElementsFromCustomScaleRevision(Map<String, List<PostCoordinationCustomScalesValueEvent>> eventsByViews,
+    public List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> getDiffElementsFromCustomScaleRevision(Map<String, List<PostCoordinationCustomScalesValueEvent>> eventsByAxis,
                                                                                                                                        List<String> orderedAxisList,
                                                                                                                                        List<TableAxisLabel> tableAxisLabels) {
         final List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> changeRecordElements = new ArrayList<>();
 
-        eventsByViews.forEach(
+        eventsByAxis.forEach(
                 (axis, eventsForAxis) ->
                         eventsForAxis.forEach(
                                 event -> changeRecordElements.add(toElement(axis, event, orderedAxisList, tableAxisLabels))
@@ -64,7 +70,39 @@ public class Revision2DiffElementsTranslator {
         );
     }
 
+
+
     private DiffOperation getDiffOperation(PostCoordinationCustomScalesValueEvent event) {
         return event.accept(changeOperationVisitor);
+    }
+
+    public List<DiffElement<SpecDocumentChange, PostCoordinationViewEvent>> getDiffElementsFromSpecRevision(List<PostCoordinationViewEvent> changesByView, List<String> orderAxisListWithSubAxis, List<TableAxisLabel> tableAxisLabels) {
+        final List<DiffElement<SpecDocumentChange, PostCoordinationViewEvent>> changeRecordElements = new ArrayList<>();
+
+        changesByView.forEach((eventsInView) -> changeRecordElements.add(toElement(eventsInView.linearizationView(), eventsInView.axisEvents(), orderAxisListWithSubAxis, tableAxisLabels)));
+        return changeRecordElements;
+    }
+
+    private DiffElement<SpecDocumentChange, PostCoordinationViewEvent> toElement(String linearizationView,
+                                                                                 List<PostCoordinationSpecificationEvent> postSpecEvents,
+                                                                                 List<String> orderedAxisList,
+                                                                                 List<TableAxisLabel> tableAxisLabels) {
+        List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
+
+        CustomScaleDocumentChange sourceDocument;
+        Optional<LinearizationDefinition> linearizationDefinitionOptional = linearizationDefinitions.stream()
+                .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equals(linearizationView))
+                .findFirst();
+        if (linearizationDefinitionOptional.isPresent()) {
+            LinearizationDefinition linDef = linearizationDefinitionOptional.get();
+            sourceDocument = SpecDocumentChange.create(linearizationView, linDef.getDisplayLabel(), linDef.getId(),linDef.getSortingCode());
+        } else {
+            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisList.indexOf(axis));
+        }
+        return new DiffElement<>(
+                getDiffOperation(customScalesValueEvent),
+                sourceDocument,
+                customScalesValueEvent
+        );
     }
 }

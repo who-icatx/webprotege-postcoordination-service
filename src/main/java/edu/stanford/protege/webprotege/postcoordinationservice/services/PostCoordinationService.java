@@ -119,7 +119,7 @@ public class PostCoordinationService {
                                     new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
                             )
                             .collect(Collectors.toSet());
-                    PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId.id(), new Date().getTime(), events);
+                    PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
                     EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }

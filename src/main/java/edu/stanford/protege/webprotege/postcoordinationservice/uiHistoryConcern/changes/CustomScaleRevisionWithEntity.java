@@ -3,8 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern
 import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationCustomScalesRevision;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.CUSTOM_SCALE_REVISIONS;
-import static edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository.WHOFIC_ENTITY_IRI;
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.*;
 
 public class CustomScaleRevisionWithEntity {
     @Field(CUSTOM_SCALE_REVISIONS)
