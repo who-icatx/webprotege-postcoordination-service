@@ -28,10 +28,13 @@ public class PostCoordinationEventProcessor {
         WhoficEntityPostCoordinationSpecification existingSpecification = fetchHistory(newSpecification.whoficEntityIri(), projectId);
         Set<PostCoordinationViewEvent> events = SpecificationToEventsMapper.createEventsFromDiff(existingSpecification, newSpecification);
 
-        PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
+        if (events.isEmpty()) {
+            PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
 
 
-        repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, revision);
+            repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, revision);
+            newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), revision);
+        }
     }
 
     public void saveNewCustomScalesRevision(WhoficCustomScalesValues newScales, UserId userId, ProjectId projectId) {
