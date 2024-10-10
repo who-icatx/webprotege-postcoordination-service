@@ -1,5 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +25,7 @@ import java.util.*;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Import({WebprotegePostcoordinationServiceServiceApplication.class})
@@ -31,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class PostCoordinationEventProcessorTest {
 
+    @MockBean
+    private LinearizationService linearizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,6 +54,10 @@ public class PostCoordinationEventProcessorTest {
     public void setUp() throws IOException {
         saveExistingHistory();
         saveExistingCustomScales();
+        FileInputStream defintions = new FileInputStream("src/test/resources/LinearizationDefinitions.json");
+        when(linearizationService.getLinearizationDefinitions())
+                .thenReturn(objectMapper.readValue(defintions, new TypeReference<>() {
+                }));
     }
 
     @Test

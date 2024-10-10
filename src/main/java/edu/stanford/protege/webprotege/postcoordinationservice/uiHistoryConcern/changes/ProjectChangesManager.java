@@ -54,7 +54,7 @@ public class ProjectChangesManager {
         totalChanges = changesByAxis.size();
         List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
 
-        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis, createOrderAxisListWithSubAxis(), tableAxisLabels);
+        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis, createOrderAxisMapWithSubAxis(), tableAxisLabels);
         List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> mutableDiffElements = new ArrayList<>(diffElements);
         mutableDiffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
 
@@ -161,27 +161,42 @@ public class ProjectChangesManager {
     }
 
 
-    private List<String> createOrderAxisListWithSubAxis() {
+    private Map<String, Integer> createOrderAxisMapWithSubAxis() {
+        Map<String, Integer> orderedAxisMap = new HashMap<>();
         TableConfiguration tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType("ICD");
+
         if (tableConfiguration == null) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
+
         List<String> orderedAxisList = new LinkedList<>(tableConfiguration.getPostCoordinationAxes());
         List<CompositeAxis> compositeAxisList = new ArrayList<>(tableConfiguration.getCompositePostCoordinationAxes());
 
-        compositeAxisList.forEach(compositeAxis ->
-                {
-                    int indexForCurrAxis = orderedAxisList.indexOf(compositeAxis.getPostCoordinationAxis());
-                    List<String> subAxisList = new LinkedList<>(compositeAxis.getSubAxis());
-                    orderedAxisList.addAll(indexForCurrAxis + 1, subAxisList);
-                    orderedAxisList.remove(indexForCurrAxis);
-                }
-        );
-        return orderedAxisList;
+        compositeAxisList.forEach(compositeAxis -> {
+            int indexForCurrAxis = orderedAxisList.indexOf(compositeAxis.getPostCoordinationAxis());
+
+            if (indexForCurrAxis != -1) {
+                List<String> subAxisList = new LinkedList<>(compositeAxis.getSubAxis());
+                orderedAxisList.addAll(indexForCurrAxis + 1, subAxisList);
+                orderedAxisList.remove(indexForCurrAxis);
+            }
+        });
+
+        orderedAxisMap = IntStream.range(0, orderedAxisList.size())
+                .boxed()
+                .collect(Collectors.toMap(orderedAxisList::get, index -> index));
+
+        return orderedAxisMap;
     }
+
 
     public Set<ProjectChangeForEntity> getProjectChangesForSpecHistories(ProjectId projectId, List<EntityPostCoordinationHistory> entitySpecHistories) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
+        List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
+        linearizationDefinitions.forEach(linDef -> {
+            entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel());
+        });
+
         Set<SpecRevisionWithEntity> specRevisions = entitySpecHistories.stream()
                 .flatMap(history ->
                         history.getPostCoordinationRevisions()
@@ -225,8 +240,8 @@ public class ProjectChangesManager {
         var eventsByView = revision.postCoordinationEventList().stream().toList();
         totalChanges = eventsByView.size();
 
-        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisListWithSubAxis());
-        sortByLinViewsAndAxis(diffElements);
+        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisMapWithSubAxis());
+        sortByLinViews(diffElements);
 
         List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForSpecRevision(diffElements, entityIrisAndNames);
         int pageElements = renderedDiffElements.size();
@@ -260,18 +275,10 @@ public class ProjectChangesManager {
         return renderedDiffElements;
     }
 
-    private void sortByLinViewsAndAxis(List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements) {
-        List<String> axisOrder = createOrderAxisListWithSubAxis();
+    private void sortByLinViews(List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements) {
         diffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
-        diffElements.forEach(diffElement -> diffElement.getLineElement()
-                .sort(Comparator.comparingInt(event -> {
-                                    int index = axisOrder.indexOf(event.getPostCoordinationAxis());
-                                    return index == -1 ? Integer.MAX_VALUE : index;
-                                }
-                        )
-                )
-        );
     }
+
 
     public ProjectChangeForEntity getProjectChangesForSpecRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision revision) {
         Map<String, String> entityIrisAndNames = new HashMap<>();

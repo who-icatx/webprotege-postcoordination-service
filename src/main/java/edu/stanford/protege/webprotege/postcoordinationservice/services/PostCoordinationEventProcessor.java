@@ -28,7 +28,7 @@ public class PostCoordinationEventProcessor {
         WhoficEntityPostCoordinationSpecification existingSpecification = fetchHistory(newSpecification.whoficEntityIri(), projectId);
         Set<PostCoordinationViewEvent> events = SpecificationToEventsMapper.createEventsFromDiff(existingSpecification, newSpecification);
 
-        if (events.isEmpty()) {
+        if (!events.isEmpty()) {
             PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
 
 

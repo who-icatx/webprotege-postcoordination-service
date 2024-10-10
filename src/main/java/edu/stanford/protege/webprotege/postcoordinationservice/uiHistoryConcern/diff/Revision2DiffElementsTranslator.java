@@ -36,14 +36,14 @@ public class Revision2DiffElementsTranslator {
     }
 
     public List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> getDiffElementsFromCustomScaleRevision(Map<String, List<PostCoordinationCustomScalesValueEvent>> eventsByAxis,
-                                                                                                                                       List<String> orderedAxisList,
+                                                                                                                                       Map<String, Integer> orderedAxisMap,
                                                                                                                                        List<TableAxisLabel> tableAxisLabels) {
         final List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> changeRecordElements = new ArrayList<>();
 
         eventsByAxis.forEach(
                 (axis, eventsForAxis) ->
                         eventsForAxis.forEach(
-                                event -> changeRecordElements.add(toElement(axis, event, orderedAxisList, tableAxisLabels))
+                                event -> changeRecordElements.add(toElement(axis, event, orderedAxisMap, tableAxisLabels))
                         )
         );
         return changeRecordElements;
@@ -51,7 +51,7 @@ public class Revision2DiffElementsTranslator {
 
     private DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent> toElement(String axis,
                                                                                                      PostCoordinationCustomScalesValueEvent customScalesValueEvent,
-                                                                                                     List<String> orderedAxisList,
+                                                                                                     Map<String, Integer> orderedAxisMap,
                                                                                                      List<TableAxisLabel> tableAxisLabels) {
         CustomScaleDocumentChange sourceDocument;
         Optional<TableAxisLabel> axisLabelOptional = tableAxisLabels.stream()
@@ -59,9 +59,9 @@ public class Revision2DiffElementsTranslator {
                 .findFirst();
         if (axisLabelOptional.isPresent()) {
             TableAxisLabel axisLabel = axisLabelOptional.get();
-            sourceDocument = CustomScaleDocumentChange.create(axisLabel.getPostCoordinationAxis(), axisLabel.getScaleLabel(), orderedAxisList.indexOf(axis));
+            sourceDocument = CustomScaleDocumentChange.create(axisLabel.getPostCoordinationAxis(), axisLabel.getScaleLabel(), orderedAxisMap.getOrDefault(axis, 0));
         } else {
-            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisList.indexOf(axis));
+            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisMap.getOrDefault(axis, 0));
         }
         return new DiffElement<>(
                 getDiffOperation(customScalesValueEvent),
@@ -76,17 +76,18 @@ public class Revision2DiffElementsTranslator {
     }
 
 
-    public List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> getDiffElementsFromSpecRevision(List<PostCoordinationViewEvent> changesByView, List<String> orderAxisListWithSubAxis) {
+    public List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> getDiffElementsFromSpecRevision(List<PostCoordinationViewEvent> changesByView, Map<String, Integer> orderAxisMapWithSubAxis) {
         final List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> changeRecordElements = new ArrayList<>();
 
-        changesByView.forEach((eventsInView) -> changeRecordElements.add(toElement(eventsInView.linearizationView(), eventsInView.axisEvents(), orderAxisListWithSubAxis)));
+        List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
+        changesByView.forEach((eventsInView) -> changeRecordElements.add(toElement(eventsInView.linearizationView(), linearizationDefinitions, eventsInView.axisEvents(), orderAxisMapWithSubAxis)));
         return changeRecordElements;
     }
 
     private DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>> toElement(String linearizationView,
+                                                                                                List<LinearizationDefinition> linearizationDefinitions,
                                                                                                 List<PostCoordinationSpecificationEvent> postSpecEvents,
-                                                                                                List<String> orderedAxisList) {
-        List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
+                                                                                                Map<String, Integer> orderedAxisMap) {
 
         SpecDocumentChange sourceDocument;
         Optional<LinearizationDefinition> linearizationDefinitionOptional = linearizationDefinitions.stream()
@@ -100,10 +101,8 @@ public class Revision2DiffElementsTranslator {
         }
 
         List<PostCoordinationSpecificationEvent> mutatedPostSpecEvents = postSpecEvents.stream()
-                .sorted(Comparator.comparingInt(event -> {
-                                    int index = orderedAxisList.indexOf(event.getPostCoordinationAxis());
-                                    return index == -1 ? Integer.MAX_VALUE : index;
-                                }
+                .sorted(Comparator.comparingInt(
+                                event -> orderedAxisMap.getOrDefault(event.getPostCoordinationAxis(), Integer.MAX_VALUE)
                         )
                 )
                 .toList();
