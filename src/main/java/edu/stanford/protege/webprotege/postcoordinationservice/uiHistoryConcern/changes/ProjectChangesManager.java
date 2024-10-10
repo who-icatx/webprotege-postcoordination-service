@@ -46,15 +46,45 @@ public class ProjectChangesManager {
         this.linearizationService = linearizationService;
     }
 
+    public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision) {
+        Map<String, String> entityIrisAndNames = new HashMap<>();
+        entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
+        List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
+        tableAxisLabels.forEach(tableAxisLabel ->
+                entityIrisAndNames.put(tableAxisLabel.getPostCoordinationAxis(), tableAxisLabel.getScaleLabel())
+        );
+
+        revision.postCoordinationEventList()
+                .forEach(event -> entityIrisAndNames.put(event.getPostCoordinationScaleValue(), event.getPostCoordinationScaleValue()));
+        List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
+
+        renderedEntitiesList.forEach(renderedEntity -> {
+            if (entityIrisAndNames.get(renderedEntity.getEntity().toStringID()) != null) {
+                entityIrisAndNames.put(renderedEntity.getEntity().toStringID(), renderedEntity.getBrowserText());
+            }
+        });
+
+        ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
+                revision,
+                entityIrisAndNames.get(whoficEntityIri),
+                entityIrisAndNames
+        );
+
+        return ProjectChangeForEntity.create(
+                whoficEntityIri,
+                projectChange
+        );
+    }
+
     private ProjectChange getProjectChangesForCustomScaleRevision(PostCoordinationCustomScalesRevision revision,
                                                                   String subjectName,
                                                                   Map<String, String> entityIrisAndNames) {
         final int totalChanges;
         var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEventList().stream().toList());
         totalChanges = changesByAxis.size();
-        List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
 
-        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis, createOrderAxisMapWithSubAxis(), tableAxisLabels);
+
+        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis, createOrderAxisMapWithSubAxis(), entityIrisAndNames);
         List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> mutableDiffElements = new ArrayList<>(diffElements);
         mutableDiffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
 
@@ -79,32 +109,6 @@ public class ProjectChangesManager {
                 "Edited Postcoordination Scale Values for Entity: " + subjectName,
                 totalChanges,
                 page);
-    }
-
-    public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision) {
-        Map<String, String> entityIrisAndNames = new HashMap<>();
-        entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
-        revision.postCoordinationEventList()
-                .forEach(event -> entityIrisAndNames.put(event.getPostCoordinationScaleValue(), event.getPostCoordinationScaleValue()));
-        List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
-
-        var entityTextOptional = renderedEntitiesList
-                .stream()
-                .filter(entityNode -> entityNode.getEntity().getIRI().toString().equals(whoficEntityIri))
-                .map(EntityNode::getBrowserText)
-                .findFirst();
-        entityTextOptional.ifPresent(browserText -> entityIrisAndNames.put(whoficEntityIri, browserText));
-
-        ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
-                revision,
-                entityIrisAndNames.get(whoficEntityIri),
-                entityIrisAndNames
-        );
-
-        return ProjectChangeForEntity.create(
-                whoficEntityIri,
-                projectChange
-        );
     }
 
     private List<DiffElement<String, String>> renderDiffElementsForCustomScale(List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements, Map<String, String> entityIrisAndNames) {
@@ -193,9 +197,7 @@ public class ProjectChangesManager {
     public Set<ProjectChangeForEntity> getProjectChangesForSpecHistories(ProjectId projectId, List<EntityPostCoordinationHistory> entitySpecHistories) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
         List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
-        linearizationDefinitions.forEach(linDef -> {
-            entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel());
-        });
+        linearizationDefinitions.forEach(linDef -> entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel()));
 
         Set<SpecRevisionWithEntity> specRevisions = entitySpecHistories.stream()
                 .flatMap(history ->
@@ -261,7 +263,7 @@ public class ProjectChangesManager {
                 RevisionNumber.valueOf("0"),
                 revision.userId(),
                 revision.timestamp(),
-                "Edited Postcoordination Scale Values for Entity: " + subjectName,
+                "Edited Postcoordination Specification for Entity: " + subjectName,
                 totalChanges,
                 page);
     }

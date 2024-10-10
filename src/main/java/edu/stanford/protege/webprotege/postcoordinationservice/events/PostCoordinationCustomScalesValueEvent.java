@@ -51,4 +51,10 @@ public abstract class PostCoordinationCustomScalesValueEvent {
     public abstract <R> R accept(@Nonnull ChangeOperationVisitorEx<R> visitor);
 
     public abstract <R> R accept(@Nonnull CustomScaleChangeVisitor<R> visitor);
+
+    public String getUiDisplayName() {
+        var eventNameWithSpaces = this.getType().replaceAll("([a-z])([A-Z]+)", "$1 $2");
+        eventNameWithSpaces = eventNameWithSpaces.toLowerCase().replace("event", "");
+        return eventNameWithSpaces.substring(0, 1).toUpperCase() + eventNameWithSpaces.substring(1);
+    }
 }

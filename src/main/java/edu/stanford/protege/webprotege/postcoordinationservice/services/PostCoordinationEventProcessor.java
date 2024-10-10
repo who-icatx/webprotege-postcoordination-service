@@ -42,7 +42,7 @@ public class PostCoordinationEventProcessor {
 
         Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldScales, newScales);
 
-        if (events.isEmpty()) {
+        if (!events.isEmpty()) {
             PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
 
             repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, revision);

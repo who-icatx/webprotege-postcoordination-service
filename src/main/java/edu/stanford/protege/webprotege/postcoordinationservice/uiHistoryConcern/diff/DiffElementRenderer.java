@@ -20,12 +20,12 @@ public class DiffElementRenderer<S extends Serializable> {
 
             @Override
             public String visit(AddCustomScaleValueEvent addScaleValueEvent) {
-                return renderHtmlForScaleValue(addScaleValueEvent, true);
+                return renderHtmlForScaleValue(addScaleValueEvent);
             }
 
             @Override
             public String visit(RemoveCustomScaleValueEvent removeScaleValueEvent) {
-                return renderHtmlForScaleValue(removeScaleValueEvent, false);
+                return renderHtmlForScaleValue(removeScaleValueEvent);
             }
 
             @Override
@@ -65,19 +65,13 @@ public class DiffElementRenderer<S extends Serializable> {
         return change.accept(visitor);
     }
 
-    private String renderHtmlForScaleValue(PostCoordinationCustomScalesValueEvent scaleValueEvent, boolean addValue) {
-        String axisName = entityIrisAndNames.get(scaleValueEvent.getPostCoordinationAxis());
+    private String renderHtmlForScaleValue(PostCoordinationCustomScalesValueEvent scaleValueEvent) {
         String scaleValueSelectionName = entityIrisAndNames.get(scaleValueEvent.getPostCoordinationScaleValue());
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("&nbsp;<span>");
-        if (addValue) {
-            stringBuilder.append("Added for axis");
-        } else {
-            stringBuilder.append("Removed for axis");
-        }
-        stringBuilder.append(axisName);
-        stringBuilder.append(" value of ");
+        stringBuilder.append(scaleValueEvent.getUiDisplayName());
+        stringBuilder.append(" of ");
         stringBuilder.append("<span class=\"ms-literal\">\"");
         stringBuilder.append(scaleValueSelectionName);
         stringBuilder.append("\"</span>");

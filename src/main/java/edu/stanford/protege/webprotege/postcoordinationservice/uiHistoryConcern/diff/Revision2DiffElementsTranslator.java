@@ -4,7 +4,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern
 import edu.stanford.protege.webprotege.diff.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationViewEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.LinearizationService;
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes.*;
 import org.springframework.stereotype.Component;
@@ -37,13 +37,13 @@ public class Revision2DiffElementsTranslator {
 
     public List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> getDiffElementsFromCustomScaleRevision(Map<String, List<PostCoordinationCustomScalesValueEvent>> eventsByAxis,
                                                                                                                                        Map<String, Integer> orderedAxisMap,
-                                                                                                                                       List<TableAxisLabel> tableAxisLabels) {
+                                                                                                                                       Map<String, String> entityIrisAndNames) {
         final List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> changeRecordElements = new ArrayList<>();
 
         eventsByAxis.forEach(
                 (axis, eventsForAxis) ->
                         eventsForAxis.forEach(
-                                event -> changeRecordElements.add(toElement(axis, event, orderedAxisMap, tableAxisLabels))
+                                event -> changeRecordElements.add(toElement(axis, event, orderedAxisMap, entityIrisAndNames))
                         )
         );
         return changeRecordElements;
@@ -52,16 +52,12 @@ public class Revision2DiffElementsTranslator {
     private DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent> toElement(String axis,
                                                                                                      PostCoordinationCustomScalesValueEvent customScalesValueEvent,
                                                                                                      Map<String, Integer> orderedAxisMap,
-                                                                                                     List<TableAxisLabel> tableAxisLabels) {
+                                                                                                     Map<String, String> entityIrisAndNames) {
         CustomScaleDocumentChange sourceDocument;
-        Optional<TableAxisLabel> axisLabelOptional = tableAxisLabels.stream()
-                .filter(tableAxisLabel -> tableAxisLabel.getPostCoordinationAxis().equals(axis))
-                .findFirst();
-        if (axisLabelOptional.isPresent()) {
-            TableAxisLabel axisLabel = axisLabelOptional.get();
-            sourceDocument = CustomScaleDocumentChange.create(axisLabel.getPostCoordinationAxis(), axisLabel.getScaleLabel(), orderedAxisMap.getOrDefault(axis, 0));
+        if (entityIrisAndNames.get(axis) != null) {
+            sourceDocument = CustomScaleDocumentChange.create(axis, entityIrisAndNames.get(axis), orderedAxisMap.getOrDefault(axis, 0));
         } else {
-            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisMap.getOrDefault(axis, 0));
+            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisMap.getOrDefault(axis, orderedAxisMap.getOrDefault(axis, Integer.MAX_VALUE)));
         }
         return new DiffElement<>(
                 getDiffOperation(customScalesValueEvent),
