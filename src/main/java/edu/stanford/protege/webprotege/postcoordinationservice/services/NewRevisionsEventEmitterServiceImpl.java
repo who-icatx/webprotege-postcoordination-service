@@ -43,6 +43,8 @@ public class NewRevisionsEventEmitterServiceImpl implements NewRevisionsEventEmi
 
     @Override
     public void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision entitySpecRevision) {
-
+        ProjectChangeForEntity projectChange = projectChangesManager.getProjectChangesForSpecRevision(projectId, whoficEntityIri, entitySpecRevision);
+        NewRevisionsEvent revisionsEvent = NewRevisionsEvent.create(EventId.generate(), projectId, Set.of(projectChange));
+        eventDispatcher.dispatchEvent(revisionsEvent);
     }
 }

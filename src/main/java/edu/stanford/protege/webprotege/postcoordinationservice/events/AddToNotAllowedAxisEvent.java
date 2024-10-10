@@ -15,7 +15,7 @@ public class AddToNotAllowedAxisEvent extends PostCoordinationSpecificationEvent
 
 
     @Override
-    String getType() {
+    public String getType() {
         return AddToNotAllowedAxisEvent.TYPE;
     }
 

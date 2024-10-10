@@ -1,7 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.diff;
 
 import edu.stanford.protege.webprotege.diff.DiffElement;
-import edu.stanford.protege.webprotege.entity.EntityNode;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes.*;
 
@@ -12,10 +11,10 @@ public class DiffElementRenderer<S extends Serializable> {
 
     private final CustomScaleChangeVisitor<String> visitor;
 
-    List<EntityNode> renderedEntities;
+    Map<String, String> entityIrisAndNames;
 
-    public DiffElementRenderer(List<EntityNode> renderedEntities) {
-        this.renderedEntities = renderedEntities;
+    public DiffElementRenderer(Map<String, String> entityIrisAndNames) {
+        this.entityIrisAndNames = entityIrisAndNames;
         visitor = new CustomScaleChangeVisitor<>() {
 
 
@@ -67,20 +66,8 @@ public class DiffElementRenderer<S extends Serializable> {
     }
 
     private String renderHtmlForScaleValue(PostCoordinationCustomScalesValueEvent scaleValueEvent, boolean addValue) {
-        Optional<EntityNode> axisNameOptional = renderedEntities.stream()
-                .filter(renderedEntity -> renderedEntity.getEntity().toStringID().equals(scaleValueEvent.getPostCoordinationAxis()))
-                .findFirst();
-        String axisName = scaleValueEvent.getPostCoordinationAxis();
-        if (axisNameOptional.isPresent()) {
-            axisName = axisNameOptional.get().getBrowserText();
-        }
-        Optional<EntityNode> scaleValueSelectionNameOptional = renderedEntities.stream()
-                .filter(renderedEntity -> renderedEntity.getEntity().toStringID().equals(scaleValueEvent.getPostCoordinationScaleValue()))
-                .findFirst();
-        String scaleValueSelectionName = scaleValueEvent.getPostCoordinationScaleValue();
-        if (scaleValueSelectionNameOptional.isPresent()) {
-            scaleValueSelectionName = scaleValueSelectionNameOptional.get().getBrowserText();
-        }
+        String axisName = entityIrisAndNames.get(scaleValueEvent.getPostCoordinationAxis());
+        String scaleValueSelectionName = entityIrisAndNames.get(scaleValueEvent.getPostCoordinationScaleValue());
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("&nbsp;<span>");
@@ -95,6 +82,51 @@ public class DiffElementRenderer<S extends Serializable> {
         stringBuilder.append(scaleValueSelectionName);
         stringBuilder.append("\"</span>");
         stringBuilder.append("</span>;&nbsp;");
+
+        return stringBuilder.toString();
+    }
+
+
+    public DiffElement<String, String> renderSpec(DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>> element) {
+        var eventsByAxis = element.getLineElement();
+        var renderedLine = renderLine(eventsByAxis);
+        var source = element.getSourceDocument();
+        var renderedSource = renderSource(source);
+        renderedLine = (renderedLine == null || renderedLine.isEmpty()) ? "no value" : renderedLine;
+        return new DiffElement<>(
+                element.getDiffOperation(),
+                renderedSource,
+                renderedLine
+        );
+    }
+
+    public String renderLine(List<PostCoordinationSpecificationEvent> changeList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        changeList.forEach(event -> {
+            String axisName = entityIrisAndNames.get(event.getPostCoordinationAxis());
+
+            stringBuilder.append("&nbsp;<span>");
+            stringBuilder.append("Added for axis");
+            stringBuilder.append(axisName);
+            stringBuilder.append(" value of ");
+            stringBuilder.append("<span class=\"ms-literal\">\"");
+            stringBuilder.append(event.getUiDisplayName());
+            stringBuilder.append("\"</span>");
+            stringBuilder.append("</span>;&nbsp;");
+        });
+
+
+        return stringBuilder.toString();
+    }
+
+    private String renderSource(SpecDocumentChange source) {
+        final StringBuilder stringBuilder = new StringBuilder();
+
+        var displayLabel = source.getLinearizationViewName() != null ? source.getLinearizationViewName() : source.getLinearizationViewIri();
+
+        stringBuilder.append("<span class=\"ms-quantifier-kw\">");
+        stringBuilder.append(displayLabel);
+        stringBuilder.append("</span>");
 
         return stringBuilder.toString();
     }

@@ -4,6 +4,7 @@ import edu.stanford.protege.webprotege.change.ProjectChange;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.diff.DiffElement;
 import edu.stanford.protege.webprotege.entity.EntityNode;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
@@ -47,7 +48,7 @@ public class ProjectChangesManager {
 
     private ProjectChange getProjectChangesForCustomScaleRevision(PostCoordinationCustomScalesRevision revision,
                                                                   String subjectName,
-                                                                  List<EntityNode> renderedEntities) {
+                                                                  Map<String, String> entityIrisAndNames) {
         final int totalChanges;
         var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEventList().stream().toList());
         totalChanges = changesByAxis.size();
@@ -57,7 +58,7 @@ public class ProjectChangesManager {
         List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> mutableDiffElements = new ArrayList<>(diffElements);
         mutableDiffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
 
-        List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForCustomScale(mutableDiffElements, renderedEntities);
+        List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForCustomScale(mutableDiffElements, entityIrisAndNames);
         int pageElements = renderedDiffElements.size();
         int pageCount;
         if (pageElements == 0) {
@@ -71,14 +72,13 @@ public class ProjectChangesManager {
                 renderedDiffElements,
                 totalChanges
         );
-        ProjectChange projectChange = ProjectChange.get(
+        return ProjectChange.get(
                 RevisionNumber.valueOf("0"),
                 revision.userId(),
                 revision.timestamp(),
                 "Edited Postcoordination Scale Values for Entity: " + subjectName,
                 totalChanges,
                 page);
-        return projectChange;
     }
 
     public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision) {
@@ -98,21 +98,19 @@ public class ProjectChangesManager {
         ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
                 revision,
                 entityIrisAndNames.get(whoficEntityIri),
-                renderedEntitiesList
+                entityIrisAndNames
         );
 
-        ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
+        return ProjectChangeForEntity.create(
                 whoficEntityIri,
                 projectChange
         );
-
-        return projectChangeForEntity;
     }
 
-    private List<DiffElement<String, String>> renderDiffElementsForCustomScale(List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements, List<EntityNode> renderedEntities) {
+    private List<DiffElement<String, String>> renderDiffElementsForCustomScale(List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements, Map<String, String> entityIrisAndNames) {
 
         List<DiffElement<String, String>> renderedDiffElements = new ArrayList<>();
-        DiffElementRenderer<String> renderer = new DiffElementRenderer<>(renderedEntities);
+        DiffElementRenderer<String> renderer = new DiffElementRenderer<>(entityIrisAndNames);
         for (DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent> diffElement : diffElements) {
             renderedDiffElements.add(renderer.render(diffElement));
         }
@@ -148,7 +146,7 @@ public class ProjectChangesManager {
                             ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
                                     revisionWithEntity.getRevision(),
                                     entityIrisAndNames.get(revisionWithEntity.getWhoficEntityIri()),
-                                    renderedEntitiesList
+                                    entityIrisAndNames
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
                                     revisionWithEntity.getWhoficEntityIri(),
@@ -165,6 +163,9 @@ public class ProjectChangesManager {
 
     private List<String> createOrderAxisListWithSubAxis() {
         TableConfiguration tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType("ICD");
+        if (tableConfiguration == null) {
+            return Collections.emptyList();
+        }
         List<String> orderedAxisList = new LinkedList<>(tableConfiguration.getPostCoordinationAxes());
         List<CompositeAxis> compositeAxisList = new ArrayList<>(tableConfiguration.getCompositePostCoordinationAxes());
 
@@ -188,9 +189,7 @@ public class ProjectChangesManager {
                                 .map(revision -> new SpecRevisionWithEntity(revision, history.getWhoficEntityIri()))
                 )
                 .sorted(Comparator.comparing(SpecRevisionWithEntity::getRevision))
-                .peek(revisionWithEntity -> {
-                    entityIrisAndNames.put(revisionWithEntity.getWhoficEntityIri(), revisionWithEntity.getWhoficEntityIri());
-                })
+                .peek(revisionWithEntity -> entityIrisAndNames.put(revisionWithEntity.getWhoficEntityIri(), revisionWithEntity.getWhoficEntityIri()))
                 .collect(Collectors.toSet());
 
         List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
@@ -205,7 +204,7 @@ public class ProjectChangesManager {
                             ProjectChange projectChange = getProjectChangesForSpecRevision(
                                     revisionWithEntity.getRevision(),
                                     entityIrisAndNames.get(revisionWithEntity.getWhoficEntityIri()),
-                                    renderedEntitiesList
+                                    entityIrisAndNames
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
                                     revisionWithEntity.getWhoficEntityIri(),
@@ -221,17 +220,15 @@ public class ProjectChangesManager {
 
     private ProjectChange getProjectChangesForSpecRevision(PostCoordinationSpecificationRevision revision,
                                                            String subjectName,
-                                                           List<EntityNode> renderedEntities) {
+                                                           Map<String, String> entityIrisAndNames) {
         final int totalChanges;
         var eventsByView = revision.postCoordinationEventList().stream().toList();
         totalChanges = eventsByView.size();
-        List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
 
-        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisListWithSubAxis(), tableAxisLabels);
-        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> mutableDiffElements = new ArrayList<>(diffElements);
-        mutableDiffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
+        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisListWithSubAxis());
+        sortByLinViewsAndAxis(diffElements);
 
-        List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForCustomScale(mutableDiffElements, renderedEntities);
+        List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForSpecRevision(diffElements, entityIrisAndNames);
         int pageElements = renderedDiffElements.size();
         int pageCount;
         if (pageElements == 0) {
@@ -245,13 +242,78 @@ public class ProjectChangesManager {
                 renderedDiffElements,
                 totalChanges
         );
-        ProjectChange projectChange = ProjectChange.get(
+        return ProjectChange.get(
                 RevisionNumber.valueOf("0"),
                 revision.userId(),
                 revision.timestamp(),
                 "Edited Postcoordination Scale Values for Entity: " + subjectName,
                 totalChanges,
                 page);
-        return projectChange;
+    }
+
+    private List<DiffElement<String, String>> renderDiffElementsForSpecRevision(List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements, Map<String, String> entityIrisAndNames) {
+        List<DiffElement<String, String>> renderedDiffElements = new ArrayList<>();
+        DiffElementRenderer<String> renderer = new DiffElementRenderer<>(entityIrisAndNames);
+        for (DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>> diffElement : diffElements) {
+            renderedDiffElements.add(renderer.renderSpec(diffElement));
+        }
+        return renderedDiffElements;
+    }
+
+    private void sortByLinViewsAndAxis(List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements) {
+        List<String> axisOrder = createOrderAxisListWithSubAxis();
+        diffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
+        diffElements.forEach(diffElement -> diffElement.getLineElement()
+                .sort(Comparator.comparingInt(event -> {
+                                    int index = axisOrder.indexOf(event.getPostCoordinationAxis());
+                                    return index == -1 ? Integer.MAX_VALUE : index;
+                                }
+                        )
+                )
+        );
+    }
+
+    public ProjectChangeForEntity getProjectChangesForSpecRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision revision) {
+        Map<String, String> entityIrisAndNames = new HashMap<>();
+        entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
+        revision.postCoordinationEventList()
+                .stream()
+                .flatMap(event -> event.axisEvents().stream())
+                .forEach(specEvent -> {
+                    entityIrisAndNames.computeIfAbsent(specEvent.getPostCoordinationAxis(), k -> specEvent.getPostCoordinationAxis());
+                    entityIrisAndNames.computeIfAbsent(specEvent.getLinearizationView(), k -> specEvent.getLinearizationView());
+
+                });
+
+        List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(Set.of(whoficEntityIri), projectId);
+        renderedEntitiesList.forEach(renderedEntity -> {
+            if (entityIrisAndNames.get(renderedEntity.getEntity().toStringID()) != null) {
+                entityIrisAndNames.put(renderedEntity.getEntity().toStringID(), renderedEntity.getBrowserText());
+            }
+        });
+        List<LinearizationDefinition> linDefs = linearizationService.getLinearizationDefinitions();
+        linDefs.forEach(linDef -> {
+            if (entityIrisAndNames.get(linDef.getWhoficEntityIri()) != null) {
+                entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel());
+            }
+        });
+
+        List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
+        tableAxisLabels.forEach(tableAxis -> {
+            if (entityIrisAndNames.get(tableAxis.getPostCoordinationAxis()) != null) {
+                entityIrisAndNames.put(tableAxis.getPostCoordinationAxis(), tableAxis.getTableLabel());
+            }
+        });
+
+        ProjectChange projectChange = getProjectChangesForSpecRevision(
+                revision,
+                entityIrisAndNames.get(whoficEntityIri),
+                entityIrisAndNames
+        );
+
+        return ProjectChangeForEntity.create(
+                whoficEntityIri,
+                projectChange
+        );
     }
 }

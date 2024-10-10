@@ -71,38 +71,50 @@ public class Revision2DiffElementsTranslator {
     }
 
 
-
     private DiffOperation getDiffOperation(PostCoordinationCustomScalesValueEvent event) {
         return event.accept(changeOperationVisitor);
     }
 
-    public List<DiffElement<SpecDocumentChange, PostCoordinationViewEvent>> getDiffElementsFromSpecRevision(List<PostCoordinationViewEvent> changesByView, List<String> orderAxisListWithSubAxis, List<TableAxisLabel> tableAxisLabels) {
-        final List<DiffElement<SpecDocumentChange, PostCoordinationViewEvent>> changeRecordElements = new ArrayList<>();
 
-        changesByView.forEach((eventsInView) -> changeRecordElements.add(toElement(eventsInView.linearizationView(), eventsInView.axisEvents(), orderAxisListWithSubAxis, tableAxisLabels)));
+    public List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> getDiffElementsFromSpecRevision(List<PostCoordinationViewEvent> changesByView, List<String> orderAxisListWithSubAxis) {
+        final List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> changeRecordElements = new ArrayList<>();
+
+        changesByView.forEach((eventsInView) -> changeRecordElements.add(toElement(eventsInView.linearizationView(), eventsInView.axisEvents(), orderAxisListWithSubAxis)));
         return changeRecordElements;
     }
 
-    private DiffElement<SpecDocumentChange, PostCoordinationViewEvent> toElement(String linearizationView,
-                                                                                 List<PostCoordinationSpecificationEvent> postSpecEvents,
-                                                                                 List<String> orderedAxisList,
-                                                                                 List<TableAxisLabel> tableAxisLabels) {
+    private DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>> toElement(String linearizationView,
+                                                                                                List<PostCoordinationSpecificationEvent> postSpecEvents,
+                                                                                                List<String> orderedAxisList) {
         List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
 
-        CustomScaleDocumentChange sourceDocument;
+        SpecDocumentChange sourceDocument;
         Optional<LinearizationDefinition> linearizationDefinitionOptional = linearizationDefinitions.stream()
                 .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equals(linearizationView))
                 .findFirst();
         if (linearizationDefinitionOptional.isPresent()) {
             LinearizationDefinition linDef = linearizationDefinitionOptional.get();
-            sourceDocument = SpecDocumentChange.create(linearizationView, linDef.getDisplayLabel(), linDef.getId(),linDef.getSortingCode());
+            sourceDocument = SpecDocumentChange.create(linearizationView, linDef.getDisplayLabel(), linDef.getId(), linDef.getSortingCode());
         } else {
-            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisList.indexOf(axis));
+            sourceDocument = SpecDocumentChange.create(linearizationView, linearizationView, linearizationView, "0");
         }
+
+        List<PostCoordinationSpecificationEvent> mutatedPostSpecEvents = postSpecEvents.stream()
+                .sorted(Comparator.comparingInt(event -> {
+                                    int index = orderedAxisList.indexOf(event.getPostCoordinationAxis());
+                                    return index == -1 ? Integer.MAX_VALUE : index;
+                                }
+                        )
+                )
+                .toList();
         return new DiffElement<>(
-                getDiffOperation(customScalesValueEvent),
+                getAddDiffOperation(),
                 sourceDocument,
-                customScalesValueEvent
+                mutatedPostSpecEvents
         );
+    }
+
+    private DiffOperation getAddDiffOperation() {
+        return DiffOperation.ADD;
     }
 }
