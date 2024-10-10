@@ -1,6 +1,6 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
-import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
@@ -16,29 +16,37 @@ public class PostCoordinationEventProcessor {
 
     private final PostCoordinationSpecificationsRepository repository;
 
-    public PostCoordinationEventProcessor(PostCoordinationSpecificationsRepository repository) {
+    private final NewRevisionsEventEmitterService newRevisionsEventEmitter;
+
+    public PostCoordinationEventProcessor(PostCoordinationSpecificationsRepository repository,
+                                          NewRevisionsEventEmitterService newRevisionsEventEmitter) {
         this.repository = repository;
+        this.newRevisionsEventEmitter = newRevisionsEventEmitter;
     }
 
-    public void saveNewSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, String userId, ProjectId projectId) {
+    public void saveNewSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId) {
         WhoficEntityPostCoordinationSpecification existingSpecification = fetchHistory(newSpecification.whoficEntityIri(), projectId);
         Set<PostCoordinationViewEvent> events = SpecificationToEventsMapper.createEventsFromDiff(existingSpecification, newSpecification);
 
-        PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
+        if (!events.isEmpty()) {
+            PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
 
 
-        repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, revision);
+            repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, revision);
+            newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), revision);
+        }
     }
 
-    public void saveNewCustomScalesRevision(WhoficCustomScalesValues newScales, String userId, ProjectId projectId) {
+    public void saveNewCustomScalesRevision(WhoficCustomScalesValues newScales, UserId userId, ProjectId projectId) {
         WhoficCustomScalesValues oldScales = fetchCustomScalesHistory(newScales.whoficEntityIri(), projectId);
 
         Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldScales, newScales);
 
-        if (events.isEmpty()) {
+        if (!events.isEmpty()) {
             PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
 
             repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, revision);
+            newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision);
         }
     }
 

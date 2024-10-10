@@ -15,7 +15,7 @@ public class AddToRequiredAxisEvent extends PostCoordinationSpecificationEvent {
 
 
     @Override
-    String getType() {
+    public String getType() {
         return AddToRequiredAxisEvent.TYPE;
     }
 

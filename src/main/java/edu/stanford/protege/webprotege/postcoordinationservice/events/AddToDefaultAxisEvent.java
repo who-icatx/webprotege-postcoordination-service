@@ -15,7 +15,7 @@ public class AddToDefaultAxisEvent extends PostCoordinationSpecificationEvent {
 
 
     @Override
-    String getType() {
+    public String getType() {
         return AddToDefaultAxisEvent.TYPE;
     }
 

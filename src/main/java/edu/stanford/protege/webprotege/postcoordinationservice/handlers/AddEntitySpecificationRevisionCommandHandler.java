@@ -30,7 +30,7 @@ public class AddEntitySpecificationRevisionCommandHandler implements CommandHand
 
     @Override
     public Mono<AddEntitySpecificationRevisionResponse> handleRequest(AddEntitySpecificationRevisionRequest request, ExecutionContext executionContext) {
-        eventProcessor.saveNewSpecificationRevision(request.entitySpecification(), executionContext.userId().id(), request.projectId());
+        eventProcessor.saveNewSpecificationRevision(request.entitySpecification(), executionContext.userId(), request.projectId());
         return Mono.just(new AddEntitySpecificationRevisionResponse());
     }
 }

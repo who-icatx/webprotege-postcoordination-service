@@ -135,7 +135,7 @@ public class PostCoordinationSpecificationServiceTest {
                                 .findFirst().orElse(null);
         assertNotNull(history);
         assertEquals(1, history.getPostCoordinationRevisions().size());
-        assertEquals("alexsilaghi", history.getPostCoordinationRevisions().iterator().next().userId());
+        assertEquals(UserId.valueOf("alexsilaghi"), history.getPostCoordinationRevisions().iterator().next().userId());
         assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList());
         Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEventList();
         assertEquals(16, viewEventSet.size());

@@ -5,6 +5,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class SpecificationToEventsMapper {
@@ -107,5 +108,9 @@ public class SpecificationToEventsMapper {
 
 
         return events;
+    }
+
+    public static Map<String, List<PostCoordinationCustomScalesValueEvent>> groupScaleEventsByAxis(List<PostCoordinationCustomScalesValueEvent> events) {
+        return events.stream().collect(Collectors.groupingBy(PostCoordinationCustomScalesValueEvent::getPostCoordinationAxis));
     }
 }
