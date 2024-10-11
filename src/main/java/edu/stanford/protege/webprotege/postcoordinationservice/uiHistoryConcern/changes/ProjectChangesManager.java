@@ -59,7 +59,7 @@ public class ProjectChangesManager {
         List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
 
         renderedEntitiesList.forEach(renderedEntity -> {
-            if (entityIrisAndNames.get(renderedEntity.getEntity().toStringID()) != null) {
+            if (entityIrisAndNames.get(renderedEntity.getEntity().toStringID()) != null && !renderedEntity.getBrowserText().equals("")) {
                 entityIrisAndNames.put(renderedEntity.getEntity().toStringID(), renderedEntity.getBrowserText());
             }
         });

@@ -58,7 +58,7 @@ public abstract class PostCoordinationSpecificationEvent {
     }
 
     public String getUiDisplayName() {
-        var eventNameWithSpaces = this.getType().replaceAll("([a-z])([A-Z]+)", "$1 $2");
+        var eventNameWithSpaces = this.getType().replace("AddTo", "").replaceAll("([a-z])([A-Z]+)", "$1 $2");
         return eventNameWithSpaces.toLowerCase();
     }
 }

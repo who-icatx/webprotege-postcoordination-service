@@ -100,9 +100,9 @@ public class DiffElementRenderer<S extends Serializable> {
             String axisName = entityIrisAndNames.get(event.getPostCoordinationAxis());
 
             stringBuilder.append("&nbsp;<span>");
-            stringBuilder.append("Added for axis");
+            stringBuilder.append("Set ");
             stringBuilder.append(axisName);
-            stringBuilder.append(" value of ");
+            stringBuilder.append(" value to ");
             stringBuilder.append("<span class=\"ms-literal\">\"");
             stringBuilder.append(event.getUiDisplayName());
             stringBuilder.append("\"</span>");

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.POSTCOORDINATION_CUSTOM_SCALES_COLLECTION;
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.PROJECT_ID;
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI;
+import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.*;
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.*;
 
 @Repository
@@ -39,8 +41,8 @@ public class PostCoordinationSpecificationsRepository {
 
     public void addSpecificationRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationSpecificationRevision specificationRevision) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(WHOFIC_ENTITY_IRI).is(whoficEntityIri)
-                .and(PROJECT_ID).is(projectId.id()));
+        query.addCriteria(Criteria.where(EntityPostCoordinationHistory.WHOFIC_ENTITY_IRI).is(whoficEntityIri)
+                .and(EntityPostCoordinationHistory.PROJECT_ID).is(projectId.id()));
 
         Update update = new Update();
         update.push(SPEC_REVISIONS, specificationRevision);
@@ -60,7 +62,7 @@ public class PostCoordinationSpecificationsRepository {
                 .and(PROJECT_ID).is(projectId.id()));
 
         Update update = new Update();
-        update.push(SPEC_REVISIONS, customScalesRevision);
+        update.push(CUSTOM_SCALE_REVISIONS, customScalesRevision);
 
         readWriteLock.executeWriteLock(() -> {
             UpdateResult result = mongoTemplate.updateFirst(query, update, EntityCustomScalesValuesHistory.class, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
