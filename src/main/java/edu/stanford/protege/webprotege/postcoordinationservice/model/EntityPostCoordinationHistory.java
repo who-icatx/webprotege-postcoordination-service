@@ -17,34 +17,41 @@ public class EntityPostCoordinationHistory {
 
     public static final String POSTCOORDINATION_HISTORY_COLLECTION = "EntityPostCoordinationHistory";
 
-    @Field("whoficEntityIri")
+    public static final String WHOFIC_ENTITY_IRI = "whoficEntityIri";
+    public static final String PROJECT_ID = "projectId";
+    public static final String SPEC_REVISIONS = "postCoordinationRevisions";
+
+    @Field(WHOFIC_ENTITY_IRI)
     @Indexed(name = "entityIriSpec")
     private final String whoficEntityIri;
 
-    @Field("projectId")
+    @Field(PROJECT_ID)
     private final String projectId;
 
-    @Field("postCoordinationRevisions")
+    @Field(SPEC_REVISIONS)
     private final List<PostCoordinationSpecificationRevision> postCoordinationRevisions;
 
 
     @JsonCreator
-    public EntityPostCoordinationHistory(@JsonProperty("whoficEntityIri") String whoficEntityIri,
-                                         @JsonProperty("projectId") String projectId,
-                                         @JsonProperty("postCoordinationRevisions") List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
+    public EntityPostCoordinationHistory(@JsonProperty(WHOFIC_ENTITY_IRI) String whoficEntityIri,
+                                         @JsonProperty(PROJECT_ID) String projectId,
+                                         @JsonProperty(SPEC_REVISIONS) List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationRevisions = postCoordinationRevisions;
     }
 
+    @JsonProperty(WHOFIC_ENTITY_IRI)
     public String getWhoficEntityIri() {
         return whoficEntityIri;
     }
 
+    @JsonProperty(PROJECT_ID)
     public String getProjectId() {
         return projectId;
     }
 
+    @JsonProperty(SPEC_REVISIONS)
     public List<PostCoordinationSpecificationRevision> getPostCoordinationRevisions() {
         return postCoordinationRevisions;
     }

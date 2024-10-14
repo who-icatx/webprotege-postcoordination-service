@@ -1,17 +1,12 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.stanford.protege.webprotege.common.ProjectId;
-import edu.stanford.protege.webprotege.common.UserId;
-import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
-import edu.stanford.protege.webprotege.postcoordinationservice.WebprotegePostcoordinationServiceServiceApplication;
+import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
-import org.bson.Document;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,11 +17,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -49,16 +41,16 @@ public class PostCoordinationCustomValueServiceTest {
 
     @Autowired
     private PostCoordinationService postCoordinationService;
+
     @BeforeEach
     public void setUp() throws IOException {
         when(documentLoader.fetchPostCoordinationDocument(eq("postCoordinationScalesImportFile.json")))
                 .thenReturn(new FileInputStream("src/test/resources/postCoordinationScalesImportFile.json"));
-
     }
 
 
     @Test
-    public void GIVEN_firstImportFile_WHEN_importing_THEN_eventsAreCorrectlyMapped(){
+    public void GIVEN_firstImportFile_WHEN_importing_THEN_eventsAreCorrectlyMapped() {
 
         postCoordinationService.crateFirstCustomScalesValuesImport("postCoordinationScalesImportFile.json", ProjectId.generate(), new UserId("alexsilaghi"));
 
@@ -72,7 +64,7 @@ public class PostCoordinationCustomValueServiceTest {
         assertNotNull(historyOptional.get().getPostCoordinationCustomScalesRevisions());
         assertEquals(1, historyOptional.get().getPostCoordinationCustomScalesRevisions().size());
         PostCoordinationCustomScalesRevision revision = historyOptional.get().getPostCoordinationCustomScalesRevisions().get(0);
-        assertEquals("alexsilaghi", revision.userId());
-        assertEquals(7, revision.postCoordinationEventList().size());
+        assertEquals(UserId.valueOf("alexsilaghi"), revision.userId());
+        assertEquals(7, revision.postCoordinationEvents().size());
     }
 }

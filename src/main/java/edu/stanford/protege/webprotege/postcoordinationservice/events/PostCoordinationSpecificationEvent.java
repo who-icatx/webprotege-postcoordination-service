@@ -32,7 +32,7 @@ public abstract class PostCoordinationSpecificationEvent {
     }
 
     @JsonProperty("@type")
-    abstract String getType();
+    public abstract String getType();
 
     public PostCoordinationSpecification applyEvent(PostCoordinationSpecification input) {
         input.getAllowedAxes().remove(this.postCoordinationAxis);
@@ -49,10 +49,16 @@ public abstract class PostCoordinationSpecificationEvent {
     @JsonProperty("postCoordinationAxis")
     public String getPostCoordinationAxis() {
         return postCoordinationAxis;
-    };
+    }
+
     @Field("linearizationView")
     @JsonProperty("linearizationView")
     public String getLinearizationView() {
         return linearizationView;
+    }
+
+    public String getUiDisplayName() {
+        var eventNameWithSpaces = this.getType().replace("AddTo", "").replaceAll("([a-z])([A-Z]+)", "$1 $2");
+        return eventNameWithSpaces.toLowerCase();
     }
 }

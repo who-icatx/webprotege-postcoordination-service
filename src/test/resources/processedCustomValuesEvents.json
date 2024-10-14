@@ -5,7 +5,7 @@
     {
       "userId": "alexsilaghi",
       "timestamp": 1726752697105,
-      "postCoordinationEventList": [
+      "postCoordinationEvents": [
         {
           "@type": "AddCustomScaleValue",
           "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
@@ -31,7 +31,7 @@
     {
       "userId": "alexsilaghi",
       "timestamp": 1726752699105,
-      "postCoordinationEventList": [
+      "postCoordinationEvents": [
         {
           "@type": "RemoveCustomScaleValue",
           "postCoordinationAxis": "http://id.who.int/icd/schema/infectiousAgent",
@@ -47,7 +47,7 @@
     {
       "userId": "alexsilaghi",
       "timestamp": 1726752699905,
-      "postCoordinationEventList": [
+      "postCoordinationEvents": [
         {
           "@type": "AddCustomScaleValue",
           "postCoordinationAxis": "http://id.who.int/icd/schema/associatedWith",

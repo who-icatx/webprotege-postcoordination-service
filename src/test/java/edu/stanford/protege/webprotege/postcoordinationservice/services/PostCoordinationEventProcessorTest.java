@@ -1,7 +1,8 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
 import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +25,7 @@ import java.util.*;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Import({WebprotegePostcoordinationServiceServiceApplication.class})
@@ -31,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class PostCoordinationEventProcessorTest {
 
+    @MockBean
+    private LinearizationService linearizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,6 +54,10 @@ public class PostCoordinationEventProcessorTest {
     public void setUp() throws IOException {
         saveExistingHistory();
         saveExistingCustomScales();
+        FileInputStream defintions = new FileInputStream("src/test/resources/LinearizationDefinitions.json");
+        when(linearizationService.getLinearizationDefinitions())
+                .thenReturn(objectMapper.readValue(defintions, new TypeReference<>() {
+                }));
     }
 
     @Test
@@ -104,7 +113,7 @@ public class PostCoordinationEventProcessorTest {
                 PostCoordinationScaleCustomization(Arrays.asList("http://id.who.int/icd/entity/194483911", "http://id.who.int/icd/entity/5555555"), "http://id.who.int/icd/schema/infectiousAgent");
         WhoficCustomScalesValues customScalesValues = new WhoficCustomScalesValues(customScalesValuesHistory.getWhoficEntityIri(), Collections.singletonList(postCoordinationScaleCustomization));
 
-        postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, "alexsilaghi", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
+        postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
         WhoficCustomScalesValues response = postCoordinationEventProcessor.fetchCustomScalesHistory(customScalesValuesHistory.getWhoficEntityIri(), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
         System.out.println(response);
     }
@@ -122,7 +131,7 @@ public class PostCoordinationEventProcessorTest {
                 "ICD",
                 Collections.singletonList(postCoordinationSpecification));
 
-        postCoordinationEventProcessor.saveNewSpecificationRevision(newSpec, "alexsilaghi", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
+        postCoordinationEventProcessor.saveNewSpecificationRevision(newSpec, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 
         WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
 
