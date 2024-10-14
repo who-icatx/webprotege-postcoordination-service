@@ -5,7 +5,7 @@
     {
       "userId": "alexsilaghi",
       "timestamp": 1726558923593,
-      "postCoordinationEventList": [
+      "postCoordinationEvents": [
         {
           "linearizationView": "http://id.who.int/icd/release/11/env",
           "axisEvents": [
@@ -331,7 +331,7 @@
     {
       "userId": "alexsilaghi",
       "timestamp": 1726958923593,
-      "postCoordinationEventList": [
+      "postCoordinationEvents": [
         {
           "linearizationView": "http://id.who.int/icd/release/11/mms",
           "axisEvents": [

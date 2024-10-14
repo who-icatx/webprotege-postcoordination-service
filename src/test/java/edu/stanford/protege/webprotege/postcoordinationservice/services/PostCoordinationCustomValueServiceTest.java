@@ -65,6 +65,6 @@ public class PostCoordinationCustomValueServiceTest {
         assertEquals(1, historyOptional.get().getPostCoordinationCustomScalesRevisions().size());
         PostCoordinationCustomScalesRevision revision = historyOptional.get().getPostCoordinationCustomScalesRevisions().get(0);
         assertEquals(UserId.valueOf("alexsilaghi"), revision.userId());
-        assertEquals(7, revision.postCoordinationEventList().size());
+        assertEquals(7, revision.postCoordinationEvents().size());
     }
 }

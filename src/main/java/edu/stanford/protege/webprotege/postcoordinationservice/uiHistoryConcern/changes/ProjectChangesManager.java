@@ -54,7 +54,7 @@ public class ProjectChangesManager {
                 entityIrisAndNames.put(tableAxisLabel.getPostCoordinationAxis(), tableAxisLabel.getScaleLabel())
         );
 
-        revision.postCoordinationEventList()
+        revision.postCoordinationEvents()
                 .forEach(event -> entityIrisAndNames.put(event.getPostCoordinationScaleValue(), event.getPostCoordinationScaleValue()));
         List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
 
@@ -80,7 +80,7 @@ public class ProjectChangesManager {
                                                                   String subjectName,
                                                                   Map<String, String> entityIrisAndNames) {
         final int totalChanges;
-        var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEventList().stream().toList());
+        var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEvents().stream().toList());
         totalChanges = changesByAxis.size();
 
 
@@ -132,7 +132,7 @@ public class ProjectChangesManager {
                 .sorted(Comparator.comparing(CustomScaleRevisionWithEntity::getRevision))
                 .peek(revisionWithEntity -> {
                     entityIrisAndNames.put(revisionWithEntity.getWhoficEntityIri(), revisionWithEntity.getWhoficEntityIri());
-                    revisionWithEntity.getRevision().postCoordinationEventList()
+                    revisionWithEntity.getRevision().postCoordinationEvents()
                             .forEach(event -> entityIrisAndNames.put(event.getPostCoordinationScaleValue(), event.getPostCoordinationScaleValue()));
                 })
                 .collect(Collectors.toSet());
@@ -239,7 +239,7 @@ public class ProjectChangesManager {
                                                            String subjectName,
                                                            Map<String, String> entityIrisAndNames) {
         final int totalChanges;
-        var eventsByView = revision.postCoordinationEventList().stream().toList();
+        var eventsByView = revision.postCoordinationEvents().stream().toList();
         totalChanges = eventsByView.size();
 
         List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisMapWithSubAxis());
@@ -285,7 +285,7 @@ public class ProjectChangesManager {
     public ProjectChangeForEntity getProjectChangesForSpecRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision revision) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
         entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
-        revision.postCoordinationEventList()
+        revision.postCoordinationEvents()
                 .stream()
                 .flatMap(event -> event.axisEvents().stream())
                 .forEach(specEvent -> {

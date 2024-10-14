@@ -11,21 +11,11 @@ import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
-                                                    Set<PostCoordinationViewEvent> postCoordinationEventList) implements Comparable<PostCoordinationSpecificationRevision>{
+                                                    Set<PostCoordinationViewEvent> postCoordinationEvents) implements Comparable<PostCoordinationSpecificationRevision>{
 
-
-    private static long lastTimestamp = 0;
-    private static int counter = 0;
 
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList) {
-        long currentTimestamp = Instant.now().toEpochMilli();
-        if (currentTimestamp == lastTimestamp) {
-            counter++;
-        } else {
-            lastTimestamp = currentTimestamp;
-            counter = 0;
-        }
-        return new PostCoordinationSpecificationRevision(userId, currentTimestamp + counter, postCoordinationEventList);
+        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList);
     }
 
     @Override
@@ -38,12 +28,12 @@ public record PostCoordinationSpecificationRevision(UserId userId,
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PostCoordinationSpecificationRevision that = (PostCoordinationSpecificationRevision) o;
-        return Objects.equal(userId, that.userId) && Objects.equal(timestamp, that.timestamp) && Objects.equal(postCoordinationEventList, that.postCoordinationEventList);
+        return Objects.equal(userId, that.userId) && Objects.equal(timestamp, that.timestamp) && Objects.equal(postCoordinationEvents, that.postCoordinationEvents);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(userId, timestamp, postCoordinationEventList);
+        return Objects.hashCode(userId, timestamp, postCoordinationEvents);
     }
 
     @Override
@@ -51,7 +41,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
         return "PostCoordinationSpecificationRevision{" +
                 "userId='" + userId + '\'' +
                 ", timestamp=" + timestamp +
-                ", postCoordinationEventList=" + postCoordinationEventList +
+                ", postCoordinationEvents=" + postCoordinationEvents +
                 '}';
     }
 }

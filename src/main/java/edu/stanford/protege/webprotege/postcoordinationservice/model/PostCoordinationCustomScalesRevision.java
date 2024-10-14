@@ -11,20 +11,11 @@ import java.util.Set;
 
 public record PostCoordinationCustomScalesRevision(UserId userId,
                                                    @Indexed(name = "rev_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
-                                                   Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList) implements Comparable<PostCoordinationCustomScalesRevision> {
+                                                   Set<PostCoordinationCustomScalesValueEvent> postCoordinationEvents) implements Comparable<PostCoordinationCustomScalesRevision> {
 
-    private static long lastTimestamp = 0;
-    private static int counter = 0;
 
     public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList) {
-        long currentTimestamp = Instant.now().toEpochMilli();
-        if (currentTimestamp == lastTimestamp) {
-            counter++;
-        } else {
-            lastTimestamp = currentTimestamp;
-            counter = 0;
-        }
-        return new PostCoordinationCustomScalesRevision(userId, currentTimestamp + counter, postCoordinationEventList);
+        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList);
     }
 
     @Override
@@ -32,12 +23,12 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PostCoordinationCustomScalesRevision that = (PostCoordinationCustomScalesRevision) o;
-        return Objects.equal(userId, that.userId) && Objects.equal(timestamp, that.timestamp) && Objects.equal(postCoordinationEventList, that.postCoordinationEventList);
+        return Objects.equal(userId, that.userId) && Objects.equal(timestamp, that.timestamp) && Objects.equal(postCoordinationEvents, that.postCoordinationEvents);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(userId, timestamp, postCoordinationEventList);
+        return Objects.hashCode(userId, timestamp, postCoordinationEvents);
     }
 
     @Override
@@ -50,7 +41,7 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
         return "PostCoordinationCustomScalesRevision{" +
                 "userId='" + userId + '\'' +
                 ", timestamp=" + timestamp +
-                ", postCoordinationEventList=" + postCoordinationEventList +
+                ", postCoordinationEvents=" + postCoordinationEvents +
                 '}';
     }
 }

@@ -1,6 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.diff;
 
 
+import com.google.common.base.Preconditions;
 import edu.stanford.protege.webprotege.diff.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
@@ -49,22 +50,29 @@ public class Revision2DiffElementsTranslator {
         return changeRecordElements;
     }
 
-    private DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent> toElement(String axis,
-                                                                                                     PostCoordinationCustomScalesValueEvent customScalesValueEvent,
-                                                                                                     Map<String, Integer> orderedAxisMap,
-                                                                                                     Map<String, String> entityIrisAndNames) {
+    private DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent> toElement(
+            String axis,
+            PostCoordinationCustomScalesValueEvent customScalesValueEvent,
+            Map<String, Integer> orderedAxisMap,
+            Map<String, String> entityIrisAndNames) {
+
+        Preconditions.checkNotNull(axis, "Axis cannot be null");
+        Preconditions.checkNotNull(customScalesValueEvent, "Custom scales value event cannot be null");
+
         CustomScaleDocumentChange sourceDocument;
-        if (entityIrisAndNames.get(axis) != null) {
-            sourceDocument = CustomScaleDocumentChange.create(axis, entityIrisAndNames.get(axis), orderedAxisMap.getOrDefault(axis, 0));
-        } else {
-            sourceDocument = CustomScaleDocumentChange.create(axis, axis, orderedAxisMap.getOrDefault(axis, orderedAxisMap.getOrDefault(axis, Integer.MAX_VALUE)));
-        }
+
+        String axisName = entityIrisAndNames.getOrDefault(axis, axis);
+        int sortingCode = orderedAxisMap.getOrDefault(axis, Integer.MAX_VALUE);
+
+        sourceDocument = CustomScaleDocumentChange.create(axis, axisName, sortingCode);
+
         return new DiffElement<>(
                 getDiffOperation(customScalesValueEvent),
                 sourceDocument,
                 customScalesValueEvent
         );
     }
+
 
 
     private DiffOperation getDiffOperation(PostCoordinationCustomScalesValueEvent event) {

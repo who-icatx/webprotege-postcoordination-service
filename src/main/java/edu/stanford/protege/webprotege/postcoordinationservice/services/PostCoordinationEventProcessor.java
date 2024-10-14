@@ -73,7 +73,7 @@ public class PostCoordinationEventProcessor {
     private WhoficCustomScalesValues processCustomScaleHistory(EntityCustomScalesValuesHistory entityCustomScalesValuesHistory) {
         WhoficCustomScalesValues response = new WhoficCustomScalesValues(entityCustomScalesValuesHistory.getWhoficEntityIri(), new ArrayList<>());
         for (PostCoordinationCustomScalesRevision revision : entityCustomScalesValuesHistory.getPostCoordinationCustomScalesRevisions()) {
-            for (PostCoordinationCustomScalesValueEvent event : revision.postCoordinationEventList()) {
+            for (PostCoordinationCustomScalesValueEvent event : revision.postCoordinationEvents()) {
                 event.applyEvent(response);
             }
         }
@@ -87,7 +87,7 @@ public class PostCoordinationEventProcessor {
 
         var postCoordinationSpecification = new HashSet<PostCoordinationSpecification>();
         for (PostCoordinationSpecificationRevision revision : postCoordinationHistory.getPostCoordinationRevisions()) {
-            for (PostCoordinationViewEvent viewEvent : revision.postCoordinationEventList()) {
+            for (PostCoordinationViewEvent viewEvent : revision.postCoordinationEvents()) {
                 PostCoordinationSpecification specification = findSpecificationWithLinearizationView(viewEvent.linearizationView(), postCoordinationSpecification);
                 for (PostCoordinationSpecificationEvent event : viewEvent.axisEvents()) {
                     event.applyEvent(specification);
