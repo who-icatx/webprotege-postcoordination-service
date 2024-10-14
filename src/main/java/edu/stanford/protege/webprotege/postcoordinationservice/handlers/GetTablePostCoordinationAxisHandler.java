@@ -1,12 +1,9 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableAxisLabel;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
+import edu.stanford.protege.webprotege.ipc.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -23,7 +20,7 @@ public class GetTablePostCoordinationAxisHandler implements CommandHandler<GetTa
     }
 
 
-    @NotNull
+    @NonNull
     @Override
     public String getChannelName() {
         return GetTablePostCoordinationAxisRequest.CHANNEL;

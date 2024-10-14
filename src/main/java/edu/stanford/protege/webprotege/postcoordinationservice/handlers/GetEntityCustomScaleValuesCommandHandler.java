@@ -5,7 +5,7 @@ import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
 
@@ -19,7 +19,7 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
         this.postCoordinationEventProcessor = postCoordinationEventProcessor;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getChannelName() {
         return GetEntityCustomScaleValuesRequest.CHANNEL;

@@ -1,19 +1,17 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public record WhoficEntityPostCoordinationSpecification(@JsonProperty("whoficEntityIri") String whoficEntityIri, @JsonProperty("entityType") String entityType,
+public record WhoficEntityPostCoordinationSpecification(@JsonProperty("whoficEntityIri") String whoficEntityIri,
+                                                        @JsonProperty("entityType") String entityType,
                                                         @JsonProperty("postcoordinationSpecifications") List<PostCoordinationSpecification> postcoordinationSpecifications) {
 
     @JsonCreator
-    public WhoficEntityPostCoordinationSpecification(@JsonProperty("whoficEntityIri") @NotNull String whoficEntityIri,
+    public WhoficEntityPostCoordinationSpecification(@JsonProperty("whoficEntityIri") @NonNull String whoficEntityIri,
                                                      @JsonProperty("entityType") String entityType,
                                                      @JsonProperty("postcoordinationSpecifications") List<PostCoordinationSpecification> postcoordinationSpecifications) {
         this.whoficEntityIri = whoficEntityIri;

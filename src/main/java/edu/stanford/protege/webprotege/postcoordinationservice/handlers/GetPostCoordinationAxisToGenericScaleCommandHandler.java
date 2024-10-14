@@ -1,9 +1,9 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 import edu.stanford.protege.webprotege.ipc.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.*;
-import org.jetbrains.annotations.NotNull;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.PostcoordinationAxisToGenericScale;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostcoordinationAxisToGenericScaleRepository;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class GetPostCoordinationAxisToGenericScaleCommandHandler implements Comm
         this.axisToGenericScaleRepository = axisToGenericScaleRepository;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getChannelName() {
         return GetPostcoordinationAxisToGenericScaleRequest.CHANNEL;

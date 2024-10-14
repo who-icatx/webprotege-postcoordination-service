@@ -3,15 +3,15 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 import com.google.common.base.Objects;
 import edu.stanford.protege.webprotege.common.UserId;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
+import org.springframework.lang.NonNull;
 
 import java.time.Instant;
 import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
-                                                    Set<PostCoordinationViewEvent> postCoordinationEvents) implements Comparable<PostCoordinationSpecificationRevision>{
+                                                    Set<PostCoordinationViewEvent> postCoordinationEvents) implements Comparable<PostCoordinationSpecificationRevision> {
 
 
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList) {
@@ -19,7 +19,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
     }
 
     @Override
-    public int compareTo(@NotNull PostCoordinationSpecificationRevision o) {
+    public int compareTo(@NonNull PostCoordinationSpecificationRevision o) {
         return Long.compare(this.timestamp, o.timestamp);
     }
 

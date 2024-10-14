@@ -1,12 +1,9 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
+import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
 
@@ -21,7 +18,7 @@ public class UploadPostCoordinationCommandHandler implements CommandHandler<Uplo
         this.postCoordinationService = postCoordinationService;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getChannelName() {
         return UploadPostCoordinationRequest.CHANNEL;

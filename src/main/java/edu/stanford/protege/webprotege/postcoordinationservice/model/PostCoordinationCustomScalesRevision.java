@@ -3,8 +3,8 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 import com.google.common.base.Objects;
 import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
+import org.springframework.lang.NonNull;
 
 import java.time.Instant;
 import java.util.Set;
@@ -32,7 +32,7 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
     }
 
     @Override
-    public int compareTo(@NotNull PostCoordinationCustomScalesRevision o) {
+    public int compareTo(@NonNull PostCoordinationCustomScalesRevision o) {
         return Long.compare(this.timestamp, o.timestamp);
     }
 

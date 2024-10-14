@@ -1,10 +1,8 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
+import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.handlers.UploadFirstCustomScalesValuesRequest.CHANNEL;
@@ -19,7 +17,7 @@ public class UploadFirstCustomScalesValuesHandler implements CommandHandler<Uplo
         this.postCoordinationService = postCoordinationService;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getChannelName() {
         return CHANNEL;

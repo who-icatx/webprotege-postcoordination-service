@@ -2,14 +2,13 @@ package edu.stanford.protege.webprotege.postcoordinationservice.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.lang.NonNull;
 
 @WritingConverter
-public class PostCoordinationCustomScalesWritingConverter  implements Converter<PostCoordinationCustomScalesValueEvent, Document> {
+public class PostCoordinationCustomScalesWritingConverter implements Converter<PostCoordinationCustomScalesValueEvent, Document> {
     private final ObjectMapper objectMapper;
 
     public PostCoordinationCustomScalesWritingConverter(ObjectMapper objectMapper) {
@@ -18,7 +17,7 @@ public class PostCoordinationCustomScalesWritingConverter  implements Converter<
 
 
     @Override
-    public Document convert(@NotNull PostCoordinationCustomScalesValueEvent source) {
+    public Document convert(@NonNull PostCoordinationCustomScalesValueEvent source) {
         return objectMapper.convertValue(source, Document.class);
     }
 }

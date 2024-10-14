@@ -2,7 +2,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.stanford.protege.webprotege.common.*;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 
 import java.util.Set;
 
@@ -21,13 +21,13 @@ public record NewRevisionsEvent(
         return new NewRevisionsEvent(eventId, projectId, changes);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public ProjectId projectId() {
         return projectId;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public EventId eventId() {
         return eventId;
