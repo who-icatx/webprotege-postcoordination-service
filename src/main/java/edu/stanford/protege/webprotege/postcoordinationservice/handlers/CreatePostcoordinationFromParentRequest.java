@@ -13,6 +13,12 @@ public record CreatePostcoordinationFromParentRequest(
 
     public final static String CHANNEL = "webprotege.postcoordination.CreateFromParentEntity";
 
+    public static CreatePostcoordinationFromParentRequest create(IRI newEntityIri,
+                                                                 IRI parentEntityIri,
+                                                                 ProjectId projectId) {
+        return new CreatePostcoordinationFromParentRequest(newEntityIri, parentEntityIri, projectId);
+    }
+
     @Override
     public String getChannel() {
         return CHANNEL;
