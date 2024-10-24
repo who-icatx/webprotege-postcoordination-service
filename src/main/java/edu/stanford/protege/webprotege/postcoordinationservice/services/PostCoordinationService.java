@@ -59,7 +59,7 @@ public class PostCoordinationService {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
+            stream.collect(StreamUtils.batchCollector(100, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
         });
     }
 
@@ -67,7 +67,7 @@ public class PostCoordinationService {
     public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
         var stream = documentRepository.fetchCustomScalesValues(documentLocation);
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+            stream.collect(StreamUtils.batchCollector(100, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
         });
     }
 
@@ -126,7 +126,7 @@ public class PostCoordinationService {
 
                 saveMultipleEntityPostCoordinationHistories(histories);
 
-                newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId,histories.stream().toList());
+                //newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId,histories.stream().toList());
             }
         };
     }

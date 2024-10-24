@@ -33,10 +33,8 @@ public class PostCoordinationSpecificationsRepository {
     }
 
     public void bulkWriteDocuments(List<InsertOneModel<Document>> listOfInsertOneModelDocument, String collectionName) {
-        readWriteLock.executeWriteLock(() -> {
-            var collection = mongoTemplate.getCollection(collectionName);
-            collection.bulkWrite(listOfInsertOneModelDocument);
-        });
+        var collection = mongoTemplate.getCollection(collectionName);
+        collection.bulkWrite(listOfInsertOneModelDocument);
     }
 
     public void addSpecificationRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationSpecificationRevision specificationRevision) {
