@@ -1,20 +1,18 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
-import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
+import edu.stanford.protege.webprotege.ipc.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
 
 @WebProtegeHandler
 public class AddEntityCustomScalesRevisionCommandHandler implements CommandHandler<AddEntityCustomScalesRevisionRequest, AddEntityCustomScalesRevisionResponse> {
 
-    private final PostCoordinationEventProcessor eventProcessor;
+    private final PostCoordinationService postCoordService;
 
-    public AddEntityCustomScalesRevisionCommandHandler(PostCoordinationEventProcessor eventProcessor) {
-        this.eventProcessor = eventProcessor;
+    public AddEntityCustomScalesRevisionCommandHandler(PostCoordinationService postCoordService) {
+        this.postCoordService = postCoordService;
     }
 
     @NotNull
@@ -31,7 +29,7 @@ public class AddEntityCustomScalesRevisionCommandHandler implements CommandHandl
     @Override
     public Mono<AddEntityCustomScalesRevisionResponse> handleRequest(AddEntityCustomScalesRevisionRequest request, ExecutionContext executionContext) {
 
-        eventProcessor.saveNewCustomScalesRevision(request.entityCustomScaleValues(), executionContext.userId(), request.projectId());
+        postCoordService.addCustomScaleRevision(request.entityCustomScaleValues(), request.projectId(), executionContext.userId());
 
         return Mono.just(new AddEntityCustomScalesRevisionResponse());
     }

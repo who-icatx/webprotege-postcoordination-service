@@ -7,22 +7,18 @@ import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityPostCoordinationRequest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityPostCoordinationResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
-import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
-import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
+import edu.stanford.protege.webprotege.postcoordinationservice.services.*;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
 
 @WebProtegeHandler
 public class GetEntityPostCoordinationCommandHandler implements CommandHandler<GetEntityPostCoordinationRequest, GetEntityPostCoordinationResponse> {
 
-    private final PostCoordinationEventProcessor postCoordinationEventProcessor;
+    private final PostCoordinationService postCoordService;
 
 
-    public GetEntityPostCoordinationCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor) {
-        this.postCoordinationEventProcessor = postCoordinationEventProcessor;
+    public GetEntityPostCoordinationCommandHandler(PostCoordinationService postCoordService) {
+        this.postCoordService = postCoordService;
     }
 
     @NotNull
@@ -39,7 +35,7 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
     @Override
     public Mono<GetEntityPostCoordinationResponse> handleRequest(GetEntityPostCoordinationRequest request, ExecutionContext executionContext) {
 
-        WhoficEntityPostCoordinationSpecification processedSpec = postCoordinationEventProcessor.fetchHistory(request.entityIRI(), request.projectId());
+        WhoficEntityPostCoordinationSpecification processedSpec = postCoordService.fetchHistory(request.entityIRI(), request.projectId());
 
         return Mono.just(new GetEntityPostCoordinationResponse(request.entityIRI(), processedSpec));
     }
