@@ -20,14 +20,14 @@ import static edu.stanford.protege.webprotege.postcoordinationservice.model.Enti
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.*;
 
 @Repository
-public class PostCoordinationSpecificationsRepository {
+public class PostCoordinationRepository {
 
 
     private final MongoTemplate mongoTemplate;
     private final ReadWriteLockService readWriteLock;
 
 
-    public PostCoordinationSpecificationsRepository(MongoTemplate mongoTemplate, ReadWriteLockService readWriteLock) {
+    public PostCoordinationRepository(MongoTemplate mongoTemplate, ReadWriteLockService readWriteLock) {
         this.mongoTemplate = mongoTemplate;
         this.readWriteLock = readWriteLock;
     }
@@ -100,7 +100,6 @@ public class PostCoordinationSpecificationsRepository {
                             .stream()
                             .sorted(Comparator.comparingLong(PostCoordinationSpecificationRevision::timestamp))
                             .collect(Collectors.toList());
-                    // Return a new EntityLinearizationHistory object with the sorted revisions
                     return new EntityPostCoordinationHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
                 });
     }

@@ -7,6 +7,7 @@ import edu.stanford.protege.webprotege.ipc.ExecutionContext;
 import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,12 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
 
     @Autowired
     private PostCoordinationEventProcessor eventProcessor;
+
+    @Autowired
+    private PostCoordinationRepository repository;
+
+    @Autowired
+    private PostCoordinationService postCoordService;
 
     @MockBean
     private LinearizationService linearizationService;
@@ -78,11 +85,13 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 parentEntityIri, "ICD", List.of(
                 new PostCoordinationSpecification("http://id.who.int/icd/release/11/mms", List.of("axis1"), List.of("axis2"), List.of(), List.of())
         ));
-        eventProcessor.saveNewSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
+        postCoordService.addSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
 
         handler.handleRequest(request, executionContext).block();
 
-        WhoficEntityPostCoordinationSpecification savedSpec = eventProcessor.fetchHistory(newEntityIri, projectId);
+        var specHistoryOptional = repository.getExistingHistoryOrderedByRevision(newEntityIri, projectId);
+        assertTrue(specHistoryOptional.isPresent(), "No history was created");
+        var savedSpec = eventProcessor.processHistory(specHistoryOptional.get());
 
         assertNotNull(savedSpec, "The new specification should be saved.");
         assertEquals(newEntityIri, savedSpec.whoficEntityIri(), "The saved specification should match the new entity IRI.");
@@ -103,12 +112,14 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 parentEntityIri, "ICD", List.of(
                         new PostCoordinationSpecification("http://id.who.int/icd/release/11/icd-o", List.of("axis1"), List.of(), List.of(), List.of())
                 ));
-        eventProcessor.saveNewSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
+        postCoordService.addSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
 
 
         handler.handleRequest(request, executionContext).block();
 
-        WhoficEntityPostCoordinationSpecification savedSpec = eventProcessor.fetchHistory(newEntityIri, projectId);
+        var specHistoryOptional = repository.getExistingHistoryOrderedByRevision(newEntityIri, projectId);
+        assertTrue(specHistoryOptional.isPresent(), "No history was created");
+        var savedSpec = eventProcessor.processHistory(specHistoryOptional.get());
 
         assertNotNull(savedSpec, "The new specification should be saved.");
         assertEquals(newEntityIri, savedSpec.whoficEntityIri(), "The saved specification should match the new entity IRI.");
@@ -144,12 +155,14 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 new PostCoordinationSpecification("http://id.who.int/icd/release/11/mms", List.of("axis1"), List.of(), List.of(), List.of()),
                 new PostCoordinationSpecification("http://id.who.int/icd/release/11/pch", List.of("axis2"), List.of(), List.of(), List.of())
         ));
-        eventProcessor.saveNewSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
+        postCoordService.addSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
 
 
         handler.handleRequest(request, executionContext).block();
 
-        WhoficEntityPostCoordinationSpecification savedSpec = eventProcessor.fetchHistory(newEntityIri, projectId);
+        var specHistoryOptional = repository.getExistingHistoryOrderedByRevision(newEntityIri, projectId);
+        assertTrue(specHistoryOptional.isPresent(), "No history was created");
+        var savedSpec = eventProcessor.processHistory(specHistoryOptional.get());
 
         assertNotNull(savedSpec, "The new specification should be saved.");
         assertEquals(2, savedSpec.postcoordinationSpecifications().size(), "There should be two linearization specifications.");
@@ -173,7 +186,7 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 parentEntityIri, "ICD", List.of(
                 new PostCoordinationSpecification("http://id.who.int/icd/release/11/mms", List.of("axis1"), List.of(), List.of(), List.of())
         ));
-        eventProcessor.saveNewSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
+        postCoordService.addSpecificationRevision(parentSpec, UserId.getGuest(), projectId);
 
 
         handler.handleRequest(request, executionContext).block();
