@@ -1,9 +1,8 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
 import org.junit.jupiter.api.*;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,14 +23,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Import({WebprotegePostcoordinationServiceServiceApplication.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @ExtendWith({SpringExtension.class, IntegrationTest.class})
 @ActiveProfiles("test")
-public class PostCoordinationCustomValueServiceTest {
+public class PostCoordinationCustomValueServiceIT {
 
-    @Autowired
-    private ObjectMapper objectMapper;
     @MockBean
     private MinioPostCoordinationDocumentLoader documentLoader;
 

@@ -50,10 +50,15 @@ public class PostCoordinationRepository {
         readWriteLock.executeWriteLock(() -> {
             UpdateResult result = mongoTemplate.updateFirst(query, update, EntityPostCoordinationHistory.class, POSTCOORDINATION_HISTORY_COLLECTION);
             if (result.getMatchedCount() == 0) {
-                EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(whoficEntityIri, projectId.id(), Arrays.asList(specificationRevision));
-                mongoTemplate.save(history);
+                throw new IllegalArgumentException(POSTCOORDINATION_HISTORY_COLLECTION + " not found for the given " +
+                        WHOFIC_ENTITY_IRI + ":" + whoficEntityIri + " and " + PROJECT_ID +
+                        ":" + projectId + ".");
             }
         });
+    }
+
+    public EntityPostCoordinationHistory saveNewSpecificationHistory(EntityPostCoordinationHistory specificationHistory) {
+        return readWriteLock.executeWriteLock(() -> mongoTemplate.save(specificationHistory, POSTCOORDINATION_HISTORY_COLLECTION));
     }
 
     public void addCustomScalesRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationCustomScalesRevision customScalesRevision) {
@@ -72,6 +77,10 @@ public class PostCoordinationRepository {
                         ":" + projectId + ".");
             }
         });
+    }
+
+    public EntityCustomScalesValuesHistory saveNewCustomScalesHistory(EntityCustomScalesValuesHistory entityScaleValueHistory) {
+        return readWriteLock.executeWriteLock(() -> mongoTemplate.save(entityScaleValueHistory, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION));
     }
 
 
@@ -114,12 +123,13 @@ public class PostCoordinationRepository {
         return readWriteLock.executeReadLock(() ->
                 Optional.ofNullable(mongoTemplate.findOne(query, EntityCustomScalesValuesHistory.class, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION))
         ).map(history -> {
-            List<PostCoordinationCustomScalesRevision> sortedRevisions = history.getPostCoordinationCustomScalesRevisions()
-                    .stream()
-                    .sorted(Comparator.comparingLong(PostCoordinationCustomScalesRevision::timestamp))
-                    .collect(Collectors.toList());
-            return new EntityCustomScalesValuesHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
-        });
+                    List<PostCoordinationCustomScalesRevision> sortedRevisions = history.getPostCoordinationCustomScalesRevisions()
+                            .stream()
+                            .sorted(Comparator.comparingLong(PostCoordinationCustomScalesRevision::timestamp))
+                            .collect(Collectors.toList());
+                    return new EntityCustomScalesValuesHistory(history.getWhoficEntityIri(), history.getProjectId(), sortedRevisions);
+                }
+        );
 
     }
 }

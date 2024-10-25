@@ -1,6 +1,5 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
-import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
@@ -12,11 +11,6 @@ import java.util.*;
 @Service
 public class PostCoordinationEventProcessor {
 
-    private final NewRevisionsEventEmitterService newRevisionsEventEmitter;
-
-    public PostCoordinationEventProcessor(NewRevisionsEventEmitterService newRevisionsEventEmitter) {
-        this.newRevisionsEventEmitter = newRevisionsEventEmitter;
-    }
 
     private PostCoordinationSpecification findSpecificationWithLinearizationView(String linearizationView, HashSet<PostCoordinationSpecification> postCoordinationSpecification) {
         return postCoordinationSpecification.stream().filter(spec -> spec.getLinearizationView().equalsIgnoreCase(linearizationView))

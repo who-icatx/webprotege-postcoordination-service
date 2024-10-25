@@ -183,14 +183,12 @@ public class PostCoordinationService {
                                     newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), newRevision);
                                 }
                             }, () -> {
-                                WhoficEntityPostCoordinationSpecification oldSpec = WhoficEntityPostCoordinationSpecification.create(newSpecification.whoficEntityIri(), newSpecification.entityType(), Collections.emptyList());
-                                Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpecification);
-
-                                if (!specEvents.isEmpty()) {
-                                    var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
-                                    repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, newRevision);
-                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), newRevision);
-                                }
+                                EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId);
+                                var savedHistory = repository.saveNewSpecificationHistory(history);
+                                savedHistory.getPostCoordinationRevisions()
+                                        .stream()
+                                        .findFirst()
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision));
                             }
                     );
                 }
@@ -214,18 +212,35 @@ public class PostCoordinationService {
                                     newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), newRevision);
                                 }
                             }, () -> {
-                                WhoficCustomScalesValues oldSpec = WhoficCustomScalesValues.create(newScales.whoficEntityIri(), Collections.emptyList());
-                                Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldSpec, newScales);
-
-                                if (!events.isEmpty()) {
-                                    var newRevision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
-                                    repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, newRevision);
-                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), newRevision);
-                                }
+                                var newHistory = createNewEntityCustomScalesHistory(newScales, projectId, userId);
+                                var savedHistory = repository.saveNewCustomScalesHistory(newHistory);
+                                savedHistory.getPostCoordinationCustomScalesRevisions()
+                                        .stream()
+                                        .findFirst()
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision));
                             }
                     );
                 }
         );
+    }
+
+    private EntityCustomScalesValuesHistory createNewEntityCustomScalesHistory(WhoficCustomScalesValues newScales,
+                                                                               ProjectId projectId,
+                                                                               UserId userId) {
+        WhoficCustomScalesValues oldSpec = WhoficCustomScalesValues.create(newScales.whoficEntityIri(), Collections.emptyList());
+        Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldSpec, newScales);
+        var revision = PostCoordinationCustomScalesRevision.create(userId, events);
+        return EntityCustomScalesValuesHistory.create(newScales.whoficEntityIri(), projectId.value(), List.of(revision));
+    }
+
+    private EntityPostCoordinationHistory createNewSpecificationHistory(WhoficEntityPostCoordinationSpecification newSpec,
+                                                                        ProjectId projectId,
+                                                                        UserId userId) {
+        WhoficEntityPostCoordinationSpecification oldSpec = WhoficEntityPostCoordinationSpecification.create(newSpec.whoficEntityIri(), newSpec.entityType(), Collections.emptyList());
+        Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpec);
+
+        var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
+        return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
     }
 
     public WhoficCustomScalesValues fetchCustomScalesHistory(String entityIri, ProjectId projectId) {

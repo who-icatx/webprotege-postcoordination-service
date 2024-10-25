@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 @ExtendWith({SpringExtension.class, IntegrationTest.class})
 @ActiveProfiles("test")
-public class WebprotegePostCoordinationServiceApplicationTests {
+public class WebprotegePostCoordinationServiceApplicationTest {
 
     @Test
     public void contextLoads() {
