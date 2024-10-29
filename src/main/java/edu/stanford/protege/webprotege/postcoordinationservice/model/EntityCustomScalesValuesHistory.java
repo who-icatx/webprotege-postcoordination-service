@@ -37,6 +37,12 @@ public class EntityCustomScalesValuesHistory {
         this.postCoordinationCustomScalesRevisions = postCoordinationCustomScalesRevisions;
     }
 
+    public static EntityCustomScalesValuesHistory create(String whoficEntityIri,
+                                                         String projectId,
+                                                         List<PostCoordinationCustomScalesRevision> postCoordinationCustomScalesRevisions) {
+        return new EntityCustomScalesValuesHistory(whoficEntityIri, projectId, postCoordinationCustomScalesRevisions);
+    }
+
     @JsonProperty(WHOFIC_ENTITY_IRI)
     public String getWhoficEntityIri() {
         return whoficEntityIri;

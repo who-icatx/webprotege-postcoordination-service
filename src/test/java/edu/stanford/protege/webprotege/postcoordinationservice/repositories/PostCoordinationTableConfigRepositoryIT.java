@@ -4,15 +4,12 @@ package edu.stanford.protege.webprotege.postcoordinationservice.repositories;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
-import edu.stanford.protege.webprotege.postcoordinationservice.WebprotegePostcoordinationServiceServiceApplication;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableAxisLabel;
-import edu.stanford.protege.webprotege.postcoordinationservice.model.TableConfiguration;
+import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,11 +21,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Import({WebprotegePostcoordinationServiceServiceApplication.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @ExtendWith({SpringExtension.class, IntegrationTest.class})
 @ActiveProfiles("test")
-public class PostCoordinationTableConfigRepositoryTest {
+public class PostCoordinationTableConfigRepositoryIT {
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -55,7 +51,7 @@ public class PostCoordinationTableConfigRepositoryTest {
         assertNotNull(tableConfiguration.getCompositePostCoordinationAxes());
         assertEquals(1, tableConfiguration.getCompositePostCoordinationAxes().size());
         assertEquals("http://id.who.int/icd/schema/levelOfConsciousness", tableConfiguration.getCompositePostCoordinationAxes().get(0).getPostCoordinationAxis());
-        assertEquals(5, tableConfiguration.getCompositePostCoordinationAxes().get(0).getSubAxis().size());
+        assertEquals(4, tableConfiguration.getCompositePostCoordinationAxes().get(0).getSubAxis().size());
 
     }
 
@@ -64,10 +60,9 @@ public class PostCoordinationTableConfigRepositoryTest {
     public void WHEN_fetchAllLabels_THEN_allLabelsAreCorrectlyFetched() throws IOException {
 
         File labels = new File("src/test/resources/postcoordinationAxisLabels.json");
-        List<Document> documents  = objectMapper.readValue(labels, new TypeReference<>() {
+        List<Document> documents = objectMapper.readValue(labels, new TypeReference<>() {
         });
         documents.forEach(document -> mongoTemplate.save(document, TableAxisLabel.AXIS_LABELS_COLLECTION));
-
 
 
         List<TableAxisLabel> axisLabels = repository.getTableAxisLabels();

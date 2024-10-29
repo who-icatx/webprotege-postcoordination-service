@@ -1,20 +1,18 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
-import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
+import edu.stanford.protege.webprotege.ipc.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
 
 @WebProtegeHandler
 public class AddEntitySpecificationRevisionCommandHandler implements CommandHandler<AddEntitySpecificationRevisionRequest, AddEntitySpecificationRevisionResponse> {
 
-    private final PostCoordinationEventProcessor eventProcessor;
+    private final PostCoordinationService postCoordService;
 
-    public AddEntitySpecificationRevisionCommandHandler(PostCoordinationEventProcessor eventProcessor) {
-        this.eventProcessor = eventProcessor;
+    public AddEntitySpecificationRevisionCommandHandler(PostCoordinationService postCoordService) {
+        this.postCoordService = postCoordService;
     }
 
     @NotNull
@@ -30,7 +28,7 @@ public class AddEntitySpecificationRevisionCommandHandler implements CommandHand
 
     @Override
     public Mono<AddEntitySpecificationRevisionResponse> handleRequest(AddEntitySpecificationRevisionRequest request, ExecutionContext executionContext) {
-        eventProcessor.saveNewSpecificationRevision(request.entitySpecification(), executionContext.userId(), request.projectId());
+        postCoordService.addSpecificationRevision(request.entitySpecification(), executionContext.userId(), request.projectId());
         return Mono.just(new AddEntitySpecificationRevisionResponse());
     }
 }

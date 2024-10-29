@@ -38,7 +38,6 @@
       {
         "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
         "replacedBySubaxes": [
-          "http://id.who.int/icd/schema/hasGCSScore",
           "http://id.who.int/icd/schema/hasGCSEyeScore",
           "http://id.who.int/icd/schema/hasGCSMotorScore",
           "http://id.who.int/icd/schema/hasGCSVerbalScore",
@@ -99,7 +98,6 @@
       {
         "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
         "replacedBySubaxes": [
-          "http://id.who.int/icd/schema/hasGCSScore",
           "http://id.who.int/icd/schema/hasGCSEyeScore",
           "http://id.who.int/icd/schema/hasGCSMotorScore",
           "http://id.who.int/icd/schema/hasGCSVerbalScore",
