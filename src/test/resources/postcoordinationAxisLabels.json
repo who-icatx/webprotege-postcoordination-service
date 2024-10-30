@@ -70,287 +70,282 @@
     "scaleLabel": "Relational"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/distribution",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/distribution",
     "tableLabel": "Distribution",
     "scaleLabel": "Distribution"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/regional",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/regional",
     "tableLabel": "Regional",
     "scaleLabel": "Regional"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/specificAnatomy",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/specificAnatomy",
     "tableLabel": "Specific Anatomy",
     "scaleLabel": "Specific Anatomy"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/serotype",
-    "tableLabel": "Serotype",
-    "scaleLabel": "Serotype"
-  },
-  {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
-    "tableLabel": "Gen. & Chrom. Anomalies",
-    "scaleLabel": "Genomic and Chromosomal Anomaly"
-  },
-  {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/fractureSubtype",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/fractureSubtype",
     "tableLabel": "Fracture Subtype",
     "scaleLabel": "Fracture Subtype"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/fractureOpenOrClosed",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/fractureOpenOrClosed",
     "tableLabel": "Fracture Open/Closed",
     "scaleLabel": "Fracture Open or Closed"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/jointInvolvementInFracture",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/jointInvolvementInFracture",
     "tableLabel": "Joint Involv. in Fracture",
     "scaleLabel": "Joint Involvement in Fracture"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/typeOfInjury",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/typeOfInjury",
     "tableLabel": "Type of Injury",
     "scaleLabel": "Type of Injury"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/extentOfBurnByBodySurface",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/extentOfBurnByBodySurface",
     "tableLabel": "Extent of Burn by Body Surface",
     "scaleLabel": "Extent of Burn by Body Surface"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/extentOfFullThicknessBurnByBodySurface",
     "tableLabel": "Ext. of Full Thickness Burn by Body Surface",
     "scaleLabel": "Extent of Full Thickness Burn by Body Surface"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/outcomeOfFullThicknessBurn",
     "tableLabel": "Outcome of Full Thickness Burn",
     "scaleLabel": "Outcome of Full Thickness Burn"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/durationOfComa",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/durationOfComa",
     "tableLabel": "Duration of Coma",
     "scaleLabel": "Duration of Coma"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/levelOfConsciousness",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
     "tableLabel": "Level of Consciousness",
     "scaleLabel": "Level of Consciousness"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasGCSEyeScore",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasGCSEyeScore",
     "tableLabel": "GCS Eye Score",
     "scaleLabel": "GCS Eye Score"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasGCSMotorScore",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasGCSMotorScore",
     "tableLabel": "GCS Motor Score",
     "scaleLabel": "GCS Motor Score"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasGCSMotorScore",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasGCSVerbalScore",
     "tableLabel": "GCS Verbal Score",
     "scaleLabel": "GCS Verbal Score"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasPupilReactionScore",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasPupilReactionScore",
     "tableLabel": "Pupil Reaction Score",
     "scaleLabel": "Pupil Reaction Score"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasManifestation",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasManifestation",
     "tableLabel": "Has Manifestation",
     "scaleLabel": "Has Manifestation"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/associatedWith",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/associatedWith",
     "tableLabel": "Associated With",
     "scaleLabel": "Associated With"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/activityWhenInjured",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/activityWhenInjured",
     "tableLabel": "Activity when Injured",
     "scaleLabel": "Activity when Injured"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/occupationalDescriptor",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/diagnosisConfirmedBy",
+    "tableLabel": "Diagnosis Confirmed By",
+    "scaleLabel": "Diagnosis Confirmed By"
+  },
+  {
+    "postcoordinationAxis": "http://id.who.int/icd/schema/occupationalDescriptor",
     "tableLabel": "Occupational Descriptor",
     "scaleLabel": "Occupational Descriptor"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/mechanismOfInjury",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/mechanismOfInjury",
     "tableLabel": "Mechanism of Injury",
     "scaleLabel": "Mechanism of Injury"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/transportEventDescriptor",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/transportEventDescriptor",
     "tableLabel": "Transport Event Descriptor",
     "scaleLabel": "Transport Event Descriptor"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/transportEventDescriptor",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/transportEventDescriptor",
     "tableLabel": "Object or Substance Producing Injury",
     "scaleLabel": "Object, Living Thing or Substance Producing Injury"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/sportsActivityDescriptor",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/sportsActivityDescriptor",
     "tableLabel": "Sports Activity Descriptor",
     "scaleLabel": "Sports Activity Descriptor"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/placeOfOccurrence",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/placeOfOccurrence",
     "tableLabel": "Place of Occurrence",
     "scaleLabel": "Place of Occurrence"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/alcoholUseInInjury",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/alcoholUseInInjury",
     "tableLabel": "Alcohol Use",
     "scaleLabel": "Alcohol Use in Injury"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/psychoactiveDrugUseInInjury",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/psychoactiveDrugUseInInjury",
     "tableLabel": "Psychoactive Drug Use",
     "scaleLabel": "Psychoactive Drug Use in Injury"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/aspectsOfAssaultAndMaltreatment",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/aspectsOfAssaultAndMaltreatment",
     "tableLabel": "Assault and Maltreatment",
     "scaleLabel": "Aspects of Assault and Maltreatment"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/aspectsOfIntentionalSelfHarm",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/aspectsOfIntentionalSelfHarm",
     "tableLabel": "Intentional Self-Harm",
     "scaleLabel": "Aspects of Intentional Self-Harm"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/aspectsOfArmedConflict",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/aspectsOfArmedConflict",
     "tableLabel": "Armed Conflict",
     "scaleLabel": "Aspects of Armed Conflict"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/typeOfLegalIntervention",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/typeOfLegalIntervention",
     "tableLabel": "Legal Intervention",
     "scaleLabel": "Type of Legal Intervention"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasTarget",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasTarget",
     "tableLabel": "Target",
     "scaleLabel": "Target"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasAction",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasAction",
     "tableLabel": "Action",
     "scaleLabel": "Action"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/hasMeans",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/hasMeans",
     "tableLabel": "Means",
     "scaleLabel": "Means"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/additionalTarget",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/additionalTarget",
     "tableLabel": "Additional Target",
     "scaleLabel": "Additional Target"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/specificAnatomicDetail",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/specificAnatomicDetail",
     "tableLabel": "Specific Anatomic Detail",
     "scaleLabel": "Specific Anatomic Detail"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/medicament",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/medicament",
     "tableLabel": "Specific Anatomic Detail",
     "scaleLabel": "Specific Anatomic Detail"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/measurement",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/measurement",
     "tableLabel": "Measurment",
     "scaleLabel": "Measurment"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/therapeuticProduct",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/therapeuticProduct",
     "tableLabel": "Therapeutic Product",
     "scaleLabel": "Therapeutic Product"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/assistiveProduct",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/assistiveProduct",
     "tableLabel": "Assistive Product",
     "scaleLabel": "Assistive Product"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/essentialPathologyTest",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/essentialPathologyTest",
     "tableLabel": "Essential Pathology Test",
     "scaleLabel": "Essential Pathology Test"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/quantifier",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/quantifier",
     "tableLabel": "Quantifiers",
     "scaleLabel": "Quantifiers"
   },
   {
-    "postcoordinationAxis":"http://who.int/icd#numberOfAnatomicalStructuresAnInterventionIsPerformedOn",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/numberOfAnatomicalStructuresAnInterventionIsPerformedOn",
     "tableLabel": "Number of Anatomical Structures an Intervention is Performed On",
     "scaleLabel": "Number of Anatomical Structures an Intervention is Performed On"
   },
   {
-    "postcoordinationAxis":"http://who.int/icd#numberOfInterventionsPerformed",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/numberOfInterventionsPerformed",
     "tableLabel": "Number of Interventions Performed",
     "scaleLabel": "Number of Interventions Performed"
   },
   {
-    "postcoordinationAxis":"http://who.int/icd#numberOfTherapeuticProductsInserted",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/numberOfTherapeuticProductsInserted",
     "tableLabel": "Number of Therapeutic Products Inserted",
     "scaleLabel": "Number of Therapeutic Products Inserted"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/telehealth",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/telehealth",
     "tableLabel": "Telehealth",
     "scaleLabel": "Telehealth"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/initiatingOrMaintainingOrDiscontinuingOrResuming",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/initiatingOrMaintainingOrDiscontinuingOrResuming",
     "tableLabel": "Initiating/Maintaining/Discont./Res.",
     "scaleLabel": "Initiating / Maintaining / Discontinuing / Resuming"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/relationshipToOtherInterventions",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/relationshipToOtherInterventions",
     "tableLabel": "Relationship to Other Interventions",
     "scaleLabel": "Relationship to Other Intervention(s)"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/natureOfIntervention",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/natureOfIntervention",
     "tableLabel": "Nature of Intervention",
     "scaleLabel": "Nature of Intervention"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/useOfEquipmentOrChallenge",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/useOfEquipmentOrChallenge",
     "tableLabel": "Use of Equipment or Challenge",
     "scaleLabel": "Use of Equipment or Challenge"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/recipient",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/recipient",
     "tableLabel": "Recipient",
     "scaleLabel": "Recipient"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/creativeTherapy",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/creativeTherapy",
     "tableLabel": "Creative Therapy",
     "scaleLabel": "Creative Therapy"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/specificSkillsAndTechnique",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/specificSkillsAndTechnique",
     "tableLabel": "Specific Skills and Technique",
     "scaleLabel": "Specific Skills and Technique"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/tissueFlap",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/tissueFlap",
     "tableLabel": "Tissue Flap",
     "scaleLabel": "Tissue Flap"
   },
   {
-    "postcoordinationAxis":"http://id.who.int/icd/schema/tissueGraft",
+    "postcoordinationAxis": "http://id.who.int/icd/schema/tissueGraft",
     "tableLabel": "Tissue Graft",
     "scaleLabel": "Tissue Graft"
   }
