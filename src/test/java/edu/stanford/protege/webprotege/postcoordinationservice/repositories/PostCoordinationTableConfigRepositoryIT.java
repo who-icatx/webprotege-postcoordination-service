@@ -47,7 +47,7 @@ public class PostCoordinationTableConfigRepositoryIT {
         TableConfiguration tableConfiguration = repository.getTableConfigurationByEntityType("ExternalCauses");
         assertNotNull(tableConfiguration);
         assertNotNull(tableConfiguration.getPostCoordinationAxes());
-        assertEquals(44, tableConfiguration.getPostCoordinationAxes().size());
+        assertEquals(42, tableConfiguration.getPostCoordinationAxes().size());
         assertNotNull(tableConfiguration.getCompositePostCoordinationAxes());
         assertEquals(1, tableConfiguration.getCompositePostCoordinationAxes().size());
         assertEquals("http://id.who.int/icd/schema/levelOfConsciousness", tableConfiguration.getCompositePostCoordinationAxes().get(0).getPostCoordinationAxis());

@@ -96,7 +96,7 @@ public class PostCoordinationServiceIT {
 
         postCoordinationService.enrichWithMissingAxis("ICD", specification, linearizationDefinitions, tableConfigs);
 
-        assertEquals(29, specification.getNotAllowedAxes().size());
+        assertEquals(27, specification.getNotAllowedAxes().size());
     }
 
 
@@ -119,7 +119,7 @@ public class PostCoordinationServiceIT {
 
         postCoordinationService.enrichWithMissingAxis("ICD", specification, linearizationDefinitions, tableConfigs);
 
-        assertEquals(29, specification.getDefaultAxes().size());
+        assertEquals(27, specification.getDefaultAxes().size());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class PostCoordinationServiceIT {
         assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents());
         Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents();
         assertEquals(16, viewEventSet.size());
-        assertEquals(31, viewEventSet.iterator().next().axisEvents().size());
+        assertEquals(29, viewEventSet.iterator().next().axisEvents().size());
         assertNotNull(viewEventSet.iterator().next().linearizationView());
 
     }
