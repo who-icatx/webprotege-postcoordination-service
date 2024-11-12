@@ -22,7 +22,10 @@ public record ProjectChangeForEntity(String whoficEntityIri,
 
     @Override
     public int compareTo(@NotNull ProjectChangeForEntity other) {
-        return Long.compare(this.projectChange.getTimestamp(), other.projectChange.getTimestamp());
-
+        int timestampComparison = Long.compare(this.projectChange.getTimestamp(), other.projectChange.getTimestamp());
+        if (timestampComparison != 0) {
+            return timestampComparison;
+        }
+        return this.whoficEntityIri.compareTo(other.whoficEntityIri);
     }
 }
