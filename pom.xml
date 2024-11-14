@@ -158,8 +158,8 @@
                         <spring.profiles.active>test</spring.profiles.active>
                     </systemPropertyVariables>
                     <includes>
-                        <include>**/*Test.java</include> <!-- Matches unit test naming convention -->
-                        <include>**/*IT.java</include> <!-- Matches unit test naming convention -->
+                        <include>**/*Test.java</include>
+                        <include>**/*IT.java</include>
                     </includes>
                 </configuration>
             </plugin>
