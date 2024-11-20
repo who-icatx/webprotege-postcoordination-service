@@ -32,8 +32,8 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
 
     @Override
     public Mono<GetEntityCustomScaleValueResponse> handleRequest(GetEntityCustomScaleValuesRequest request, ExecutionContext executionContext) {
-        WhoficCustomScalesValues processedScales = postCoordService.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
+        GetEntityCustomScaleValueResponse response = postCoordService.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
 
-        return Mono.just(new GetEntityCustomScaleValueResponse(processedScales));
+        return Mono.just(response);
     }
 }

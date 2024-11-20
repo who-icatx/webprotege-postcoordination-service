@@ -25,6 +25,8 @@ webprotege:
     requestqueue: webprotege-postcoordination-service-queue
     responsequeue: webprotege-postcoordination-service-response-queue
     timeout: 60000
+    eventsqueue: webprotege-postcoordination-events-queue
+    event-subscribe: true
   readWriteLock:
     timeoutInMillies: 1000
     maxRetries: 5

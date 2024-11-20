@@ -5,11 +5,17 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.stanford.protege.webprotege.common.Response;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficEntityPostCoordinationSpecification;
 
+import java.util.Date;
+
 import static edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEntityPostCoordinationRequest.CHANNEL;
 
 @JsonTypeName(CHANNEL)
 public record GetEntityPostCoordinationResponse(@JsonProperty("entityIri")
                                                 String entityIri,
+
+                                                @JsonProperty("lastRevisionDate")
+                                                Date lastRevisionDate,
+
                                                 @JsonProperty("postCoordinationSpecification")
                                                 WhoficEntityPostCoordinationSpecification postCoordinationSpecification) implements Response {
 }
