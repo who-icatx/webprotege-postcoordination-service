@@ -1,14 +1,10 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.*;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION)
@@ -39,6 +35,12 @@ public class EntityPostCoordinationHistory {
         this.whoficEntityIri = whoficEntityIri;
         this.projectId = projectId;
         this.postCoordinationRevisions = postCoordinationRevisions;
+    }
+
+    public static EntityPostCoordinationHistory create(String whoficEntityIri,
+                                                       String projectId,
+                                                       List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
+        return new EntityPostCoordinationHistory(whoficEntityIri, projectId, postCoordinationRevisions);
     }
 
     @JsonProperty(WHOFIC_ENTITY_IRI)

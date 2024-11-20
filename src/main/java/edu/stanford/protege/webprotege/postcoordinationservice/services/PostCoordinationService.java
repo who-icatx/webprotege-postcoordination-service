@@ -2,17 +2,13 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.InsertOneModel;
-import edu.stanford.protege.webprotege.common.ProjectId;
-import edu.stanford.protege.webprotege.common.UserId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
 import edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationDocumentRepository;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.*;
 import org.bson.Document;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +24,7 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 public class PostCoordinationService {
 
 
-    private final PostCoordinationSpecificationsRepository specRepository;
+    private final PostCoordinationRepository repository;
     private final PostCoordinationTableConfigRepository configRepository;
     private final LinearizationService linearizationService;
     private final ReadWriteLockService readWriteLock;
@@ -36,21 +32,24 @@ public class PostCoordinationService {
     private final ObjectMapper objectMapper;
     private final NewRevisionsEventEmitterService newRevisionsEventEmitter;
 
+    private final PostCoordinationEventProcessor eventProcessor;
 
-    public PostCoordinationService(PostCoordinationSpecificationsRepository specRepository,
+
+    public PostCoordinationService(PostCoordinationRepository repository,
                                    PostCoordinationTableConfigRepository configRepository,
                                    LinearizationService linearizationService,
                                    ReadWriteLockService readWriteLock,
                                    PostCoordinationDocumentRepository documentRepository,
                                    ObjectMapper objectMapper,
-                                   NewRevisionsEventEmitterService newRevisionsEventEmitter) {
-        this.specRepository = specRepository;
+                                   NewRevisionsEventEmitterService newRevisionsEventEmitter, PostCoordinationEventProcessor eventProcessor) {
+        this.repository = repository;
         this.configRepository = configRepository;
         this.linearizationService = linearizationService;
         this.readWriteLock = readWriteLock;
         this.documentRepository = documentRepository;
         this.objectMapper = objectMapper;
         this.newRevisionsEventEmitter = newRevisionsEventEmitter;
+        this.eventProcessor = eventProcessor;
     }
 
 
@@ -59,7 +58,7 @@ public class PostCoordinationService {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(100, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
         });
     }
 
@@ -67,12 +66,12 @@ public class PostCoordinationService {
     public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
         var stream = documentRepository.fetchCustomScalesValues(documentLocation);
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(100, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
         });
     }
 
     private Consumer<List<WhoficCustomScalesValues>> createBatchProcessorForSavingPaginatedCustomScales(ProjectId projectId,
-                                                                                                                         UserId userId) {
+                                                                                                        UserId userId) {
         return page -> {
             if (isNotEmpty(page)) {
                 Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
@@ -86,7 +85,7 @@ public class PostCoordinationService {
                         .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
                         .toList();
 
-                specRepository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
+                repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
 
                 newRevisionsEventEmitter.emitNewRevisionsEventForScaleHistory(projectId, new ArrayList<>(histories));
             }
@@ -100,10 +99,10 @@ public class PostCoordinationService {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
                 for (WhoficEntityPostCoordinationSpecification specification : page) {
 
-                    for(LinearizationDefinition linearizationDefinition: definitionList) {
+                    for (LinearizationDefinition linearizationDefinition : definitionList) {
                         boolean linearizationExists = specification.postcoordinationSpecifications().stream().anyMatch(spec ->
                                 spec.getLinearizationView().equalsIgnoreCase(linearizationDefinition.getWhoficEntityIri()));
-                        if(!linearizationExists) {
+                        if (!linearizationExists) {
                             specification.postcoordinationSpecifications().add(new PostCoordinationSpecification(linearizationDefinition.getWhoficEntityIri(),
                                     new ArrayList<>(),
                                     new ArrayList<>(),
@@ -126,16 +125,17 @@ public class PostCoordinationService {
 
                 saveMultipleEntityPostCoordinationHistories(histories);
 
-                //newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId,histories.stream().toList());
+                newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList());
             }
         };
     }
+
     private void saveMultipleEntityPostCoordinationHistories(Set<EntityPostCoordinationHistory> historiesToBeSaved) {
         var documents = historiesToBeSaved.stream()
                 .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
                 .toList();
 
-        specRepository.bulkWriteDocuments(documents, POSTCOORDINATION_HISTORY_COLLECTION);
+        repository.bulkWriteDocuments(documents, POSTCOORDINATION_HISTORY_COLLECTION);
     }
 
 
@@ -164,6 +164,96 @@ public class PostCoordinationService {
             }
         }
         return specification;
+    }
+
+    public void addSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId) {
+
+        readWriteLock.executeWriteLock(() -> {
+                    var existingHistoryOptional = this.repository.getExistingHistoryOrderedByRevision(newSpecification.whoficEntityIri(), projectId);
+                    existingHistoryOptional.ifPresentOrElse(history -> {
+
+                                WhoficEntityPostCoordinationSpecification oldSpec = eventProcessor.processHistory(history);
+
+                                Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpecification);
+
+
+                                if (!specEvents.isEmpty()) {
+                                    var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
+                                    repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, newRevision);
+                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), newRevision);
+                                }
+                            }, () -> {
+                                EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId);
+                                var savedHistory = repository.saveNewSpecificationHistory(history);
+                                savedHistory.getPostCoordinationRevisions()
+                                        .stream()
+                                        .findFirst()
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision));
+                            }
+                    );
+                }
+        );
+    }
+
+    public void addCustomScaleRevision(WhoficCustomScalesValues newScales,
+                                       ProjectId projectId, UserId userId) {
+        readWriteLock.executeWriteLock(() -> {
+                    var existingScaleHistoryOptional = this.repository.getExistingCustomScaleHistoryOrderedByRevision(newScales.whoficEntityIri(), projectId);
+                    existingScaleHistoryOptional.ifPresentOrElse(history -> {
+
+                                WhoficCustomScalesValues oldSpec = eventProcessor.processCustomScaleHistory(history);
+
+                                Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldSpec, newScales);
+
+
+                                if (!events.isEmpty()) {
+                                    var newRevision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
+                                    repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, newRevision);
+                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), newRevision);
+                                }
+                            }, () -> {
+                                var newHistory = createNewEntityCustomScalesHistory(newScales, projectId, userId);
+                                var savedHistory = repository.saveNewCustomScalesHistory(newHistory);
+                                savedHistory.getPostCoordinationCustomScalesRevisions()
+                                        .stream()
+                                        .findFirst()
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision));
+                            }
+                    );
+                }
+        );
+    }
+
+    private EntityCustomScalesValuesHistory createNewEntityCustomScalesHistory(WhoficCustomScalesValues newScales,
+                                                                               ProjectId projectId,
+                                                                               UserId userId) {
+        WhoficCustomScalesValues oldSpec = WhoficCustomScalesValues.create(newScales.whoficEntityIri(), Collections.emptyList());
+        Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldSpec, newScales);
+        var revision = PostCoordinationCustomScalesRevision.create(userId, events);
+        return EntityCustomScalesValuesHistory.create(newScales.whoficEntityIri(), projectId.value(), List.of(revision));
+    }
+
+    private EntityPostCoordinationHistory createNewSpecificationHistory(WhoficEntityPostCoordinationSpecification newSpec,
+                                                                        ProjectId projectId,
+                                                                        UserId userId) {
+        WhoficEntityPostCoordinationSpecification oldSpec = WhoficEntityPostCoordinationSpecification.create(newSpec.whoficEntityIri(), newSpec.entityType(), Collections.emptyList());
+        Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpec);
+
+        var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
+        return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
+    }
+
+    public WhoficCustomScalesValues fetchCustomScalesHistory(String entityIri, ProjectId projectId) {
+        return this.repository.getExistingCustomScaleHistoryOrderedByRevision(entityIri, projectId)
+                .map(eventProcessor::processCustomScaleHistory)
+                .orElseGet(() -> new WhoficCustomScalesValues(entityIri, Collections.emptyList()));
+
+    }
+
+    public WhoficEntityPostCoordinationSpecification fetchHistory(String entityIri, ProjectId projectId) {
+        return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
+                .map(eventProcessor::processHistory)
+                .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList()));
     }
 
 }

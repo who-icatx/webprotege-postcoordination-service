@@ -1,177 +1,112 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
-import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
-import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
-import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationSpecificationsRepository;
-import org.bson.Document;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.*;
 import java.util.*;
 
-import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Import({WebprotegePostcoordinationServiceServiceApplication.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-@ExtendWith({SpringExtension.class, IntegrationTest.class})
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class PostCoordinationEventProcessorTest {
 
-    @MockBean
-    private LinearizationService linearizationService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private PostCoordinationEventProcessor postCoordinationEventProcessor;
-
-    @Autowired
-    private PostCoordinationSpecificationsRepository repository;
-
-    private EntityPostCoordinationHistory entityPostCoordinationHistory;
-
-    private EntityCustomScalesValuesHistory customScalesValuesHistory;
+    private PostCoordinationEventProcessor eventProcessor;
 
     @BeforeEach
-    public void setUp() throws IOException {
-        saveExistingHistory();
-        saveExistingCustomScales();
-        FileInputStream defintions = new FileInputStream("src/test/resources/LinearizationDefinitions.json");
-        when(linearizationService.getLinearizationDefinitions())
-                .thenReturn(objectMapper.readValue(defintions, new TypeReference<>() {
-                }));
+    public void setUp() {
+        eventProcessor = new PostCoordinationEventProcessor();
     }
 
     @Test
-    public void GIVEN_savedDocument_WHEN_processingEvents_THEN_correctResponseIsGiven() {
-        WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
+    void GIVEN_customScalesHistoryWithEvents_WHEN_processCustomScaleHistory_THEN_correctCustomizationsReturned() {
+        List<PostCoordinationCustomScalesValueEvent> events1 = List.of(
+                new AddCustomScaleValueEvent("axis1", "value1"),
+                new AddCustomScaleValueEvent("axis1", "value2")
+        );
 
-        Optional<PostCoordinationSpecification> envSpec = specification.postcoordinationSpecifications().stream()
-                .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/env"))
+        List<PostCoordinationCustomScalesValueEvent> events2 = List.of(
+                new RemoveCustomScaleValueEvent("axis1", "value1")  // Now "axis1" exists before removal
+        );
+
+        EntityCustomScalesValuesHistory customScalesHistory = new EntityCustomScalesValuesHistory(
+                "entity1",
+                ProjectId.generate().toString(),
+                List.of(
+                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 1L, new HashSet<>(events1)),
+                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 2L, new HashSet<>(events2))
+                )
+        );
+
+        WhoficCustomScalesValues result = eventProcessor.processCustomScaleHistory(customScalesHistory);
+
+        assertNotNull(result);
+        assertEquals(1, result.scaleCustomizations().size());
+
+        Optional<PostCoordinationScaleCustomization> axis1Customization = result.scaleCustomizations().stream()
+                .filter(scale -> scale.getPostcoordinationAxis().equals("axis1"))
                 .findFirst();
-        Optional<PostCoordinationSpecification> mmsSpec = specification.postcoordinationSpecifications().stream()
-                .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/mms"))
-                .findFirst();
 
-        assertTrue(envSpec.isPresent());
-        assertTrue(mmsSpec.isPresent());
-
-        assertEquals(31, envSpec.get().getDefaultAxes().size());
-        assertEquals(0, envSpec.get().getAllowedAxes().size());
-        assertEquals(0, envSpec.get().getNotAllowedAxes().size());
-        assertEquals(0, envSpec.get().getRequiredAxes().size());
-
-
-        assertEquals(0, mmsSpec.get().getDefaultAxes().size());
-        assertEquals(2, mmsSpec.get().getAllowedAxes().size());
-        assertEquals(29, mmsSpec.get().getNotAllowedAxes().size());
-        assertEquals(0, mmsSpec.get().getRequiredAxes().size());
+        assertTrue(axis1Customization.isPresent());
+        assertEquals(1, axis1Customization.get().getPostcoordinationScaleValues().size());
+        assertEquals("value2", axis1Customization.get().getPostcoordinationScaleValues().get(0));
     }
 
 
     @Test
-    public void GIVEN_savedCustomScaleEvents_WHEN_processing_THEN_eventsAreCorrectlyProcessed() {
+    void GIVEN_specificationHistoryWithEvents_WHEN_processHistory_THEN_correctSpecificationReturned() {
+        List<PostCoordinationSpecificationEvent> events1 = List.of(
+                new AddToRequiredAxisEvent("axis1", "view1"),
+                new AddToDefaultAxisEvent("axis2", "view1")
+        );
+        List<PostCoordinationSpecificationEvent> events2 = List.of(
+                new AddToNotAllowedAxisEvent("axis1", "view1")
+        );
 
-        WhoficCustomScalesValues response = postCoordinationEventProcessor.fetchCustomScalesHistory(customScalesValuesHistory.getWhoficEntityIri(), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
-        assertNotNull(response);
-        assertEquals(2, response.scaleCustomizations().size());
+        EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(
+                "entity1",
+                "project1",
+                List.of(
+                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 1L, Set.of(new PostCoordinationViewEvent("view1", events1))),
+                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 2L, Set.of(new PostCoordinationViewEvent("view1", events2)))
+                )
+        );
 
-        Optional<PostCoordinationScaleCustomization> infectiousAgent = response.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/infectiousAgent"))
-                .findFirst();
-        assertTrue(infectiousAgent.isPresent());
-        assertEquals(2, infectiousAgent.get().getPostcoordinationScaleValues().size());
+        WhoficEntityPostCoordinationSpecification result = eventProcessor.processHistory(history);
 
-        Optional<PostCoordinationScaleCustomization> associatedWith = response.scaleCustomizations().stream()
-                .filter(scale -> scale.getPostcoordinationAxis().equalsIgnoreCase("http://id.who.int/icd/schema/associatedWith"))
-                .findFirst();
-        assertTrue(associatedWith.isPresent());
-        assertEquals(1, associatedWith.get().getPostcoordinationScaleValues().size());
+        assertNotNull(result);
+        assertEquals("entity1", result.whoficEntityIri());
+        assertEquals(1, result.postcoordinationSpecifications().size());
+
+        PostCoordinationSpecification specification = result.postcoordinationSpecifications().get(0);
+        assertEquals("view1", specification.getLinearizationView());
+        assertTrue(specification.getNotAllowedAxes().contains("axis1"));
+        assertFalse(specification.getRequiredAxes().contains("axis1"));
+        assertTrue(specification.getDefaultAxes().contains("axis2"));
     }
 
     @Test
-    public void test() {
-        PostCoordinationScaleCustomization postCoordinationScaleCustomization = new
-                PostCoordinationScaleCustomization(Arrays.asList("http://id.who.int/icd/entity/194483911", "http://id.who.int/icd/entity/5555555"), "http://id.who.int/icd/schema/infectiousAgent");
-        WhoficCustomScalesValues customScalesValues = new WhoficCustomScalesValues(customScalesValuesHistory.getWhoficEntityIri(), Collections.singletonList(postCoordinationScaleCustomization));
+    void GIVEN_emptyCustomScalesHistory_WHEN_processCustomScaleHistory_THEN_noCustomizationsReturned() {
+        EntityCustomScalesValuesHistory emptyCustomScalesHistory = new EntityCustomScalesValuesHistory("entity1", ProjectId.generate().toString(), Collections.emptyList());
 
-        postCoordinationEventProcessor.saveNewCustomScalesRevision(customScalesValues, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
-        WhoficCustomScalesValues response = postCoordinationEventProcessor.fetchCustomScalesHistory(customScalesValuesHistory.getWhoficEntityIri(), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
-        System.out.println(response);
+        WhoficCustomScalesValues result = eventProcessor.processCustomScaleHistory(emptyCustomScalesHistory);
+
+        assertNotNull(result);
+        assertEquals(0, result.scaleCustomizations().size());
     }
 
     @Test
-    public void WHEN_addingNewRevision_WHEN_fetchingTheProcessedData_THEN_revisionIsApplied() {
+    void GIVEN_emptyPostCoordinationHistory_WHEN_processHistory_THEN_noSpecificationsReturned() {
+        EntityPostCoordinationHistory emptyHistory = new EntityPostCoordinationHistory("entity1", "project1", Collections.emptyList());
 
-        PostCoordinationSpecification postCoordinationSpecification = new PostCoordinationSpecification("http://id.who.int/icd/release/11/mms",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Collections.singletonList("http://id.who.int/icd/schema/infectiousAgent"));
+        WhoficEntityPostCoordinationSpecification result = eventProcessor.processHistory(emptyHistory);
 
-        WhoficEntityPostCoordinationSpecification newSpec = new WhoficEntityPostCoordinationSpecification("http://id.who.int/icd/entity/2042704797",
-                "ICD",
-                Collections.singletonList(postCoordinationSpecification));
-
-        postCoordinationEventProcessor.saveNewSpecificationRevision(newSpec, UserId.valueOf("alexsilaghi"), ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
-
-        WhoficEntityPostCoordinationSpecification specification = postCoordinationEventProcessor.fetchHistory("http://id.who.int/icd/entity/2042704797", ProjectId.valueOf("b717d9a3-f265-46f5-bd15-9f1cf4b132c8"));
-
-        assertNotNull(specification);
-
-        Optional<PostCoordinationSpecification> mms = specification.postcoordinationSpecifications().stream()
-                .filter(spec -> spec.getLinearizationView().equalsIgnoreCase("http://id.who.int/icd/release/11/mms"))
-                .findFirst();
-
-        assertTrue(mms.isPresent());
-        assertEquals(1, mms.get().getRequiredAxes().size());
-        assertEquals(28, mms.get().getNotAllowedAxes().size());
-        assertEquals(2, mms.get().getAllowedAxes().size());
-        assertEquals("http://id.who.int/icd/schema/infectiousAgent", mms.get().getRequiredAxes().get(0));
+        assertNotNull(result);
+        assertEquals("entity1", result.whoficEntityIri());
+        assertEquals(0, result.postcoordinationSpecifications().size());
     }
-
-
-    private void saveExistingHistory() throws IOException {
-        File initialFile = new File("src/test/resources/processedPostCoordinationHistory.json");
-        objectMapper = new WebProtegeJacksonApplication().objectMapper(new OWLDataFactoryImpl());
-        entityPostCoordinationHistory = objectMapper.readValue(initialFile, EntityPostCoordinationHistory.class);
-        List<PostCoordinationSpecificationRevision> sortedRevisions = entityPostCoordinationHistory.getPostCoordinationRevisions()
-                .stream()
-                .toList()
-                .stream()
-                .sorted(Comparator.comparingLong(PostCoordinationSpecificationRevision::timestamp))
-                .toList();
-
-        entityPostCoordinationHistory = new EntityPostCoordinationHistory(entityPostCoordinationHistory.getWhoficEntityIri(), entityPostCoordinationHistory.getProjectId(), sortedRevisions);
-
-        repository.writeDocument(objectMapper.convertValue(entityPostCoordinationHistory, Document.class), POSTCOORDINATION_HISTORY_COLLECTION);
-
-    }
-
-    private void saveExistingCustomScales() throws IOException {
-
-        File processedCustomScales = new File("src/test/resources/processedCustomValuesEvents.json");
-        Document existingData = objectMapper.readValue(processedCustomScales, Document.class);
-        repository.writeDocument(existingData, EntityCustomScalesValuesHistory.POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
-        this.customScalesValuesHistory = objectMapper.convertValue(existingData, EntityCustomScalesValuesHistory.class);
-    }
-
 }

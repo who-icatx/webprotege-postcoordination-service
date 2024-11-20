@@ -4,7 +4,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.WhoficCustomScalesValues;
-import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationEventProcessor;
+import edu.stanford.protege.webprotege.postcoordinationservice.services.PostCoordinationService;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
 
@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<GetEntityCustomScaleValuesRequest, GetEntityCustomScaleValueResponse> {
 
 
-    private final PostCoordinationEventProcessor postCoordinationEventProcessor;
+    private final PostCoordinationService postCoordService;
 
-    public GetEntityCustomScaleValuesCommandHandler(PostCoordinationEventProcessor postCoordinationEventProcessor) {
-        this.postCoordinationEventProcessor = postCoordinationEventProcessor;
+    public GetEntityCustomScaleValuesCommandHandler(PostCoordinationService postCoordService) {
+        this.postCoordService = postCoordService;
     }
 
     @NotNull
@@ -32,7 +32,7 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
 
     @Override
     public Mono<GetEntityCustomScaleValueResponse> handleRequest(GetEntityCustomScaleValuesRequest request, ExecutionContext executionContext) {
-        WhoficCustomScalesValues processedScales = postCoordinationEventProcessor.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
+        WhoficCustomScalesValues processedScales = postCoordService.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
 
         return Mono.just(new GetEntityCustomScaleValueResponse(processedScales));
     }

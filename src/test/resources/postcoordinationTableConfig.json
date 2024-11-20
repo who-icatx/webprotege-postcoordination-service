@@ -19,8 +19,6 @@
       "http://id.who.int/icd/schema/distribution",
       "http://id.who.int/icd/schema/regional",
       "http://id.who.int/icd/schema/specificAnatomy",
-      "http://id.who.int/icd/schema/serotype",
-      "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
       "http://id.who.int/icd/schema/fractureSubtype",
       "http://id.who.int/icd/schema/fractureOpenOrClosed",
       "http://id.who.int/icd/schema/jointInvolvementInFracture",
@@ -38,7 +36,6 @@
       {
         "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
         "replacedBySubaxes": [
-          "http://id.who.int/icd/schema/hasGCSScore",
           "http://id.who.int/icd/schema/hasGCSEyeScore",
           "http://id.who.int/icd/schema/hasGCSMotorScore",
           "http://id.who.int/icd/schema/hasGCSVerbalScore",
@@ -80,8 +77,6 @@
       "http://id.who.int/icd/schema/distribution",
       "http://id.who.int/icd/schema/regional",
       "http://id.who.int/icd/schema/specificAnatomy",
-      "http://id.who.int/icd/schema/serotype",
-      "http://id.who.int/icd/schema/genomicAndChomosomalAnomaly",
       "http://id.who.int/icd/schema/fractureSubtype",
       "http://id.who.int/icd/schema/fractureOpenOrClosed",
       "http://id.who.int/icd/schema/jointInvolvementInFracture",
@@ -99,7 +94,6 @@
       {
         "postcoordinationAxis": "http://id.who.int/icd/schema/levelOfConsciousness",
         "replacedBySubaxes": [
-          "http://id.who.int/icd/schema/hasGCSScore",
           "http://id.who.int/icd/schema/hasGCSEyeScore",
           "http://id.who.int/icd/schema/hasGCSMotorScore",
           "http://id.who.int/icd/schema/hasGCSVerbalScore",
