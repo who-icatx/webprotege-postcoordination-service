@@ -2,6 +2,8 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 
 import com.fasterxml.jackson.annotation.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.*;
 
@@ -11,6 +13,9 @@ import static edu.stanford.protege.webprotege.postcoordinationservice.model.Enti
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = POSTCOORDINATION_CUSTOM_SCALES_COLLECTION)
+@CompoundIndexes({
+        @CompoundIndex(name = "entity_iri_project_idx", def = "{'" + EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI + "': 1, '" + EntityCustomScalesValuesHistory.PROJECT_ID + "': 1}")
+})
 public class EntityCustomScalesValuesHistory {
 
     public static final String POSTCOORDINATION_CUSTOM_SCALES_COLLECTION = "EntityPostCoordinationCustomScales";
@@ -23,6 +28,7 @@ public class EntityCustomScalesValuesHistory {
     private final String whoficEntityIri;
 
     @Field(PROJECT_ID)
+    @Indexed(name = "entityProjectId")
     private final String projectId;
 
     @Field(CUSTOM_SCALE_REVISIONS)

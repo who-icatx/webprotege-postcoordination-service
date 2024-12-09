@@ -22,6 +22,7 @@ public class EntityPostCoordinationHistory {
     private final String whoficEntityIri;
 
     @Field(PROJECT_ID)
+    @Indexed(name = "entityIriProjectId")
     private final String projectId;
 
     @Field(SPEC_REVISIONS)
