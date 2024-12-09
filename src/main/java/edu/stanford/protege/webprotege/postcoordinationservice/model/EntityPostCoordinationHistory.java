@@ -1,6 +1,8 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 import com.fasterxml.jackson.annotation.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.*;
 
@@ -8,6 +10,9 @@ import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION)
+@CompoundIndexes({
+        @CompoundIndex(name = "entity_iri_project_idx", def = "{'" + EntityPostCoordinationHistory.WHOFIC_ENTITY_IRI + "': 1, '" + EntityPostCoordinationHistory.PROJECT_ID + "': 1}")
+})
 public class EntityPostCoordinationHistory {
 
 
@@ -18,11 +23,11 @@ public class EntityPostCoordinationHistory {
     public static final String SPEC_REVISIONS = "postCoordinationRevisions";
 
     @Field(WHOFIC_ENTITY_IRI)
-    @Indexed(name = "entityIriSpec")
+    @Indexed(name = "entityIriSpec_idx")
     private final String whoficEntityIri;
 
     @Field(PROJECT_ID)
-    @Indexed(name = "entityIriProjectId")
+    @Indexed(name = "entityIriProjectId_idx")
     private final String projectId;
 
     @Field(SPEC_REVISIONS)

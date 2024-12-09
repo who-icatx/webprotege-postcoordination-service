@@ -24,11 +24,11 @@ public class EntityCustomScalesValuesHistory {
     public static final String PROJECT_ID = "projectId";
     public static final String CUSTOM_SCALE_REVISIONS = "postCoordinationCustomScalesRevisions";
     @Field(WHOFIC_ENTITY_IRI)
-    @Indexed(name = "entityIriScales")
+    @Indexed(name = "entityIriScales_idx")
     private final String whoficEntityIri;
 
     @Field(PROJECT_ID)
-    @Indexed(name = "entityProjectId")
+    @Indexed(name = "entityProjectId_idx")
     private final String projectId;
 
     @Field(CUSTOM_SCALE_REVISIONS)
