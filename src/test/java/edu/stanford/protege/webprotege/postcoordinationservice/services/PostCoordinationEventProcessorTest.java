@@ -37,8 +37,8 @@ public class PostCoordinationEventProcessorTest {
                 "entity1",
                 ProjectId.generate().toString(),
                 List.of(
-                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 1L, new HashSet<>(events1)),
-                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 2L, new HashSet<>(events2))
+                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 1L, new HashSet<>(events1), CommitStatus.COMMITTED, null),
+                        new PostCoordinationCustomScalesRevision(UserId.getGuest(), 2L, new HashSet<>(events2), CommitStatus.COMMITTED, null)
                 )
         );
 
@@ -71,8 +71,8 @@ public class PostCoordinationEventProcessorTest {
                 "entity1",
                 "project1",
                 List.of(
-                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 1L, Set.of(new PostCoordinationViewEvent("view1", events1))),
-                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 2L, Set.of(new PostCoordinationViewEvent("view1", events2)))
+                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 1L, Set.of(new PostCoordinationViewEvent("view1", events1)), CommitStatus.COMMITTED, null),
+                        new PostCoordinationSpecificationRevision(UserId.getGuest(), 2L, Set.of(new PostCoordinationViewEvent("view1", events2)), CommitStatus.COMMITTED, null)
                 )
         );
 

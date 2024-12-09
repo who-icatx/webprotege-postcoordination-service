@@ -3,6 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.repositories;
 
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.result.UpdateResult;
+import edu.stanford.protege.webprotege.common.ChangeRequestId;
 import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.ReadWriteLockService;
@@ -23,6 +24,8 @@ import static edu.stanford.protege.webprotege.postcoordinationservice.model.Enti
 public class PostCoordinationRepository {
 
 
+    private static final String CHANGE_REQUEST_ID = "changeRequestId";
+
     private final MongoTemplate mongoTemplate;
     private final ReadWriteLockService readWriteLock;
 
@@ -33,10 +36,8 @@ public class PostCoordinationRepository {
     }
 
     public void bulkWriteDocuments(List<InsertOneModel<Document>> listOfInsertOneModelDocument, String collectionName) {
-        readWriteLock.executeWriteLock(() -> {
-            var collection = mongoTemplate.getCollection(collectionName);
-            collection.bulkWrite(listOfInsertOneModelDocument);
-        });
+        var collection = mongoTemplate.getCollection(collectionName);
+        collection.bulkWrite(listOfInsertOneModelDocument);
     }
 
     public void addSpecificationRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationSpecificationRevision specificationRevision) {
@@ -61,6 +62,7 @@ public class PostCoordinationRepository {
         return readWriteLock.executeWriteLock(() -> mongoTemplate.save(specificationHistory, POSTCOORDINATION_HISTORY_COLLECTION));
     }
 
+
     public void addCustomScalesRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationCustomScalesRevision customScalesRevision) {
         Query query = new Query();
         query.addCriteria(Criteria.where(WHOFIC_ENTITY_IRI).is(whoficEntityIri)
@@ -83,13 +85,13 @@ public class PostCoordinationRepository {
         return readWriteLock.executeWriteLock(() -> mongoTemplate.save(entityScaleValueHistory, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION));
     }
 
-
     public void writeDocument(Document document, String collectionName) {
         readWriteLock.executeWriteLock(() -> {
             var collection = mongoTemplate.getCollection(collectionName);
             collection.insertOne(document);
         });
     }
+
 
     public Optional<EntityPostCoordinationHistory> findHistoryByEntityIriAndProjectId(String entityIri, ProjectId projectId) {
 
@@ -131,5 +133,75 @@ public class PostCoordinationRepository {
                 }
         );
 
+    }
+
+    public void deletePostCoordinationCustomScalesRevision(ChangeRequestId changeRequestId, ProjectId projectId, String entityIri) {
+
+        Query query = new Query();
+        query.addCriteria(
+                Criteria.where(WHOFIC_ENTITY_IRI).is(entityIri)
+                        .and(PROJECT_ID).is(projectId.value())
+        );
+        Update update = new Update().pull("postCoordinationCustomScalesRevisions",
+                new Document("changeRequestId._id", changeRequestId.id()));
+
+        readWriteLock.executeReadLock(() ->
+                Optional.of(mongoTemplate.updateFirst(query,update, EntityCustomScalesValuesHistory.class, CUSTOM_SCALE_REVISIONS ))
+        );
+    }
+
+    public void deletePostCoordinationSpecificationRevision(ChangeRequestId changeRequestId, ProjectId projectId, String entityIri) {
+
+        Query query = new Query();
+        query.addCriteria(
+                Criteria.where(WHOFIC_ENTITY_IRI).is(entityIri)
+                        .and(PROJECT_ID).is(projectId.value())
+        );
+        Update update = new Update().pull("postCoordinationRevisions",
+                new Document("changeRequestId._id", changeRequestId.id()));
+
+        readWriteLock.executeReadLock(() -> {
+
+            UpdateResult updateResult = mongoTemplate.updateFirst(query,update, EntityPostCoordinationHistory.class, POSTCOORDINATION_HISTORY_COLLECTION);
+            System.out.println(updateResult);
+            return null;
+        }
+
+        );
+    }
+
+    public void commitPostCoordinationSpecificationRevision(ChangeRequestId changeRequestId, ProjectId projectId, String entityIri){
+        Query query = new Query(Criteria.where(WHOFIC_ENTITY_IRI)
+                .is(entityIri)
+                .and(PROJECT_ID).is(projectId.id())
+                .and("postCoordinationRevisions")
+                .elemMatch(
+                        Criteria.where("changeRequestId").is(changeRequestId)
+                                .and("commitStatus").is(CommitStatus.UNCOMMITTED.name())
+                )
+        );
+        Update update = new Update().set("postCoordinationRevisions.$.commitStatus", CommitStatus.COMMITTED.name());
+
+        readWriteLock.executeReadLock(() ->
+                Optional.of(mongoTemplate.updateFirst(query,update, EntityPostCoordinationHistory.class, POSTCOORDINATION_HISTORY_COLLECTION))
+        );
+    }
+
+    public void commitPostCoordinationCustomScalesRevision(ChangeRequestId changeRequestId, ProjectId projectId, String entityIri){
+        Query query = new Query(Criteria.where(WHOFIC_ENTITY_IRI)
+                .is(entityIri)
+                .and(PROJECT_ID).is(projectId.id())
+                .and("postCoordinationCustomScalesRevisions")
+                .elemMatch(
+                        Criteria.where("changeRequestId").is(changeRequestId)
+                                .and("commitStatus").is(CommitStatus.UNCOMMITTED.name())
+                )
+        );
+
+        Update update = new Update().set("postCoordinationCustomScalesRevisions.$.commitStatus", CommitStatus.COMMITTED.name());
+
+        readWriteLock.executeReadLock(() ->
+                Optional.of(mongoTemplate.updateFirst(query,update, EntityCustomScalesValuesHistory.class, CUSTOM_SCALE_REVISIONS ))
+        );
     }
 }
