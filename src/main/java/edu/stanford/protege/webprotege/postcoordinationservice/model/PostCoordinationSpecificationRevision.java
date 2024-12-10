@@ -14,7 +14,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
                                                     Set<PostCoordinationViewEvent> postCoordinationEvents,
                                                     CommitStatus commitStatus,
-                                                    ChangeRequestId changeRequestId) implements Comparable<PostCoordinationSpecificationRevision>{
+                                                    String changeRequestId) implements Comparable<PostCoordinationSpecificationRevision>{
 
 
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList) {
@@ -22,7 +22,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
     }
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
-        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId);
+        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
     }
 
     public static PostCoordinationSpecificationRevision createCommittedClone(PostCoordinationSpecificationRevision revision) {

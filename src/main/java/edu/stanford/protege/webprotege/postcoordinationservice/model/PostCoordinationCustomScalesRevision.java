@@ -14,7 +14,7 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
                                                    @Indexed(name = "rev_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
                                                    Set<PostCoordinationCustomScalesValueEvent> postCoordinationEvents,
                                                    CommitStatus commitStatus,
-                                                   ChangeRequestId changeRequestId) implements Comparable<PostCoordinationCustomScalesRevision> {
+                                                   String changeRequestId) implements Comparable<PostCoordinationCustomScalesRevision> {
 
 
     public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList) {
@@ -23,7 +23,7 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
 
     public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
-        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId);
+        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
     }
 
     public static PostCoordinationCustomScalesRevision createCommittedClone(PostCoordinationCustomScalesRevision revision) {
