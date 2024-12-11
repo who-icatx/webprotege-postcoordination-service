@@ -1,6 +1,7 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 import com.google.common.base.Objects;
+import edu.stanford.protege.webprotege.common.ChangeRequestId;
 import edu.stanford.protege.webprotege.common.UserId;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
 import org.jetbrains.annotations.NotNull;
@@ -11,11 +12,22 @@ import java.util.Set;
 
 public record PostCoordinationCustomScalesRevision(UserId userId,
                                                    @Indexed(name = "rev_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
-                                                   Set<PostCoordinationCustomScalesValueEvent> postCoordinationEvents) implements Comparable<PostCoordinationCustomScalesRevision> {
+                                                   Set<PostCoordinationCustomScalesValueEvent> postCoordinationEvents,
+                                                   CommitStatus commitStatus,
+                                                   String changeRequestId) implements Comparable<PostCoordinationCustomScalesRevision> {
 
 
     public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList) {
-        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList);
+        return create(userId, postCoordinationEventList, null);
+    }
+
+    public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
+        CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
+        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
+    }
+
+    public static PostCoordinationCustomScalesRevision createCommittedClone(PostCoordinationCustomScalesRevision revision) {
+        return new PostCoordinationCustomScalesRevision(revision.userId(), revision.timestamp(), revision.postCoordinationEvents(), CommitStatus.COMMITTED, revision.changeRequestId());
     }
 
     @Override

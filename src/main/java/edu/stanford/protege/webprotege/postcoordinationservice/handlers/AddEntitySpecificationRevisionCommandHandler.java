@@ -28,7 +28,7 @@ public class AddEntitySpecificationRevisionCommandHandler implements CommandHand
 
     @Override
     public Mono<AddEntitySpecificationRevisionResponse> handleRequest(AddEntitySpecificationRevisionRequest request, ExecutionContext executionContext) {
-        postCoordService.addSpecificationRevision(request.entitySpecification(), executionContext.userId(), request.projectId());
+        postCoordService.addSpecificationRevision(request.entitySpecification(), executionContext.userId(), request.projectId(), request.changeRequestId());
         return Mono.just(new AddEntitySpecificationRevisionResponse());
     }
 }

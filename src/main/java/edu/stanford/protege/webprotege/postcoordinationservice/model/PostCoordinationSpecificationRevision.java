@@ -2,6 +2,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 
 import com.google.common.base.Objects;
+import edu.stanford.protege.webprotege.common.ChangeRequestId;
 import edu.stanford.protege.webprotege.common.UserId;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
@@ -11,11 +12,21 @@ import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
-                                                    Set<PostCoordinationViewEvent> postCoordinationEvents) implements Comparable<PostCoordinationSpecificationRevision>{
+                                                    Set<PostCoordinationViewEvent> postCoordinationEvents,
+                                                    CommitStatus commitStatus,
+                                                    String changeRequestId) implements Comparable<PostCoordinationSpecificationRevision>{
 
 
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList) {
-        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList);
+        return create(userId, postCoordinationEventList, null);
+    }
+    public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
+        CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
+        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
+    }
+
+    public static PostCoordinationSpecificationRevision createCommittedClone(PostCoordinationSpecificationRevision revision) {
+        return new PostCoordinationSpecificationRevision(revision.userId, revision.timestamp, revision.postCoordinationEvents, CommitStatus.COMMITTED, revision.changeRequestId);
     }
 
     @Override

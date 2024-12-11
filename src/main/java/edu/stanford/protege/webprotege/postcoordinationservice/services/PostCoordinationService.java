@@ -12,6 +12,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.repositories.*;
 import org.bson.Document;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class PostCoordinationService {
                 Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
                 for (WhoficCustomScalesValues specification : page) {
                     Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.convertToFirstImportEvents(specification);
-                    PostCoordinationCustomScalesRevision revision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
+                    PostCoordinationCustomScalesRevision revision = PostCoordinationCustomScalesRevision.create(userId, events);
                     EntityCustomScalesValuesHistory history = new EntityCustomScalesValuesHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }
@@ -87,7 +88,7 @@ public class PostCoordinationService {
 
                 repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
 
-                newRevisionsEventEmitter.emitNewRevisionsEventForScaleHistory(projectId, new ArrayList<>(histories));
+                newRevisionsEventEmitter.emitNewRevisionsEventForScaleHistory(projectId, new ArrayList<>(histories), null);
             }
         };
     }
@@ -118,14 +119,14 @@ public class PostCoordinationService {
                                     new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
                             )
                             .collect(Collectors.toSet());
-                    PostCoordinationSpecificationRevision revision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), events);
+                    PostCoordinationSpecificationRevision revision = PostCoordinationSpecificationRevision.create(userId, events);
                     EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
                     histories.add(history);
                 }
 
                 saveMultipleEntityPostCoordinationHistories(histories);
 
-                newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList());
+                newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList(), null);
             }
         };
     }
@@ -167,6 +168,10 @@ public class PostCoordinationService {
     }
 
     public void addSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId) {
+        addSpecificationRevision(newSpecification, userId, projectId, null);
+    }
+
+    public void addSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId, ChangeRequestId changeRequestId) {
 
         readWriteLock.executeWriteLock(() -> {
                     var existingHistoryOptional = this.repository.getExistingHistoryOrderedByRevision(newSpecification.whoficEntityIri(), projectId);
@@ -178,17 +183,17 @@ public class PostCoordinationService {
 
 
                                 if (!specEvents.isEmpty()) {
-                                    var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
+                                    var newRevision = PostCoordinationSpecificationRevision.create(userId, specEvents, changeRequestId);
                                     repository.addSpecificationRevision(newSpecification.whoficEntityIri(), projectId, newRevision);
-                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), newRevision);
+                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newSpecification.whoficEntityIri(), newRevision, changeRequestId);
                                 }
                             }, () -> {
-                                EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId);
+                                EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId, changeRequestId);
                                 var savedHistory = repository.saveNewSpecificationHistory(history);
                                 savedHistory.getPostCoordinationRevisions()
                                         .stream()
                                         .findFirst()
-                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision));
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision, changeRequestId));
                             }
                     );
                 }
@@ -196,7 +201,14 @@ public class PostCoordinationService {
     }
 
     public void addCustomScaleRevision(WhoficCustomScalesValues newScales,
-                                       ProjectId projectId, UserId userId) {
+                                       ProjectId projectId,
+                                       UserId userId) {
+        addCustomScaleRevision(newScales, projectId, userId, null);
+    }
+    public void addCustomScaleRevision(WhoficCustomScalesValues newScales,
+                                       ProjectId projectId,
+                                       UserId userId,
+                                       ChangeRequestId changeRequestId) {
         readWriteLock.executeWriteLock(() -> {
                     var existingScaleHistoryOptional = this.repository.getExistingCustomScaleHistoryOrderedByRevision(newScales.whoficEntityIri(), projectId);
                     existingScaleHistoryOptional.ifPresentOrElse(history -> {
@@ -207,17 +219,17 @@ public class PostCoordinationService {
 
 
                                 if (!events.isEmpty()) {
-                                    var newRevision = new PostCoordinationCustomScalesRevision(userId, new Date().getTime(), events);
+                                    var newRevision = PostCoordinationCustomScalesRevision.create(userId, events, changeRequestId);
                                     repository.addCustomScalesRevision(newScales.whoficEntityIri(), projectId, newRevision);
-                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), newRevision);
+                                    newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), newRevision, changeRequestId);
                                 }
                             }, () -> {
-                                var newHistory = createNewEntityCustomScalesHistory(newScales, projectId, userId);
+                                var newHistory = createNewEntityCustomScalesHistory(newScales, projectId, userId, changeRequestId);
                                 var savedHistory = repository.saveNewCustomScalesHistory(newHistory);
                                 savedHistory.getPostCoordinationCustomScalesRevisions()
                                         .stream()
                                         .findFirst()
-                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision));
+                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision, changeRequestId));
                             }
                     );
                 }
@@ -226,34 +238,54 @@ public class PostCoordinationService {
 
     private EntityCustomScalesValuesHistory createNewEntityCustomScalesHistory(WhoficCustomScalesValues newScales,
                                                                                ProjectId projectId,
-                                                                               UserId userId) {
+                                                                               UserId userId,
+                                                                               ChangeRequestId changeRequestId) {
         WhoficCustomScalesValues oldSpec = WhoficCustomScalesValues.create(newScales.whoficEntityIri(), Collections.emptyList());
         Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.createScaleEventsFromDiff(oldSpec, newScales);
-        var revision = PostCoordinationCustomScalesRevision.create(userId, events);
+        var revision = PostCoordinationCustomScalesRevision.create(userId, events, changeRequestId);
         return EntityCustomScalesValuesHistory.create(newScales.whoficEntityIri(), projectId.value(), List.of(revision));
     }
 
     private EntityPostCoordinationHistory createNewSpecificationHistory(WhoficEntityPostCoordinationSpecification newSpec,
                                                                         ProjectId projectId,
-                                                                        UserId userId) {
+                                                                        UserId userId,
+                                                                        ChangeRequestId changeRequestId) {
         WhoficEntityPostCoordinationSpecification oldSpec = WhoficEntityPostCoordinationSpecification.create(newSpec.whoficEntityIri(), newSpec.entityType(), Collections.emptyList());
         Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpec);
 
-        var newRevision = new PostCoordinationSpecificationRevision(userId, new Date().getTime(), specEvents);
+        var newRevision = PostCoordinationSpecificationRevision.create(userId, specEvents, changeRequestId);
         return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
     }
 
-    public WhoficCustomScalesValues fetchCustomScalesHistory(String entityIri, ProjectId projectId) {
+    public GetEntityCustomScaleValueResponse fetchCustomScalesHistory(String entityIri, ProjectId projectId) {
         return this.repository.getExistingCustomScaleHistoryOrderedByRevision(entityIri, projectId)
-                .map(eventProcessor::processCustomScaleHistory)
-                .orElseGet(() -> new WhoficCustomScalesValues(entityIri, Collections.emptyList()));
+                .map(history -> {
+                    Date lastRevisionDate = null;
+                    if (!history.getPostCoordinationCustomScalesRevisions().isEmpty()) {
+                        long lastRevisionTimestamp = history.getPostCoordinationCustomScalesRevisions().get(history.getPostCoordinationCustomScalesRevisions().size() - 1).timestamp();
+                        lastRevisionDate = Date.from(Instant.ofEpochMilli(lastRevisionTimestamp));
+                    }
+                    WhoficCustomScalesValues scales = eventProcessor.processCustomScaleHistory(history);
+                    return new GetEntityCustomScaleValueResponse(lastRevisionDate, scales);
+                })
+                .orElseGet(() -> new GetEntityCustomScaleValueResponse(null, new WhoficCustomScalesValues(entityIri, Collections.emptyList())));
 
     }
 
-    public WhoficEntityPostCoordinationSpecification fetchHistory(String entityIri, ProjectId projectId) {
+    public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId) {
         return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
-                .map(eventProcessor::processHistory)
-                .orElseGet(() -> new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList()));
+                .map(history -> {
+                    Date lastChangeDate = null;
+                    if (!history.getPostCoordinationRevisions().isEmpty()) {
+                        long lastTimestamp = history.getPostCoordinationRevisions().get(history.getPostCoordinationRevisions().size() - 1).timestamp();
+                        lastChangeDate = Date.from(Instant.ofEpochMilli(lastTimestamp));
+                    }
+
+                    return new GetEntityPostCoordinationResponse(entityIri, lastChangeDate, eventProcessor.processHistory(history));
+                })
+                .orElseGet(() -> new GetEntityPostCoordinationResponse(entityIri,
+                        null,
+                        new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList())));
     }
 
 }

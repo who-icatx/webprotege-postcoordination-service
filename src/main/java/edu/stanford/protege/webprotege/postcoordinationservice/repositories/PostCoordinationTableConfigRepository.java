@@ -33,6 +33,7 @@ public class PostCoordinationTableConfigRepository {
     }
 
 
+    @Cacheable("postCoordConfigByEntity")
     public TableConfiguration getTableConfigurationByEntityType(String entityType) {
         Query query = Query.query(Criteria.where(ENTITY_TYPE_KEY).is(entityType));
 
