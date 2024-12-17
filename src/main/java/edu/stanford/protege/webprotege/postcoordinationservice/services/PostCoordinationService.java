@@ -56,10 +56,8 @@ public class PostCoordinationService {
 
     public void createFirstSpecificationImport(String documentLocation, ProjectId projectId, UserId userId) {
         var stream = documentRepository.fetchPostCoordinationSpecifications(documentLocation);
-        List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
-        List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, definitionList, configurations)));
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId)));
         });
     }
 
@@ -94,39 +92,28 @@ public class PostCoordinationService {
     }
 
 
-    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
+    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId) {
         return page -> {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
                 for (WhoficEntityPostCoordinationSpecification specification : page) {
-
-                    for (LinearizationDefinition linearizationDefinition : definitionList) {
-                        boolean linearizationExists = specification.postcoordinationSpecifications().stream().anyMatch(spec ->
-                                spec.getLinearizationView().equalsIgnoreCase(linearizationDefinition.getWhoficEntityIri()));
-                        if (!linearizationExists) {
-                            specification.postcoordinationSpecifications().add(new PostCoordinationSpecification(linearizationDefinition.getWhoficEntityIri(),
-                                    new ArrayList<>(),
-                                    new ArrayList<>(),
-                                    new ArrayList<>(),
-                                    new ArrayList<>()));
-                        }
-
-                    }
-
                     Set<PostCoordinationViewEvent> events = specification.postcoordinationSpecifications().stream()
-                            .map(spec -> enrichWithMissingAxis(specification.entityType(), spec, definitionList, configurations))
                             .map(spec ->
                                     new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
                             )
+                            .filter(spec -> !spec.axisEvents().isEmpty())
                             .collect(Collectors.toSet());
                     PostCoordinationSpecificationRevision revision = PostCoordinationSpecificationRevision.create(userId, events);
-                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
-                    histories.add(history);
+                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(),  projectId.id(), List.of(revision));
+                    if(!events.isEmpty()) {
+                        histories.add(history);
+                    }
+                }
+                if(!histories.isEmpty()) {
+                    saveMultipleEntityPostCoordinationHistories(histories);
                 }
 
-                saveMultipleEntityPostCoordinationHistories(histories);
-
-                newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList(), null);
+                //newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList(), null);
             }
         };
     }
@@ -140,33 +127,6 @@ public class PostCoordinationService {
     }
 
 
-    PostCoordinationSpecification enrichWithMissingAxis(String entityType, PostCoordinationSpecification specification, List<LinearizationDefinition> definitionList, List<TableConfiguration> configurations) {
-        LinearizationDefinition definition = definitionList.stream()
-                .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equalsIgnoreCase(specification.getLinearizationView()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Couldn't find the linearization definition " + specification.getLinearizationView()));
-
-        TableConfiguration tableConfiguration = configurations.stream()
-                .filter(config -> config.getEntityType().equalsIgnoreCase(entityType))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Couldn't find the equivalent entity type " + entityType));
-
-        for (String availableAxis : tableConfiguration.getPostCoordinationAxes()) {
-            boolean isAlreadySet = specification.getRequiredAxes().contains(availableAxis) ||
-                    specification.getAllowedAxes().contains(availableAxis) ||
-                    specification.getNotAllowedAxes().contains(availableAxis) ||
-                    specification.getDefaultAxes().contains(availableAxis);
-            if (!isAlreadySet) {
-                if (definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
-                    specification.getDefaultAxes().add(availableAxis);
-                } else {
-                    specification.getNotAllowedAxes().add(availableAxis);
-                }
-            }
-        }
-        return specification;
-    }
-
     public void addSpecificationRevision(WhoficEntityPostCoordinationSpecification newSpecification, UserId userId, ProjectId projectId) {
         addSpecificationRevision(newSpecification, userId, projectId, null);
     }
@@ -178,9 +138,7 @@ public class PostCoordinationService {
                     existingHistoryOptional.ifPresentOrElse(history -> {
 
                                 WhoficEntityPostCoordinationSpecification oldSpec = eventProcessor.processHistory(history);
-
                                 Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpecification);
-
 
                                 if (!specEvents.isEmpty()) {
                                     var newRevision = PostCoordinationSpecificationRevision.create(userId, specEvents, changeRequestId);
@@ -272,20 +230,23 @@ public class PostCoordinationService {
 
     }
 
-    public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId) {
+    public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, String entityType) {
+        List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
+        List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
                 .map(history -> {
-                    Date lastChangeDate = null;
-                    if (!history.getPostCoordinationRevisions().isEmpty()) {
-                        long lastTimestamp = history.getPostCoordinationRevisions().get(history.getPostCoordinationRevisions().size() - 1).timestamp();
-                        lastChangeDate = Date.from(Instant.ofEpochMilli(lastTimestamp));
-                    }
-
-                    return new GetEntityPostCoordinationResponse(entityIri, lastChangeDate, eventProcessor.processHistory(history));
-                })
-                .orElseGet(() -> new GetEntityPostCoordinationResponse(entityIri,
-                        null,
-                        new WhoficEntityPostCoordinationSpecification(entityIri, null, Collections.emptyList())));
+                            history.getPostCoordinationRevisions().add(0, PostCoordinationSpecificationRevision.createDefaultInitialRevision(
+                                    entityType,
+                                    definitionList,
+                                    configurations));
+                            return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
+                        }
+                )
+                .orElseGet(() -> {
+                    var specs =  Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityType, definitionList, configurations));
+                    var history = new EntityPostCoordinationHistory(entityIri, projectId.id(), specs);
+                    return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
+                });
     }
 
 }

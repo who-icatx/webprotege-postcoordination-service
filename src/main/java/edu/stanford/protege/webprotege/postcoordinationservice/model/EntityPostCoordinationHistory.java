@@ -22,6 +22,8 @@ public class EntityPostCoordinationHistory {
     public static final String PROJECT_ID = "projectId";
     public static final String SPEC_REVISIONS = "postCoordinationRevisions";
 
+    public static final String ENTITY_TYPE = "entityType";
+
     @Field(WHOFIC_ENTITY_IRI)
     @Indexed(name = "entityIriSpec_idx")
     private final String whoficEntityIri;
@@ -29,6 +31,7 @@ public class EntityPostCoordinationHistory {
     @Field(PROJECT_ID)
     @Indexed(name = "entityIriProjectId_idx")
     private final String projectId;
+
 
     @Field(SPEC_REVISIONS)
     private final List<PostCoordinationSpecificationRevision> postCoordinationRevisions;
@@ -46,7 +49,7 @@ public class EntityPostCoordinationHistory {
     public static EntityPostCoordinationHistory create(String whoficEntityIri,
                                                        String projectId,
                                                        List<PostCoordinationSpecificationRevision> postCoordinationRevisions) {
-        return new EntityPostCoordinationHistory(whoficEntityIri, projectId, postCoordinationRevisions);
+        return new EntityPostCoordinationHistory(whoficEntityIri, projectId , postCoordinationRevisions);
     }
 
     @JsonProperty(WHOFIC_ENTITY_IRI)
