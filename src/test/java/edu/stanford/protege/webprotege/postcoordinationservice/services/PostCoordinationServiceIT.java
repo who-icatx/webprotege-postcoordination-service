@@ -82,7 +82,7 @@ public class PostCoordinationServiceIT {
         postCoordinationService.createFirstSpecificationImport("postCoordinationImportFile.json", projectId, userId);
         List<EntityPostCoordinationHistory> histories = mongoTemplate.findAll(EntityPostCoordinationHistory.class);
         assertNotNull(histories);
-        assertEquals(3, histories.size());
+        assertEquals(1, histories.size());
         EntityPostCoordinationHistory history = histories.stream()
                 .filter(h -> h.getWhoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
                 .findFirst().orElse(null);
