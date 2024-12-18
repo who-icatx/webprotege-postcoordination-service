@@ -11,9 +11,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordi
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
-import java.time.*;
-import java.util.HashSet;
-import java.util.List;
+import java.time.Instant;
 import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
