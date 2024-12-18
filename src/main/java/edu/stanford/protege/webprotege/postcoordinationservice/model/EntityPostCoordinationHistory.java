@@ -22,7 +22,6 @@ public class EntityPostCoordinationHistory {
     public static final String PROJECT_ID = "projectId";
     public static final String SPEC_REVISIONS = "postCoordinationRevisions";
 
-    public static final String ENTITY_TYPE = "entityType";
 
     @Field(WHOFIC_ENTITY_IRI)
     @Indexed(name = "entityIriSpec_idx")
