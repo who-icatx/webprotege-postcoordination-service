@@ -208,8 +208,14 @@ public class PostCoordinationService {
                                                                         ProjectId projectId,
                                                                         UserId userId,
                                                                         ChangeRequestId changeRequestId) {
-        WhoficEntityPostCoordinationSpecification oldSpec = WhoficEntityPostCoordinationSpecification.create(newSpec.whoficEntityIri(), newSpec.entityType(), Collections.emptyList());
-        Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpec);
+        List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
+        List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
+        var defaultRevision = PostCoordinationSpecificationRevision.createDefaultInitialRevision(newSpec.entityType(),
+                definitionList,
+                configurations);
+
+        WhoficEntityPostCoordinationSpecification defaultSpec = eventProcessor.processHistory(new EntityPostCoordinationHistory(newSpec.whoficEntityIri(), projectId.id(), Arrays.asList(defaultRevision)));
+        Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(defaultSpec, newSpec);
 
         var newRevision = PostCoordinationSpecificationRevision.create(userId, specEvents, changeRequestId);
         return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
