@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
