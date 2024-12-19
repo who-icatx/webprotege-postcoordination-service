@@ -7,7 +7,9 @@ import edu.stanford.protege.webprotege.ipc.ExecutionContext;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationDocumentRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationRepository;
+import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,11 +44,21 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
     @Autowired
     private PostCoordinationRepository repository;
 
-    @Autowired
     private PostCoordinationService postCoordService;
+
+    @Autowired
+    private PostCoordinationDocumentRepository postCoordinationDocumentRepository;
+    @Autowired
+    private ReadWriteLockService readWriteLockService;
 
     @MockBean
     private LinearizationService linearizationService;
+
+    @Autowired
+    private NewRevisionsEventEmitterService newRevisionsEventEmitterService;
+
+    @MockBean
+    private PostCoordinationTableConfigRepository postCoordinationTableConfigRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -70,7 +82,19 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 .thenReturn(objectMapper.readValue(defintions, new TypeReference<>() {
                 }));
 
+        File tableConfig = new File("src/test/resources/postcoordinationTableConfig.json");
+        List<TableConfiguration> documents = objectMapper.readValue(tableConfig, new TypeReference<>() {
+        });
+        when(postCoordinationTableConfigRepository.getALlTableConfiguration()).thenReturn(documents);
         mongoTemplate.getDb().drop();
+        postCoordService = new PostCoordinationService(repository,
+                postCoordinationTableConfigRepository,
+                linearizationService,
+                readWriteLockService,
+                postCoordinationDocumentRepository,
+                objectMapper,
+                newRevisionsEventEmitterService,
+                eventProcessor);
     }
 
     @Test

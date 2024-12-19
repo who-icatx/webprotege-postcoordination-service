@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: webprotege-postcoordination-service
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    password: guest
+    username: guest
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: webprotege
+      auto-index-creation: true
+      uri: mongodb://${spring.data.mongodb.host}:${spring.data.mongodb.port}/webprotege

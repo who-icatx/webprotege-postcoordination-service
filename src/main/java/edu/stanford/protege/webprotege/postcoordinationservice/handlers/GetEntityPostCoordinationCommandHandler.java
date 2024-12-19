@@ -35,7 +35,7 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
     @Override
     public Mono<GetEntityPostCoordinationResponse> handleRequest(GetEntityPostCoordinationRequest request, ExecutionContext executionContext) {
 
-        GetEntityPostCoordinationResponse processedSpec = postCoordService.fetchHistory(request.entityIRI(), request.projectId());
+        GetEntityPostCoordinationResponse processedSpec = postCoordService.fetchHistory(request.entityIRI(), request.projectId(), "ICD");
 
         return Mono.just(processedSpec);
     }

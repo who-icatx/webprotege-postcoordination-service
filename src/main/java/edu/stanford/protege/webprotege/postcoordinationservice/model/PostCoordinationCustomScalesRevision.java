@@ -23,7 +23,7 @@ public record PostCoordinationCustomScalesRevision(UserId userId,
 
     public static PostCoordinationCustomScalesRevision create(UserId userId, Set<PostCoordinationCustomScalesValueEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
-        return new PostCoordinationCustomScalesRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
+        return new PostCoordinationCustomScalesRevision(userId, System.currentTimeMillis(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
     }
 
     public static PostCoordinationCustomScalesRevision createCommittedClone(PostCoordinationCustomScalesRevision revision) {

@@ -13,9 +13,6 @@ import static edu.stanford.protege.webprotege.postcoordinationservice.dto.GetEnt
 public record GetEntityPostCoordinationResponse(@JsonProperty("entityIri")
                                                 String entityIri,
 
-                                                @JsonProperty("lastRevisionDate")
-                                                Date lastRevisionDate,
-
                                                 @JsonProperty("postCoordinationSpecification")
                                                 WhoficEntityPostCoordinationSpecification postCoordinationSpecification) implements Response {
 }
