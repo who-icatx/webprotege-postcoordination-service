@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
     }
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
-        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
+        return new PostCoordinationSpecificationRevision(userId, System.currentTimeMillis(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
     }
 
 
@@ -57,7 +58,7 @@ public record PostCoordinationSpecificationRevision(UserId userId,
         }
 
         return new PostCoordinationSpecificationRevision(UserId.valueOf("initialRevision"),
-                Instant.EPOCH.getEpochSecond(),
+                new Date().getTime(),
                 postCoordinationEvents,
                 CommitStatus.COMMITTED,
                 null
