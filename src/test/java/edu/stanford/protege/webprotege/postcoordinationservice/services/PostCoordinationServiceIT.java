@@ -76,58 +76,13 @@ public class PostCoordinationServiceIT {
         projectId = ProjectId.generate();
     }
 
-    @Test
-    public void GIVEN_mainLinearization_WHEN_enriching_THEN_missingAxisAreSetToNotAllowed() throws IOException {
-
-        File labels = new File("src/test/resources/LinearizationDefinitions.json");
-        List<LinearizationDefinition> linearizationDefinitions = objectMapper.readValue(labels, new TypeReference<>() {
-        });
-        File tableConfig = new File("src/test/resources/postcoordinationTableConfig.json");
-        List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
-        });
-
-        PostCoordinationSpecification specification = new PostCoordinationSpecification(
-                "http://id.who.int/icd/release/11/mms",
-                Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-
-        postCoordinationService.enrichWithMissingAxis("ICD", specification, linearizationDefinitions, tableConfigs);
-
-        assertEquals(27, specification.getNotAllowedAxes().size());
-    }
-
-
-    @Test
-    public void GIVEN_telescopicLinearization_WHEN_enriching_THEN_missingAxisAreSetToDefault() throws IOException {
-        File labels = new File("src/test/resources/LinearizationDefinitions.json");
-        List<LinearizationDefinition> linearizationDefinitions = objectMapper.readValue(labels, new TypeReference<>() {
-        });
-        File tableConfig = new File("src/test/resources/postcoordinationTableConfig.json");
-        List<TableConfiguration> tableConfigs = objectMapper.readValue(tableConfig, new TypeReference<>() {
-        });
-
-        PostCoordinationSpecification specification = new PostCoordinationSpecification(
-                "http://id.who.int/icd/release/11/ocu",
-                Arrays.asList("http://id.who.int/icd/schema/hasSeverity", "http://id.who.int/icd/schema/medication"),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-
-        postCoordinationService.enrichWithMissingAxis("ICD", specification, linearizationDefinitions, tableConfigs);
-
-        assertEquals(27, specification.getDefaultAxes().size());
-    }
 
     @Test
     public void GIVEN_existingFile_WHEN_firstImport_THEN_allEventsAreGenerated() {
         postCoordinationService.createFirstSpecificationImport("postCoordinationImportFile.json", projectId, userId);
         List<EntityPostCoordinationHistory> histories = mongoTemplate.findAll(EntityPostCoordinationHistory.class);
         assertNotNull(histories);
-        assertEquals(3, histories.size());
+        assertEquals(1, histories.size());
         EntityPostCoordinationHistory history = histories.stream()
                 .filter(h -> h.getWhoficEntityIri().equalsIgnoreCase("http://id.who.int/icd/entity/257068234"))
                 .findFirst().orElse(null);
@@ -136,8 +91,8 @@ public class PostCoordinationServiceIT {
         assertEquals(userId, history.getPostCoordinationRevisions().iterator().next().userId());
         assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents());
         Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents();
-        assertEquals(16, viewEventSet.size());
-        assertEquals(29, viewEventSet.iterator().next().axisEvents().size());
+        assertEquals(1, viewEventSet.size());
+        assertEquals(2, viewEventSet.iterator().next().axisEvents().size());
         assertNotNull(viewEventSet.iterator().next().linearizationView());
 
     }

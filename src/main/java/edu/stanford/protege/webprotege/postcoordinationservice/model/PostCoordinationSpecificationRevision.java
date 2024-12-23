@@ -4,10 +4,17 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 import com.google.common.base.Objects;
 import edu.stanford.protege.webprotege.common.ChangeRequestId;
 import edu.stanford.protege.webprotege.common.UserId;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.AddToDefaultAxisEvent;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.AddToNotAllowedAxisEvent;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
 import java.time.Instant;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
@@ -22,11 +29,40 @@ public record PostCoordinationSpecificationRevision(UserId userId,
     }
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
-        return new PostCoordinationSpecificationRevision(userId, Instant.now().toEpochMilli(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
+        return new PostCoordinationSpecificationRevision(userId, System.currentTimeMillis(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
     }
 
-    public static PostCoordinationSpecificationRevision createCommittedClone(PostCoordinationSpecificationRevision revision) {
-        return new PostCoordinationSpecificationRevision(revision.userId, revision.timestamp, revision.postCoordinationEvents, CommitStatus.COMMITTED, revision.changeRequestId);
+
+    public static PostCoordinationSpecificationRevision createDefaultInitialRevision(String entityType,
+                                                                                     List<LinearizationDefinition> definitionList,
+                                                                                     List<TableConfiguration> configurations) {
+        Set<PostCoordinationViewEvent> postCoordinationEvents = new HashSet<>();
+
+
+        for (LinearizationDefinition definition : definitionList) {
+            TableConfiguration tableConfiguration = configurations.stream()
+                    .filter(config -> config.getEntityType().equalsIgnoreCase(entityType))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Couldn't find the equivalent entity type " + entityType));
+
+            List<PostCoordinationSpecificationEvent> specificationEvents = tableConfiguration.getPostCoordinationAxes().stream()
+                    .map(availableAxis -> {
+                        if (definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
+                            return new AddToDefaultAxisEvent(availableAxis, definition.getWhoficEntityIri());
+                        } else {
+                            return new AddToNotAllowedAxisEvent(availableAxis, definition.getWhoficEntityIri());
+                        }
+                    }).toList();
+            postCoordinationEvents.add(new PostCoordinationViewEvent(definition.getWhoficEntityIri(), specificationEvents));
+
+        }
+
+        return new PostCoordinationSpecificationRevision(UserId.valueOf("initialRevision"),
+                new Date().getTime(),
+                postCoordinationEvents,
+                CommitStatus.COMMITTED,
+                null
+        );
     }
 
     @Override
