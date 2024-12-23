@@ -46,7 +46,7 @@ public class EntityRendererManager {
         try {
             renderedEntities = this.getRenderedEntities(new HashSet<>(entityIris), projectId, new ExecutionContext()).get(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            logger.error(e.getMessage());
+            logger.error(e.toString());
         }
         List<EntityNode> renderedEntitiesList = renderedEntities != null ? renderedEntities.renderedEntities() : List.of();
 

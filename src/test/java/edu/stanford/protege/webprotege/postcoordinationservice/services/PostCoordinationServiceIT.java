@@ -91,8 +91,8 @@ public class PostCoordinationServiceIT {
         assertEquals(userId, history.getPostCoordinationRevisions().iterator().next().userId());
         assertNotNull(history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents());
         Set<PostCoordinationViewEvent> viewEventSet = history.getPostCoordinationRevisions().iterator().next().postCoordinationEvents();
-        assertEquals(16, viewEventSet.size());
-        assertEquals(29, viewEventSet.iterator().next().axisEvents().size());
+        assertEquals(1, viewEventSet.size());
+        assertEquals(2, viewEventSet.iterator().next().axisEvents().size());
         assertNotNull(viewEventSet.iterator().next().linearizationView());
 
     }

@@ -113,7 +113,6 @@ public class PostCoordinationService {
                     saveMultipleEntityPostCoordinationHistories(histories);
                 }
 
-                //newRevisionsEventEmitter.emitNewRevisionsEventForSpecHistory(projectId, histories.stream().toList(), null);
             }
         };
     }

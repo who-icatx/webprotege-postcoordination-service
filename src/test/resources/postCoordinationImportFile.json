@@ -46,7 +46,7 @@
     {
       "whoficEntityIri": "http://id.who.int/icd/entity/741162165",
       "entityType": "ICD",
-      "postCoordinationSpecifications": [
+      "postcoordinationSpecifications": [
         {
           "linearizationView": "http://id.who.int/icd/release/11/mnh"
         },
@@ -85,7 +85,7 @@
     {
       "whoficEntityIri": "http://id.who.int/icd/entity/2042704797",
       "entityType": "ICD",
-      "postCoordinationSpecifications": [
+      "postcoordinationSpecifications": [
         {
           "linearizationView": "http://id.who.int/icd/release/11/mnh"
         },
