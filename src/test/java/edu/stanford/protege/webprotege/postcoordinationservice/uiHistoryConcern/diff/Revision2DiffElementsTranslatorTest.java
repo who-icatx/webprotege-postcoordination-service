@@ -99,9 +99,9 @@ class Revision2DiffElementsTranslatorTest {
         orderedAxisMap.put("Axis2", 2);
 
         LinearizationDefinition linDef = mock(LinearizationDefinition.class);
-        when(linDef.getWhoficEntityIri()).thenReturn("LinearizationView");
+        when(linDef.getLinearizationUri()).thenReturn("LinearizationView");
         when(linDef.getDisplayLabel()).thenReturn("Linearization View Label");
-        when(linDef.getId()).thenReturn("LinearizationViewID");
+        when(linDef.getLinearizationId()).thenReturn("LinearizationViewID");
 
         when(linearizationService.getLinearizationDefinitions()).thenReturn(List.of(linDef));
 

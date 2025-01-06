@@ -2,31 +2,25 @@ package edu.stanford.protege.webprotege.postcoordinationservice.model;
 
 
 import com.google.common.base.Objects;
-import edu.stanford.protege.webprotege.common.ChangeRequestId;
-import edu.stanford.protege.webprotege.common.UserId;
+import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.AddToDefaultAxisEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.AddToNotAllowedAxisEvent;
-import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationSpecificationEvent;
+import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
                                                     Set<PostCoordinationViewEvent> postCoordinationEvents,
                                                     CommitStatus commitStatus,
-                                                    String changeRequestId) implements Comparable<PostCoordinationSpecificationRevision>{
+                                                    String changeRequestId) implements Comparable<PostCoordinationSpecificationRevision> {
 
 
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList) {
         return create(userId, postCoordinationEventList, null);
     }
+
     public static PostCoordinationSpecificationRevision create(UserId userId, Set<PostCoordinationViewEvent> postCoordinationEventList, ChangeRequestId changeRequestId) {
         CommitStatus status = changeRequestId != null && changeRequestId.id() != null ? CommitStatus.UNCOMMITTED : CommitStatus.COMMITTED;
         return new PostCoordinationSpecificationRevision(userId, System.currentTimeMillis(), postCoordinationEventList, status, changeRequestId != null ? changeRequestId.id() : null);
@@ -48,12 +42,12 @@ public record PostCoordinationSpecificationRevision(UserId userId,
             List<PostCoordinationSpecificationEvent> specificationEvents = tableConfiguration.getPostCoordinationAxes().stream()
                     .map(availableAxis -> {
                         if (definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
-                            return new AddToDefaultAxisEvent(availableAxis, definition.getWhoficEntityIri());
+                            return new AddToDefaultAxisEvent(availableAxis, definition.getLinearizationUri());
                         } else {
-                            return new AddToNotAllowedAxisEvent(availableAxis, definition.getWhoficEntityIri());
+                            return new AddToNotAllowedAxisEvent(availableAxis, definition.getLinearizationUri());
                         }
                     }).toList();
-            postCoordinationEvents.add(new PostCoordinationViewEvent(definition.getWhoficEntityIri(), specificationEvents));
+            postCoordinationEvents.add(new PostCoordinationViewEvent(definition.getLinearizationUri(), specificationEvents));
 
         }
 

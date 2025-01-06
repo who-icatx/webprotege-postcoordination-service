@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LinearizationDefinition {
 
 
-    @JsonProperty("Id")
-    private final String id;
+    @JsonProperty("linearizationId")
+    private final String linearizationId;
 
-    @JsonProperty("whoficEntityIri")
-    private final String whoficEntityIri;
+    @JsonProperty("linearizationUri")
+    private final String linearizationUri;
 
-    @JsonProperty("Description")
+    @JsonProperty("description")
     private final String description;
 
     @JsonProperty("linearizationMode")
@@ -27,7 +27,7 @@ public class LinearizationDefinition {
     @JsonProperty("sortingCode")
     private final String sortingCode;
 
-    @JsonProperty("DisplayLabel")
+    @JsonProperty("displayLabel")
     private final String displayLabel;
 
     @JsonProperty("oldId")
@@ -35,17 +35,17 @@ public class LinearizationDefinition {
 
 
     @JsonCreator
-    public LinearizationDefinition(@JsonProperty("Id") String id,
-                                   @JsonProperty("whoficEntityIri") String whoficEntityIri,
+    public LinearizationDefinition(@JsonProperty("linearizationId") String linearizationId,
+                                   @JsonProperty("linearizationUri") String linearizationUri,
                                    @JsonProperty("oldId") String oldId,
-                                   @JsonProperty("Description")String description,
-                                   @JsonProperty("LinearizationMode") String linearizationMode,
-                                   @JsonProperty("DisplayLabel") String displayLabel,
+                                   @JsonProperty("description")String description,
+                                   @JsonProperty("linearizationMode") String linearizationMode,
+                                   @JsonProperty("displayLabel") String displayLabel,
                                    @JsonProperty("rootId") String rootId,
                                    @JsonProperty("CoreLinId") String coreLinId,
                                    @JsonProperty("sortingCode") String sortingCode) {
-        this.id = id;
-        this.whoficEntityIri = whoficEntityIri;
+        this.linearizationId = linearizationId;
+        this.linearizationUri = linearizationUri;
         this.description = description;
         this.linearizationMode = linearizationMode;
         this.rootId = rootId;
@@ -55,12 +55,12 @@ public class LinearizationDefinition {
         this.displayLabel = displayLabel;
     }
 
-    public String getId() {
-        return id;
+    public String getLinearizationId() {
+        return linearizationId;
     }
 
-    public String getWhoficEntityIri() {
-        return whoficEntityIri;
+    public String getLinearizationUri() {
+        return linearizationUri;
     }
 
     public String getLinearizationMode() {
