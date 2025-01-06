@@ -95,11 +95,11 @@ public class Revision2DiffElementsTranslator {
 
         SpecDocumentChange sourceDocument;
         Optional<LinearizationDefinition> linearizationDefinitionOptional = linearizationDefinitions.stream()
-                .filter(linearizationDefinition -> linearizationDefinition.getLinearizationUri().equals(linearizationView))
+                .filter(linearizationDefinition -> linearizationDefinition.getWhoficEntityIri().equals(linearizationView))
                 .findFirst();
         if (linearizationDefinitionOptional.isPresent()) {
             LinearizationDefinition linDef = linearizationDefinitionOptional.get();
-            sourceDocument = SpecDocumentChange.create(linearizationView, linDef.getDisplayLabel(), linDef.getLinearizationId(), linDef.getSortingCode());
+            sourceDocument = SpecDocumentChange.create(linearizationView, linDef.getDisplayLabel(), linDef.getId(), linDef.getSortingCode());
         } else {
             sourceDocument = SpecDocumentChange.create(linearizationView, linearizationView, linearizationView, "0");
         }

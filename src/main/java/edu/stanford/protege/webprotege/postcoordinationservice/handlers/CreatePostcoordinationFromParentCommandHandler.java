@@ -51,7 +51,7 @@ public class CreatePostcoordinationFromParentCommandHandler implements CommandHa
             var parentWhoficSpec = eventProcessor.processHistory(parentWhoficHistory);
 
             parentWhoficSpec.postcoordinationSpecifications().forEach(spec -> {
-                var currDef = definitionList.stream().filter(lin -> lin.getLinearizationUri().equalsIgnoreCase(spec.getLinearizationView())).findFirst();
+                var currDef = definitionList.stream().filter(lin -> lin.getWhoficEntityIri().equalsIgnoreCase(spec.getLinearizationView())).findFirst();
                 if (currDef.isEmpty()) {
                     return;
                 }

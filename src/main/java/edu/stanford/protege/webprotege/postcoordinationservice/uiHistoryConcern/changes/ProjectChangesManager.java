@@ -197,7 +197,7 @@ public class ProjectChangesManager {
     public Set<ProjectChangeForEntity> getProjectChangesForSpecHistories(ProjectId projectId, List<EntityPostCoordinationHistory> entitySpecHistories) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
         List<LinearizationDefinition> linearizationDefinitions = linearizationService.getLinearizationDefinitions();
-        linearizationDefinitions.forEach(linDef -> entityIrisAndNames.put(linDef.getLinearizationUri(), linDef.getDisplayLabel()));
+        linearizationDefinitions.forEach(linDef -> entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel()));
 
         Set<SpecRevisionWithEntity> specRevisions = entitySpecHistories.stream()
                 .flatMap(history ->
@@ -302,8 +302,8 @@ public class ProjectChangesManager {
         });
         List<LinearizationDefinition> linDefs = linearizationService.getLinearizationDefinitions();
         linDefs.forEach(linDef -> {
-            if (entityIrisAndNames.get(linDef.getLinearizationUri()) != null) {
-                entityIrisAndNames.put(linDef.getLinearizationUri(), linDef.getDisplayLabel());
+            if (entityIrisAndNames.get(linDef.getWhoficEntityIri()) != null) {
+                entityIrisAndNames.put(linDef.getWhoficEntityIri(), linDef.getDisplayLabel());
             }
         });
 
