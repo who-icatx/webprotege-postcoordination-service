@@ -78,7 +78,7 @@ public class PostCoordinationServiceIT {
 
 
     @Test
-    public void GIVEN_existingFile_WHEN_firstImport_THEN_allEventsAreGenerated() {
+    public void GIVEN_existingFile_WHEN_firstImport_THEN_onlyGivenEventsAreGenerated() {
         postCoordinationService.createFirstSpecificationImport("postCoordinationImportFile.json", projectId, userId);
         List<EntityPostCoordinationHistory> histories = mongoTemplate.findAll(EntityPostCoordinationHistory.class);
         assertNotNull(histories);
