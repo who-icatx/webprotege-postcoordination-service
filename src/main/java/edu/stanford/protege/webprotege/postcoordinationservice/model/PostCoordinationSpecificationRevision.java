@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public record PostCoordinationSpecificationRevision(UserId userId,
                                                     @Indexed(name = "spec_timestamp", direction = IndexDirection.DESCENDING) Long timestamp,
@@ -27,19 +28,22 @@ public record PostCoordinationSpecificationRevision(UserId userId,
     }
 
 
-    public static PostCoordinationSpecificationRevision createDefaultInitialRevision(String entityType,
+    public static PostCoordinationSpecificationRevision createDefaultInitialRevision(List<String> entityTypes,
                                                                                      List<LinearizationDefinition> definitionList,
                                                                                      List<TableConfiguration> configurations) {
         Set<PostCoordinationViewEvent> postCoordinationEvents = new HashSet<>();
 
 
         for (LinearizationDefinition definition : definitionList) {
-            TableConfiguration tableConfiguration = configurations.stream()
-                    .filter(config -> config.getEntityType().equalsIgnoreCase(entityType))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Couldn't find the equivalent entity type " + entityType));
+            Set<String> postCoordinationAxis  = configurations.stream()
+                    .filter(config -> entityTypes.contains(config.getEntityType()))
+                    .flatMap(config -> config.getPostCoordinationAxes().stream())
+                    .collect(Collectors.toSet());
+            if(postCoordinationAxis.isEmpty()) {
+                throw  new RuntimeException("Couldn't find the equivalent entity type " + entityTypes);
+            }
 
-            List<PostCoordinationSpecificationEvent> specificationEvents = tableConfiguration.getPostCoordinationAxes().stream()
+            List<PostCoordinationSpecificationEvent> specificationEvents = postCoordinationAxis.stream()
                     .map(availableAxis -> {
                         if (definition.getCoreLinId() != null && !definition.getCoreLinId().isEmpty()) {
                             return new AddToDefaultAxisEvent(availableAxis, definition.getLinearizationUri());
@@ -48,7 +52,6 @@ public record PostCoordinationSpecificationRevision(UserId userId,
                         }
                     }).toList();
             postCoordinationEvents.add(new PostCoordinationViewEvent(definition.getLinearizationUri(), specificationEvents));
-
         }
 
         return new PostCoordinationSpecificationRevision(UserId.valueOf("initialRevision"),

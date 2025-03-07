@@ -3,10 +3,12 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
+import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.nodeRendering.EntityRendererManager;
 import org.bson.Document;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +22,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityCustomScalesValuesHistory.POSTCOORDINATION_CUSTOM_SCALES_COLLECTION;
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +49,13 @@ public class PostCoordinationServiceIT {
     private MinioPostCoordinationDocumentLoader documentLoader;
 
     @MockBean
+    private EntityRendererManager entityRendererManager;
+
+    @MockBean
     private LinearizationService linearizationService;
+
+    @MockBean
+    private CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypesExecutor;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -71,7 +81,7 @@ public class PostCoordinationServiceIT {
         List<Document> documents = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
         documents.forEach(document -> mongoTemplate.save(document, TableConfiguration.DEFINITIONS_COLLECTION));
-
+        when(entityTypesExecutor.execute(any(), any())).thenReturn(CompletableFuture.supplyAsync(() -> new GetIcatxEntityTypeResponse(Arrays.asList("ICD"))));
         userId = UserId.valueOf("alexsilaghi");
         projectId = ProjectId.generate();
     }
