@@ -13,7 +13,7 @@ public class PostCoordinationEventProcessor {
 
 
     private PostCoordinationSpecification findSpecificationWithLinearizationView(String linearizationView, HashSet<PostCoordinationSpecification> postCoordinationSpecification) {
-        return postCoordinationSpecification.stream().filter(spec -> spec.getLinearizationView().equalsIgnoreCase(linearizationView))
+        return postCoordinationSpecification.stream().filter(spec -> spec.getLinearizationView() != null && spec.getLinearizationView().equalsIgnoreCase(linearizationView))
                 .findFirst()
                 .orElse(new PostCoordinationSpecification(linearizationView, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
