@@ -3,6 +3,9 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.InsertOneModel;
 import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
+import edu.stanford.protege.webprotege.ipc.ExecutionContext;
+import edu.stanford.protege.webprotege.ipc.MessageProcessingException;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
@@ -10,10 +13,12 @@ import edu.stanford.protege.webprotege.postcoordinationservice.mappers.Specifica
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.*;
 import org.bson.Document;
+import org.semanticweb.owlapi.model.IRI;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,8 +28,6 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 @Service
 public class PostCoordinationService {
-
-
     private final PostCoordinationRepository repository;
     private final PostCoordinationTableConfigRepository configRepository;
     private final LinearizationService linearizationService;
@@ -35,6 +38,8 @@ public class PostCoordinationService {
 
     private final PostCoordinationEventProcessor eventProcessor;
 
+    private final CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypeExecutor;
+
 
     public PostCoordinationService(PostCoordinationRepository repository,
                                    PostCoordinationTableConfigRepository configRepository,
@@ -42,7 +47,7 @@ public class PostCoordinationService {
                                    ReadWriteLockService readWriteLock,
                                    PostCoordinationDocumentRepository documentRepository,
                                    ObjectMapper objectMapper,
-                                   NewRevisionsEventEmitterService newRevisionsEventEmitter, PostCoordinationEventProcessor eventProcessor) {
+                                   NewRevisionsEventEmitterService newRevisionsEventEmitter, PostCoordinationEventProcessor eventProcessor, CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypeExecutor) {
         this.repository = repository;
         this.configRepository = configRepository;
         this.linearizationService = linearizationService;
@@ -51,6 +56,7 @@ public class PostCoordinationService {
         this.objectMapper = objectMapper;
         this.newRevisionsEventEmitter = newRevisionsEventEmitter;
         this.eventProcessor = eventProcessor;
+        this.entityTypeExecutor = entityTypeExecutor;
     }
 
 
@@ -209,7 +215,13 @@ public class PostCoordinationService {
                                                                         ChangeRequestId changeRequestId) {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
-        var defaultRevision = PostCoordinationSpecificationRevision.createDefaultInitialRevision(newSpec.entityType(),
+        List<String> entityTypes;
+        try {
+            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"")).get().icatxEntityTypes();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new MessageProcessingException("Error fetching entity types", e);
+        }
+        var defaultRevision = PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes,
                 definitionList,
                 configurations);
 
@@ -235,20 +247,20 @@ public class PostCoordinationService {
 
     }
 
-    public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, String entityType) {
+    public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, List<String> entityTypes) {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
                 .map(history -> {
                             history.getPostCoordinationRevisions().add(0, PostCoordinationSpecificationRevision.createDefaultInitialRevision(
-                                    entityType,
+                                    entityTypes,
                                     definitionList,
                                     configurations));
                             return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
                         }
                 )
                 .orElseGet(() -> {
-                    var specs =  Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityType, definitionList, configurations));
+                    var specs =  Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes, definitionList, configurations));
                     var history = new EntityPostCoordinationHistory(entityIri, projectId.id(), specs);
                     return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
                 });

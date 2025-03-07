@@ -1,26 +1,21 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.changes;
 
+import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.PostCoordinationSpecificationRevision;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.*;
 
-public class SpecRevisionWithEntity {
+public record SpecRevisionWithEntity(@Field(SPEC_REVISIONS) PostCoordinationSpecificationRevision revision,
+                                     ProjectId projectId, @Field(WHOFIC_ENTITY_IRI) String whoficEntityIri) {
 
-    @Field(SPEC_REVISIONS)
-    private final PostCoordinationSpecificationRevision revision;
-    @Field(WHOFIC_ENTITY_IRI)
-    private final String whoficEntityIri;
-    public SpecRevisionWithEntity(PostCoordinationSpecificationRevision revision, String whoficEntityIri) {
-        this.revision = revision;
-        this.whoficEntityIri = whoficEntityIri;
-    }
-
-    public PostCoordinationSpecificationRevision getRevision() {
+    @Override
+    public PostCoordinationSpecificationRevision revision() {
         return revision;
     }
 
-    public String getWhoficEntityIri() {
+    @Override
+    public String whoficEntityIri() {
         return whoficEntityIri;
     }
 }

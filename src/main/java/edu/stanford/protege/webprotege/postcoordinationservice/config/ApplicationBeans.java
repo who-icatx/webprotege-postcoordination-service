@@ -8,6 +8,8 @@ import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.impl.CommandExecutorImpl;
 import edu.stanford.protege.webprotege.postcoordinationservice.*;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinitionRequest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinitionResponse;
 import org.semanticweb.owlapi.model.IRI;
@@ -57,6 +59,12 @@ public class ApplicationBeans {
     @Bean
     CommandExecutor<LinearizationDefinitionRequest, LinearizationDefinitionResponse> executorForLinearizationDefinitions() {
         return new CommandExecutorImpl<>(LinearizationDefinitionResponse.class);
+    }
+
+
+    @Bean
+    CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> executorForPrepareBackupFilesForUse() {
+        return new CommandExecutorImpl<>(GetIcatxEntityTypeResponse.class);
     }
 
 }

@@ -4,6 +4,10 @@ import edu.stanford.protege.webprotege.change.ProjectChange;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.diff.DiffElement;
 import edu.stanford.protege.webprotege.entity.EntityNode;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
+import edu.stanford.protege.webprotege.ipc.ExecutionContext;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
@@ -12,10 +16,12 @@ import edu.stanford.protege.webprotege.postcoordinationservice.services.Lineariz
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.diff.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.nodeRendering.EntityRendererManager;
 import edu.stanford.protege.webprotege.revision.RevisionNumber;
+import org.semanticweb.owlapi.model.IRI;
 import org.slf4j.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.*;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper.groupScaleEventsByAxis;
@@ -33,17 +39,19 @@ public class ProjectChangesManager {
     private final PostCoordinationTableConfigRepository tableConfigurationRepo;
 
     private final LinearizationService linearizationService;
+    private final CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypesExecutor;
 
 
     public ProjectChangesManager(
             Revision2DiffElementsTranslator revision2DiffElementsTranslator,
             EntityRendererManager entityRendererManager,
             PostCoordinationTableConfigRepository tableConfigurationRepo,
-            LinearizationService linearizationService) {
+            LinearizationService linearizationService, CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypesExecutor) {
         this.revision2DiffElementsTranslator = revision2DiffElementsTranslator;
         this.entityRendererManager = entityRendererManager;
         this.tableConfigurationRepo = tableConfigurationRepo;
         this.linearizationService = linearizationService;
+        this.entityTypesExecutor = entityTypesExecutor;
     }
 
     public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision) {
@@ -67,7 +75,9 @@ public class ProjectChangesManager {
         ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
                 revision,
                 entityIrisAndNames.get(whoficEntityIri),
-                entityIrisAndNames
+                entityIrisAndNames,
+                projectId,
+                whoficEntityIri
         );
 
         return ProjectChangeForEntity.create(
@@ -78,13 +88,16 @@ public class ProjectChangesManager {
 
     private ProjectChange getProjectChangesForCustomScaleRevision(PostCoordinationCustomScalesRevision revision,
                                                                   String subjectName,
-                                                                  Map<String, String> entityIrisAndNames) {
+                                                                  Map<String, String> entityIrisAndNames,
+                                                                  ProjectId projectId,
+                                                                  String whofiEntityIri) {
         final int totalChanges;
         var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEvents().stream().toList());
         totalChanges = changesByAxis.size();
 
 
-        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis, createOrderAxisMapWithSubAxis(), entityIrisAndNames);
+        List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromCustomScaleRevision(changesByAxis,
+                createOrderAxisMapWithSubAxis(whofiEntityIri, projectId, revision.userId()), entityIrisAndNames);
         List<DiffElement<CustomScaleDocumentChange, PostCoordinationCustomScalesValueEvent>> mutableDiffElements = new ArrayList<>(diffElements);
         mutableDiffElements.sort(Comparator.comparing(diffElement -> diffElement.getSourceDocument().getSortingCode()));
 
@@ -150,7 +163,9 @@ public class ProjectChangesManager {
                             ProjectChange projectChange = getProjectChangesForCustomScaleRevision(
                                     revisionWithEntity.getRevision(),
                                     entityIrisAndNames.get(revisionWithEntity.getWhoficEntityIri()),
-                                    entityIrisAndNames
+                                    entityIrisAndNames,
+                                    projectId,
+                                    revisionWithEntity.getWhoficEntityIri()
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
                                     revisionWithEntity.getWhoficEntityIri(),
@@ -165,32 +180,40 @@ public class ProjectChangesManager {
     }
 
 
-    private Map<String, Integer> createOrderAxisMapWithSubAxis() {
+    private Map<String, Integer> createOrderAxisMapWithSubAxis(String whoficEntityiri, ProjectId projectId, UserId userId) {
         Map<String, Integer> orderedAxisMap = new HashMap<>();
-        TableConfiguration tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType("ICD");
+        try {
+            GetIcatxEntityTypeResponse typeResponse = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(whoficEntityiri), projectId), new ExecutionContext(userId, "")).get();
+            List<TableConfiguration> tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType(typeResponse.icatxEntityTypes());
 
-        if (tableConfiguration == null) {
-            return Collections.emptyMap();
-        }
-
-        List<String> orderedAxisList = new LinkedList<>(tableConfiguration.getPostCoordinationAxes());
-        List<CompositeAxis> compositeAxisList = new ArrayList<>(tableConfiguration.getCompositePostCoordinationAxes());
-
-        compositeAxisList.forEach(compositeAxis -> {
-            int indexForCurrAxis = orderedAxisList.indexOf(compositeAxis.getPostCoordinationAxis());
-
-            if (indexForCurrAxis != -1) {
-                List<String> subAxisList = new LinkedList<>(compositeAxis.getSubAxis());
-                orderedAxisList.addAll(indexForCurrAxis + 1, subAxisList);
-                orderedAxisList.remove(indexForCurrAxis);
+            if (tableConfiguration == null) {
+                return Collections.emptyMap();
             }
-        });
+            List<String> orderedAxisList = tableConfiguration.stream()
+                    .flatMap(c -> c.getPostCoordinationAxes().stream()).distinct()
+                    .collect(Collectors.toList());
 
-        orderedAxisMap = IntStream.range(0, orderedAxisList.size())
-                .boxed()
-                .collect(Collectors.toMap(orderedAxisList::get, index -> index));
 
-        return orderedAxisMap;
+            List<CompositeAxis> compositeAxisList = tableConfiguration.stream().flatMap(c -> c.getCompositePostCoordinationAxes().stream()).toList();
+
+            compositeAxisList.forEach(compositeAxis -> {
+                int indexForCurrAxis = orderedAxisList.indexOf(compositeAxis.getPostCoordinationAxis());
+
+                if (indexForCurrAxis != -1) {
+                    List<String> subAxisList = new LinkedList<>(compositeAxis.getSubAxis());
+                    orderedAxisList.addAll(indexForCurrAxis + 1, subAxisList);
+                    orderedAxisList.remove(indexForCurrAxis);
+                }
+            });
+
+            orderedAxisMap = IntStream.range(0, orderedAxisList.size())
+                    .boxed()
+                    .collect(Collectors.toMap(orderedAxisList::get, index -> index));
+
+            return orderedAxisMap;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -203,10 +226,10 @@ public class ProjectChangesManager {
                 .flatMap(history ->
                         history.getPostCoordinationRevisions()
                                 .stream()
-                                .map(revision -> new SpecRevisionWithEntity(revision, history.getWhoficEntityIri()))
+                                .map(revision -> new SpecRevisionWithEntity(revision, projectId, history.getWhoficEntityIri()))
                 )
-                .sorted(Comparator.comparing(SpecRevisionWithEntity::getRevision))
-                .peek(revisionWithEntity -> entityIrisAndNames.put(revisionWithEntity.getWhoficEntityIri(), revisionWithEntity.getWhoficEntityIri()))
+                .sorted(Comparator.comparing(SpecRevisionWithEntity::revision))
+                .peek(revisionWithEntity -> entityIrisAndNames.put(revisionWithEntity.whoficEntityIri(), revisionWithEntity.whoficEntityIri()))
                 .collect(Collectors.toSet());
 
         List<EntityNode> renderedEntitiesList = entityRendererManager.getRenderedEntities(entityIrisAndNames.keySet(), projectId);
@@ -219,12 +242,12 @@ public class ProjectChangesManager {
         Set<ProjectChangeForEntity> projectChangeForEntityList = specRevisions.stream()
                 .flatMap(revisionWithEntity -> {
                             ProjectChange projectChange = getProjectChangesForSpecRevision(
-                                    revisionWithEntity.getRevision(),
-                                    entityIrisAndNames.get(revisionWithEntity.getWhoficEntityIri()),
+                                    revisionWithEntity,
+                                    entityIrisAndNames.get(revisionWithEntity.whoficEntityIri()),
                                     entityIrisAndNames
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
-                                    revisionWithEntity.getWhoficEntityIri(),
+                                    revisionWithEntity.whoficEntityIri(),
                                     projectChange
                             );
                             return Stream.of(projectChangeForEntity);
@@ -235,14 +258,16 @@ public class ProjectChangesManager {
         return projectChangeForEntityList;
     }
 
-    private ProjectChange getProjectChangesForSpecRevision(PostCoordinationSpecificationRevision revision,
+    private ProjectChange getProjectChangesForSpecRevision(SpecRevisionWithEntity specRevisionWithEntity,
                                                            String subjectName,
                                                            Map<String, String> entityIrisAndNames) {
         final int totalChanges;
+        PostCoordinationSpecificationRevision revision = specRevisionWithEntity.revision();
         var eventsByView = revision.postCoordinationEvents().stream().toList();
         totalChanges = eventsByView.size();
 
-        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView, createOrderAxisMapWithSubAxis());
+        List<DiffElement<SpecDocumentChange, List<PostCoordinationSpecificationEvent>>> diffElements = revision2DiffElementsTranslator.getDiffElementsFromSpecRevision(eventsByView,
+                createOrderAxisMapWithSubAxis(specRevisionWithEntity.whoficEntityIri(), specRevisionWithEntity.projectId(), specRevisionWithEntity.revision().userId()));
         sortByLinViews(diffElements);
 
         List<DiffElement<String, String>> renderedDiffElements = renderDiffElementsForSpecRevision(diffElements, entityIrisAndNames);
@@ -315,7 +340,7 @@ public class ProjectChangesManager {
         });
 
         ProjectChange projectChange = getProjectChangesForSpecRevision(
-                revision,
+                new SpecRevisionWithEntity(revision, projectId, whoficEntityIri),
                 entityIrisAndNames.get(whoficEntityIri),
                 entityIrisAndNames
         );

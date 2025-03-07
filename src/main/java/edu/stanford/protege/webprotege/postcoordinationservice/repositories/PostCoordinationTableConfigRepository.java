@@ -34,10 +34,10 @@ public class PostCoordinationTableConfigRepository {
 
 
     @Cacheable("postCoordConfigByEntity")
-    public TableConfiguration getTableConfigurationByEntityType(String entityType) {
-        Query query = Query.query(Criteria.where(ENTITY_TYPE_KEY).is(entityType));
+    public List<TableConfiguration> getTableConfigurationByEntityType(List<String> entityTypes) {
+        Query query = Query.query(Criteria.where(ENTITY_TYPE_KEY).in(entityTypes));
 
-        return mongoTemplate.findOne(query, TableConfiguration.class);
+        return mongoTemplate.find(query, TableConfiguration.class);
     }
 
     public List<TableAxisLabel> getTableAxisLabels() {
