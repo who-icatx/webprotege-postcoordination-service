@@ -2,7 +2,10 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 
 import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.MinioPostCoordinationDocumentLoader;
 import org.junit.jupiter.api.*;
@@ -17,8 +20,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -37,10 +42,14 @@ public class PostCoordinationCustomValueServiceIT {
     @Autowired
     private PostCoordinationService postCoordinationService;
 
+    @MockBean
+    private CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypeExecutor;
+
     @BeforeEach
     public void setUp() throws IOException {
         when(documentLoader.fetchPostCoordinationDocument(eq("postCoordinationScalesImportFile.json")))
                 .thenReturn(new FileInputStream("src/test/resources/postCoordinationScalesImportFile.json"));
+        when(entityTypeExecutor.execute(any(), any())).thenReturn(CompletableFuture.supplyAsync(() -> new GetIcatxEntityTypeResponse(Arrays.asList("ICD"))));
     }
 
 

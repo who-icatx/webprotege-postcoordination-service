@@ -3,6 +3,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
@@ -11,6 +12,7 @@ import edu.stanford.protege.webprotege.postcoordinationservice.repositories.Post
 import org.bson.Document;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,9 +23,11 @@ import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.model.EntityPostCoordinationHistory.POSTCOORDINATION_HISTORY_COLLECTION;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -47,6 +51,10 @@ public class PostCoordinationEventProcessorIT {
     @Autowired
     private PostCoordinationService postCoordService;
 
+
+    @MockBean
+    private CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypeExecutor;
+
     private EntityCustomScalesValuesHistory customScalesValuesHistory;
 
     @BeforeEach
@@ -57,6 +65,8 @@ public class PostCoordinationEventProcessorIT {
         when(linearizationService.getLinearizationDefinitions())
                 .thenReturn(objectMapper.readValue(defintions, new TypeReference<>() {
                 }));
+
+        when(entityTypeExecutor.execute(any(), any())).thenReturn(CompletableFuture.supplyAsync(() -> new GetIcatxEntityTypeResponse(Arrays.asList("ICD"))));
     }
 
     @Test
