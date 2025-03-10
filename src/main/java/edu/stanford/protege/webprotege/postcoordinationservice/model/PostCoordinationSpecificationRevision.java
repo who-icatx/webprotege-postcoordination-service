@@ -39,9 +39,6 @@ public record PostCoordinationSpecificationRevision(UserId userId,
                     .filter(config -> entityTypes.contains(config.getEntityType()))
                     .flatMap(config -> config.getPostCoordinationAxes().stream())
                     .collect(Collectors.toSet());
-            if(postCoordinationAxis.isEmpty()) {
-                throw  new RuntimeException("Couldn't find the equivalent entity type " + entityTypes);
-            }
 
             List<PostCoordinationSpecificationEvent> specificationEvents = postCoordinationAxis.stream()
                     .map(availableAxis -> {
