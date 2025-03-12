@@ -3,8 +3,11 @@ package edu.stanford.protege.webprotege.postcoordinationservice.handlers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.stanford.protege.webprotege.common.*;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.ExecutionContext;
 import edu.stanford.protege.webprotege.postcoordinationservice.IntegrationTest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.PostCoordinationSpecification;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationDocumentRepository;
@@ -24,9 +27,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -60,6 +66,9 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
     @MockBean
     private PostCoordinationTableConfigRepository postCoordinationTableConfigRepository;
 
+    @MockBean
+    private CommandExecutor<GetIcatxEntityTypeRequest, GetIcatxEntityTypeResponse> entityTypeExecutor;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -85,6 +94,7 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
         File tableConfig = new File("src/test/resources/postcoordinationTableConfig.json");
         List<TableConfiguration> documents = objectMapper.readValue(tableConfig, new TypeReference<>() {
         });
+        when(entityTypeExecutor.execute(any(), any())).thenReturn(CompletableFuture.supplyAsync(() -> new GetIcatxEntityTypeResponse(Arrays.asList("ICD"))));
         when(postCoordinationTableConfigRepository.getALlTableConfiguration()).thenReturn(documents);
         mongoTemplate.getDb().drop();
         postCoordService = new PostCoordinationService(repository,
@@ -94,7 +104,7 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
                 postCoordinationDocumentRepository,
                 objectMapper,
                 newRevisionsEventEmitterService,
-                eventProcessor);
+                eventProcessor, entityTypeExecutor);
     }
 
     @Test

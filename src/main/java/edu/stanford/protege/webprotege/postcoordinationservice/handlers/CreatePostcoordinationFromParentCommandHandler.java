@@ -45,7 +45,7 @@ public class CreatePostcoordinationFromParentCommandHandler implements CommandHa
         List<LinearizationDefinition> definitionList = linService.getLinearizationDefinitions();
 
         var parentWhoficHistoryOptional = repo.getExistingHistoryOrderedByRevision(request.parentEntityIri().toString(), request.projectId());
-        parentWhoficHistoryOptional.ifPresent(parentWhoficHistory ->{
+        parentWhoficHistoryOptional.ifPresent(parentWhoficHistory -> {
             List<PostCoordinationSpecification> newSpecsList = new ArrayList<>();
 
             var parentWhoficSpec = eventProcessor.processHistory(parentWhoficHistory);
