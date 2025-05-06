@@ -29,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +84,7 @@ class CreatePostcoordinationFromParentCommandHandlerIT {
     @BeforeEach
     void setUp() throws IOException {
         projectId = ProjectId.generate();
-        executionContext = new ExecutionContext(UserId.valueOf("testUser"), "testToken");
+        executionContext = new ExecutionContext(UserId.valueOf("testUser"), "testToken", UUID.randomUUID().toString());
         parentEntityIri = "http://example.org/parentEntity";
         newEntityIri = "http://example.org/newEntity";
         FileInputStream defintions = new FileInputStream("src/test/resources/LinearizationDefinitions.json");

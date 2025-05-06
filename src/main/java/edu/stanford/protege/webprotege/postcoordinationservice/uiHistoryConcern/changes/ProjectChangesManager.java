@@ -6,6 +6,7 @@ import edu.stanford.protege.webprotege.diff.DiffElement;
 import edu.stanford.protege.webprotege.entity.EntityNode;
 import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.ExecutionContext;
+import edu.stanford.protege.webprotege.ipc.util.CorrelationMDCUtil;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
@@ -183,7 +184,7 @@ public class ProjectChangesManager {
     private Map<String, Integer> createOrderAxisMapWithSubAxis(String whoficEntityiri, ProjectId projectId, UserId userId) {
         Map<String, Integer> orderedAxisMap = new HashMap<>();
         try {
-            GetIcatxEntityTypeResponse typeResponse = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(whoficEntityiri), projectId), new ExecutionContext(userId, "")).get();
+            GetIcatxEntityTypeResponse typeResponse = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(whoficEntityiri), projectId), new ExecutionContext(userId, "", CorrelationMDCUtil.getCorrelationId())).get();
             List<TableConfiguration> tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType(typeResponse.icatxEntityTypes());
 
             if (tableConfiguration == null) {

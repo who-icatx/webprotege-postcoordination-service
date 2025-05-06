@@ -6,6 +6,7 @@ import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.ExecutionContext;
 import edu.stanford.protege.webprotege.ipc.MessageProcessingException;
+import edu.stanford.protege.webprotege.ipc.util.CorrelationMDCUtil;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.PostCoordinationCustomScalesValueEvent;
@@ -217,7 +218,7 @@ public class PostCoordinationService {
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         List<String> entityTypes;
         try {
-            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"")).get().icatxEntityTypes();
+            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"", CorrelationMDCUtil.getCorrelationId())).get().icatxEntityTypes();
         } catch (InterruptedException | ExecutionException e) {
             throw new MessageProcessingException("Error fetching entity types", e);
         }
