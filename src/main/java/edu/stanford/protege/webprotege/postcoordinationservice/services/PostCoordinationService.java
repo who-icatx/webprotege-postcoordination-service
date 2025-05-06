@@ -92,7 +92,6 @@ public class PostCoordinationService {
 
                 repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
 
-                newRevisionsEventEmitter.emitNewRevisionsEventForScaleHistory(projectId, new ArrayList<>(histories), null);
             }
         };
     }
