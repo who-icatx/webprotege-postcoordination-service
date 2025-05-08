@@ -153,10 +153,12 @@ public class PostCoordinationService {
                             }, () -> {
                                 EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId, changeRequestId);
                                 var savedHistory = repository.saveNewSpecificationHistory(history);
-                                savedHistory.getPostCoordinationRevisions()
-                                        .stream()
-                                        .findFirst()
-                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision, changeRequestId));
+                                if(!newSpecification.postcoordinationSpecifications().isEmpty()){
+                                    savedHistory.getPostCoordinationRevisions()
+                                            .stream()
+                                            .findFirst()
+                                            .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision, changeRequestId));
+                                }
                             }
                     );
                 }
