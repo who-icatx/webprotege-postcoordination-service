@@ -4,12 +4,9 @@ import edu.stanford.protege.webprotege.change.ProjectChange;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.diff.DiffElement;
 import edu.stanford.protege.webprotege.entity.EntityNode;
-import edu.stanford.protege.webprotege.ipc.CommandExecutor;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
+import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.ipc.util.CorrelationMDCUtil;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.LinearizationDefinition;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
@@ -55,7 +52,7 @@ public class ProjectChangesManager {
         this.entityTypesExecutor = entityTypesExecutor;
     }
 
-    public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision) {
+    public ProjectChangeForEntity getProjectChangesForCustomScaleRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision revision, String commitMessage) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
         entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
         List<TableAxisLabel> tableAxisLabels = tableConfigurationRepo.getTableAxisLabels();
@@ -78,7 +75,8 @@ public class ProjectChangesManager {
                 entityIrisAndNames.get(whoficEntityIri),
                 entityIrisAndNames,
                 projectId,
-                whoficEntityIri
+                whoficEntityIri,
+                commitMessage
         );
 
         return ProjectChangeForEntity.create(
@@ -91,7 +89,8 @@ public class ProjectChangesManager {
                                                                   String subjectName,
                                                                   Map<String, String> entityIrisAndNames,
                                                                   ProjectId projectId,
-                                                                  String whofiEntityIri) {
+                                                                  String whofiEntityIri,
+                                                                  String commitMessage) {
         final int totalChanges;
         var changesByAxis = groupScaleEventsByAxis(revision.postCoordinationEvents().stream().toList());
         totalChanges = changesByAxis.size();
@@ -116,11 +115,12 @@ public class ProjectChangesManager {
                 renderedDiffElements,
                 totalChanges
         );
+        var message = commitMessage != null ? commitMessage : "";
         return ProjectChange.get(
                 RevisionNumber.valueOf("0"),
                 revision.userId(),
                 revision.timestamp(),
-                "Edited Postcoordination Scale Values for Entity: " + subjectName,
+                "Edited Postcoordination Scale Values for Entity: " + subjectName + " : " + message,
                 totalChanges,
                 page);
     }
@@ -166,7 +166,8 @@ public class ProjectChangesManager {
                                     entityIrisAndNames.get(revisionWithEntity.getWhoficEntityIri()),
                                     entityIrisAndNames,
                                     projectId,
-                                    revisionWithEntity.getWhoficEntityIri()
+                                    revisionWithEntity.getWhoficEntityIri(),
+                                    ""
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
                                     revisionWithEntity.getWhoficEntityIri(),
@@ -245,7 +246,8 @@ public class ProjectChangesManager {
                             ProjectChange projectChange = getProjectChangesForSpecRevision(
                                     revisionWithEntity,
                                     entityIrisAndNames.get(revisionWithEntity.whoficEntityIri()),
-                                    entityIrisAndNames
+                                    entityIrisAndNames,
+                                    ""
                             );
                             ProjectChangeForEntity projectChangeForEntity = ProjectChangeForEntity.create(
                                     revisionWithEntity.whoficEntityIri(),
@@ -261,7 +263,7 @@ public class ProjectChangesManager {
 
     private ProjectChange getProjectChangesForSpecRevision(SpecRevisionWithEntity specRevisionWithEntity,
                                                            String subjectName,
-                                                           Map<String, String> entityIrisAndNames) {
+                                                           Map<String, String> entityIrisAndNames, String commitMessage) {
         final int totalChanges;
         PostCoordinationSpecificationRevision revision = specRevisionWithEntity.revision();
         var eventsByView = revision.postCoordinationEvents().stream().toList();
@@ -285,11 +287,12 @@ public class ProjectChangesManager {
                 renderedDiffElements,
                 totalChanges
         );
+        var message = commitMessage != null ? commitMessage : "";
         return ProjectChange.get(
                 RevisionNumber.valueOf("0"),
                 revision.userId(),
                 revision.timestamp(),
-                "Edited Postcoordination Specification for Entity: " + subjectName,
+                "Edited Postcoordination Specification for Entity: " + subjectName + " : " + message,
                 totalChanges,
                 page);
     }
@@ -308,7 +311,7 @@ public class ProjectChangesManager {
     }
 
 
-    public ProjectChangeForEntity getProjectChangesForSpecRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision revision) {
+    public ProjectChangeForEntity getProjectChangesForSpecRevision(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision revision, String commitMessage) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
         entityIrisAndNames.put(whoficEntityIri, whoficEntityIri);
         revision.postCoordinationEvents()
@@ -343,7 +346,8 @@ public class ProjectChangesManager {
         ProjectChange projectChange = getProjectChangesForSpecRevision(
                 new SpecRevisionWithEntity(revision, projectId, whoficEntityIri),
                 entityIrisAndNames.get(whoficEntityIri),
-                entityIrisAndNames
+                entityIrisAndNames,
+                commitMessage
         );
 
         return ProjectChangeForEntity.create(

@@ -35,15 +35,15 @@ public class NewRevisionsEventEmitterServiceImpl implements NewRevisionsEventEmi
     }
 
     @Override
-    public void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision entityCustomScaleRevision, ChangeRequestId changeRequestId) {
-        ProjectChangeForEntity projectChange = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, entityCustomScaleRevision);
+    public void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision entityCustomScaleRevision, ChangeRequestId changeRequestId, String commitMessage) {
+        ProjectChangeForEntity projectChange = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, entityCustomScaleRevision, commitMessage);
         NewRevisionsEvent revisionsEvent = NewRevisionsEvent.create(EventId.generate(), projectId, Set.of(projectChange), changeRequestId);
         eventDispatcher.dispatchEvent(revisionsEvent);
     }
 
     @Override
-    public void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision entitySpecRevision, ChangeRequestId changeRequestId) {
-        ProjectChangeForEntity projectChange = projectChangesManager.getProjectChangesForSpecRevision(projectId, whoficEntityIri, entitySpecRevision);
+    public void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision entitySpecRevision, ChangeRequestId changeRequestId, String commitMessage) {
+        ProjectChangeForEntity projectChange = projectChangesManager.getProjectChangesForSpecRevision(projectId, whoficEntityIri, entitySpecRevision, commitMessage);
         NewRevisionsEvent revisionsEvent = NewRevisionsEvent.create(EventId.generate(), projectId, Set.of(projectChange), changeRequestId);
         eventDispatcher.dispatchEvent(revisionsEvent);
     }
