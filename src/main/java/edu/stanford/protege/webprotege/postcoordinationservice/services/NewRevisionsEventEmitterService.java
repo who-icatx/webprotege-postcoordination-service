@@ -11,7 +11,7 @@ public interface NewRevisionsEventEmitterService {
 
     void emitNewRevisionsEventForSpecHistory(ProjectId projectId, List<EntityPostCoordinationHistory> entitySpecHistories, ChangeRequestId changeRequestId);
 
-    void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision entityCustomScaleRevision, ChangeRequestId changeRequestId);
+    void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationCustomScalesRevision entityCustomScaleRevision, ChangeRequestId changeRequestId, String commitMessage);
 
-    void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision entitySpecRevision, ChangeRequestId changeRequestId);
+    void emitNewRevisionsEvent(ProjectId projectId, String whoficEntityIri, PostCoordinationSpecificationRevision entitySpecRevision, ChangeRequestId changeRequestId, String commitMessage);
 }

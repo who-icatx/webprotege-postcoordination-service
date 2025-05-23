@@ -14,7 +14,8 @@ public record AddEntityCustomScalesRevisionRequest(@JsonProperty("projectId")
                                                    ProjectId projectId,
                                                    @JsonProperty("entityCustomScaleValues")
                                                    WhoficCustomScalesValues entityCustomScaleValues,
-                                                   @JsonProperty("changeRequestId") @Nullable ChangeRequestId changeRequestId) implements Request<AddEntityCustomScalesRevisionResponse> {
+                                                   @JsonProperty("changeRequestId") @Nullable ChangeRequestId changeRequestId,
+                                                   @JsonProperty("commitMessage") @Nullable String commitMessage) implements Request<AddEntityCustomScalesRevisionResponse> {
 
     public final static String CHANNEL = "webprotege.postcoordination.AddEntityCustomScalesRevision";
 
@@ -23,8 +24,9 @@ public record AddEntityCustomScalesRevisionRequest(@JsonProperty("projectId")
                                                               ProjectId projectId,
                                                               @JsonProperty("entityCustomScaleValues")
                                                               WhoficCustomScalesValues entityCustomScaleValues,
-                                                              @JsonProperty("changeRequestId") @Nullable ChangeRequestId changeRequestId) {
-        return new AddEntityCustomScalesRevisionRequest(projectId, entityCustomScaleValues, changeRequestId);
+                                                              @JsonProperty("changeRequestId") @Nullable ChangeRequestId changeRequestId,
+                                                              @JsonProperty("commitMessage") String commitMessage) {
+        return new AddEntityCustomScalesRevisionRequest(projectId, entityCustomScaleValues, changeRequestId, commitMessage);
     }
 
     @Override

@@ -4,16 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.entity.EntityNode;
 import edu.stanford.protege.webprotege.ipc.CommandExecutor;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeRequest;
-import edu.stanford.protege.webprotege.postcoordinationservice.dto.GetIcatxEntityTypeResponse;
+import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.events.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.PostCoordinationTableConfigRepository;
 import edu.stanford.protege.webprotege.postcoordinationservice.services.LinearizationService;
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.diff.Revision2DiffElementsTranslator;
 import edu.stanford.protege.webprotege.postcoordinationservice.uiHistoryConcern.nodeRendering.EntityRendererManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
@@ -49,7 +47,7 @@ public class ProjectChangesManagerTest {
     private ProjectChangesManager projectChangesManager;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         when(entityTypeExecutor.execute(any(), any())).thenReturn(CompletableFuture.supplyAsync(() -> new GetIcatxEntityTypeResponse(Arrays.asList("ICD"))));
     }
 
@@ -67,7 +65,7 @@ public class ProjectChangesManagerTest {
 
         when(entityRendererManager.getRenderedEntities(Set.of(whoficEntityIri), projectId))
                 .thenReturn(List.of(entityNode));
-        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision);
+        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision, "");
 
         assertNotNull(result);
         assertEquals(0, result.projectChange().getChangeCount());
@@ -94,7 +92,7 @@ public class ProjectChangesManagerTest {
         when(entityRendererManager.getRenderedEntities(Set.of(whoficEntityIri), projectId))
                 .thenReturn(List.of(entityNode));
 
-        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision);
+        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision, "");
 
         assertNotNull(result);
         assertEquals(1, result.projectChange().getChangeCount());
@@ -124,7 +122,7 @@ public class ProjectChangesManagerTest {
         when(entityRendererManager.getRenderedEntities(Set.of(whoficEntityIri), projectId))
                 .thenReturn(List.of(entityNode));
 
-        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision);
+        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForCustomScaleRevision(projectId, whoficEntityIri, customScaleRevision, "");
 
         assertNotNull(result);
         assertEquals(2, result.projectChange().getChangeCount());
@@ -193,7 +191,7 @@ public class ProjectChangesManagerTest {
         when(entityRendererManager.getRenderedEntities(Set.of(whoficEntityIri), projectId))
                 .thenReturn(List.of(entityNode));
 
-        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForSpecRevision(projectId, whoficEntityIri, specRevision);
+        ProjectChangeForEntity result = projectChangesManager.getProjectChangesForSpecRevision(projectId, whoficEntityIri, specRevision, "");
 
         assertNotNull(result);
 
