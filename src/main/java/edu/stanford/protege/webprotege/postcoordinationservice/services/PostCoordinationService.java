@@ -2,6 +2,8 @@ package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.ReplaceOneModel;
+import com.mongodb.client.model.ReplaceOptions;
 import edu.stanford.protege.webprotege.common.*;
 import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.ExecutionContext;
@@ -88,11 +90,18 @@ public class PostCoordinationService {
                     histories.add(history);
                 }
                 var documents = histories.stream()
-                        .map(history -> new InsertOneModel<>(objectMapper.convertValue(history, Document.class)))
+                        .map(history -> {
+                            Document doc = objectMapper.convertValue(history, Document.class);
+                            return new ReplaceOneModel<>(
+                                new Document(EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI, history.getWhoficEntityIri())
+                                    .append(EntityCustomScalesValuesHistory.PROJECT_ID, history.getProjectId()),
+                                doc,
+                                new ReplaceOptions().upsert(true)
+                            );
+                        })
                         .toList();
 
                 repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
-
             }
         };
     }
