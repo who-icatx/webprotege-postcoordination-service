@@ -71,9 +71,7 @@ public class PostCoordinationService {
 
     public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
         var stream = documentRepository.fetchCustomScalesValues(documentLocation);
-        readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
-        });
+        stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
     }
 
     private Consumer<List<WhoficCustomScalesValues>> createBatchProcessorForSavingPaginatedCustomScales(ProjectId projectId,
