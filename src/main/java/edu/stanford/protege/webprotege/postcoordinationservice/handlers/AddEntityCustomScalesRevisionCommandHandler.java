@@ -29,7 +29,7 @@ public class AddEntityCustomScalesRevisionCommandHandler implements CommandHandl
     @Override
     public Mono<AddEntityCustomScalesRevisionResponse> handleRequest(AddEntityCustomScalesRevisionRequest request, ExecutionContext executionContext) {
 
-        postCoordService.addCustomScaleRevision(request.entityCustomScaleValues(), request.projectId(), executionContext.userId(), request.changeRequestId());
+        postCoordService.addCustomScaleRevision(request.entityCustomScaleValues(), request.projectId(), executionContext.userId(), request.changeRequestId(), request.commitMessage());
 
         return Mono.just(new AddEntityCustomScalesRevisionResponse());
     }

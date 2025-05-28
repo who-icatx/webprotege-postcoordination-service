@@ -10,7 +10,7 @@
     </parent>
     <groupId>edu.stanford.protege</groupId>
     <artifactId>webprotege-postcoordination-service</artifactId>
-    <version>1.0.20</version>
+    <version>1.0.22</version>
     <name>webprotege-postcoordination-service</name>
     <description>This microservice handles saving the post coordination configuration , querying the configuration for a
         given entity and the configuration
@@ -41,6 +41,12 @@
             <groupId>edu.stanford.protege</groupId>
             <artifactId>webprotege-ipc</artifactId>
             <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.stanford.protege</groupId>
+            <artifactId>webprotege-common</artifactId>
+            <version>0.9.11</version>
         </dependency>
 
         <dependency>
@@ -138,7 +144,7 @@
         <dependency>
             <groupId>edu.stanford.protege</groupId>
             <artifactId>webprotege-backend-api</artifactId>
-            <version>1.0.27-WHO</version>
+            <version>3.0.2-WHO</version>
         </dependency>
 
     </dependencies>

@@ -2,6 +2,7 @@ package edu.stanford.protege.webprotege.postcoordinationservice.repositories;
 
 
 import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.WriteModel;
 import com.mongodb.client.result.UpdateResult;
 import edu.stanford.protege.webprotege.common.ChangeRequestId;
 import edu.stanford.protege.webprotege.common.ProjectId;
@@ -36,10 +37,10 @@ public class PostCoordinationRepository {
         this.readWriteLock = readWriteLock;
     }
 
-    public void bulkWriteDocuments(List<InsertOneModel<Document>> listOfInsertOneModelDocument, String collectionName) {
+    public void bulkWriteDocuments(List<? extends WriteModel<Document>> listOfWriteModelDocument, String collectionName) {
         readWriteLock.executeWriteLock(() -> {
             var collection = mongoTemplate.getCollection(collectionName);
-            collection.bulkWrite(listOfInsertOneModelDocument);
+            collection.bulkWrite(listOfWriteModelDocument);
         });
     }
 
