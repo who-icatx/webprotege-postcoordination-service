@@ -1,13 +1,9 @@
 package edu.stanford.protege.webprotege.postcoordinationservice.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.model.InsertOneModel;
-import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.*;
 import edu.stanford.protege.webprotege.common.*;
-import edu.stanford.protege.webprotege.ipc.CommandExecutor;
-import edu.stanford.protege.webprotege.ipc.ExecutionContext;
-import edu.stanford.protege.webprotege.ipc.MessageProcessingException;
+import edu.stanford.protege.webprotege.ipc.*;
 import edu.stanford.protege.webprotege.ipc.util.CorrelationMDCUtil;
 import edu.stanford.protege.webprotege.postcoordinationservice.StreamUtils;
 import edu.stanford.protege.webprotege.postcoordinationservice.dto.*;
@@ -91,10 +87,10 @@ public class PostCoordinationService {
                         .map(history -> {
                             Document doc = objectMapper.convertValue(history, Document.class);
                             return new ReplaceOneModel<>(
-                                new Document(EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI, history.getWhoficEntityIri())
-                                    .append(EntityCustomScalesValuesHistory.PROJECT_ID, history.getProjectId()),
-                                doc,
-                                new ReplaceOptions().upsert(true)
+                                    new Document(EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI, history.getWhoficEntityIri())
+                                            .append(EntityCustomScalesValuesHistory.PROJECT_ID, history.getProjectId()),
+                                    doc,
+                                    new ReplaceOptions().upsert(true)
                             );
                         })
                         .toList();
@@ -117,12 +113,12 @@ public class PostCoordinationService {
                             .filter(spec -> !spec.axisEvents().isEmpty())
                             .collect(Collectors.toSet());
                     PostCoordinationSpecificationRevision revision = PostCoordinationSpecificationRevision.create(userId, events);
-                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(),  projectId.id(), List.of(revision));
-                    if(!events.isEmpty()) {
+                    EntityPostCoordinationHistory history = new EntityPostCoordinationHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
+                    if (!events.isEmpty()) {
                         histories.add(history);
                     }
                 }
-                if(!histories.isEmpty()) {
+                if (!histories.isEmpty()) {
                     saveMultipleEntityPostCoordinationHistories(histories);
                 }
 
@@ -160,7 +156,7 @@ public class PostCoordinationService {
                             }, () -> {
                                 EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId, changeRequestId);
                                 var savedHistory = repository.saveNewSpecificationHistory(history);
-                                if(!newSpecification.postcoordinationSpecifications().isEmpty()){
+                                if (!newSpecification.postcoordinationSpecifications().isEmpty()) {
                                     savedHistory.getPostCoordinationRevisions()
                                             .stream()
                                             .findFirst()
@@ -177,6 +173,7 @@ public class PostCoordinationService {
                                        UserId userId) {
         addCustomScaleRevision(newScales, projectId, userId, null, null);
     }
+
     public void addCustomScaleRevision(WhoficCustomScalesValues newScales,
                                        ProjectId projectId,
                                        UserId userId,
@@ -202,7 +199,11 @@ public class PostCoordinationService {
                                 savedHistory.getPostCoordinationCustomScalesRevisions()
                                         .stream()
                                         .findFirst()
-                                        .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision, changeRequestId, commitMessage));
+                                        .ifPresent(revision -> {
+                                            if (!revision.postCoordinationEvents().isEmpty()) {
+                                                newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, newScales.whoficEntityIri(), revision, changeRequestId, commitMessage);
+                                            }
+                                        });
                             }
                     );
                 }
@@ -227,7 +228,7 @@ public class PostCoordinationService {
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         List<String> entityTypes;
         try {
-            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"", CorrelationMDCUtil.getCorrelationId())).get().icatxEntityTypes();
+            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId, "", CorrelationMDCUtil.getCorrelationId())).get().icatxEntityTypes();
         } catch (InterruptedException | ExecutionException e) {
             throw new MessageProcessingException("Error fetching entity types", e);
         }
@@ -270,7 +271,7 @@ public class PostCoordinationService {
                         }
                 )
                 .orElseGet(() -> {
-                    var specs =  Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes, definitionList, configurations));
+                    var specs = Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes, definitionList, configurations));
                     var history = new EntityPostCoordinationHistory(entityIri, projectId.id(), specs);
                     return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
                 });
