@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 
@@ -45,7 +47,8 @@ public class GetTablePostCoordinationAxisHandler implements CommandHandler<GetTa
     @Override
     public Mono<GetTablePostCoordinationAxisResponse> handleRequest(GetTablePostCoordinationAxisRequest request, ExecutionContext executionContext) {
         try {
-            GetIcatxEntityTypeResponse response = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(request.entityIri(), request.projectId()), executionContext).get();
+            GetIcatxEntityTypeResponse response = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(request.entityIri(), request.projectId()), executionContext)
+                    .get(5, TimeUnit.SECONDS);
             List<TableConfiguration> tableConfigurations = tableConfigRepository.getTableConfigurationByEntityType(response.icatxEntityTypes());
             List<TableAxisLabel> labels = tableConfigRepository.getTableAxisLabels();
 
@@ -64,7 +67,7 @@ public class GetTablePostCoordinationAxisHandler implements CommandHandler<GetTa
 
             TableConfiguration mergedConfiguration = new TableConfiguration(entityTypes, postCoordinationAxes, compositeAxes);
             return Mono.just(new GetTablePostCoordinationAxisResponse(mergedConfiguration, labels));
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             LOGGER.error("Error fetching entity types",e);
             return Mono.error(new MessageProcessingException("Error fetching entity types", e));
         }

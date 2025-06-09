@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @WebProtegeHandler
 public class GetEntityPostCoordinationCommandHandler implements CommandHandler<GetEntityPostCoordinationRequest, GetEntityPostCoordinationResponse> {
@@ -44,12 +46,13 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
     @Override
     public Mono<GetEntityPostCoordinationResponse> handleRequest(GetEntityPostCoordinationRequest request, ExecutionContext executionContext) {
         try {
-            List<String> entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(request.entityIRI()), request.projectId()), executionContext).get().icatxEntityTypes();
+            List<String> entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(request.entityIRI()), request.projectId()), executionContext)
+                    .get(5, TimeUnit.SECONDS).icatxEntityTypes();
 
             GetEntityPostCoordinationResponse processedSpec = postCoordService.fetchHistory(request.entityIRI(), request.projectId(),  entityTypes);
 
             return Mono.just(processedSpec);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             LOGGER.error("Error fetching entity types",e);
             return Mono.error(new MessageProcessingException("Error fetching entity types", e));
         }

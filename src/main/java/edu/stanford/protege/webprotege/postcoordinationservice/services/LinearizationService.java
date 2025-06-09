@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class LinearizationService {
@@ -25,7 +26,7 @@ public class LinearizationService {
     @Cacheable("linearizationDefinitions")
     public List<LinearizationDefinition> getLinearizationDefinitions() {
         try {
-            return commandExecutor.execute(new LinearizationDefinitionRequest(), new ExecutionContext()).get().definitionList();
+            return commandExecutor.execute(new LinearizationDefinitionRequest(), new ExecutionContext()).get(5, TimeUnit.SECONDS).definitionList();
         } catch (Exception e) {
             throw new RuntimeException("Exception fetching the definitions ", e);
         }

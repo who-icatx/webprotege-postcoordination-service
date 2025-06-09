@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -227,8 +229,9 @@ public class PostCoordinationService {
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
         List<String> entityTypes;
         try {
-            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"", CorrelationMDCUtil.getCorrelationId())).get().icatxEntityTypes();
-        } catch (InterruptedException | ExecutionException e) {
+            entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpec.whoficEntityIri()), projectId), new ExecutionContext(userId,"", CorrelationMDCUtil.getCorrelationId()))
+                    .get(5, TimeUnit.SECONDS).icatxEntityTypes();
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new MessageProcessingException("Error fetching entity types", e);
         }
         var defaultRevision = PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes,

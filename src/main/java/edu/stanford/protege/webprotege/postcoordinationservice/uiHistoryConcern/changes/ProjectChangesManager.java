@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.*;
 
 import static edu.stanford.protege.webprotege.postcoordinationservice.mappers.SpecificationToEventsMapper.groupScaleEventsByAxis;
@@ -185,7 +187,8 @@ public class ProjectChangesManager {
     private Map<String, Integer> createOrderAxisMapWithSubAxis(String whoficEntityiri, ProjectId projectId, UserId userId) {
         Map<String, Integer> orderedAxisMap = new HashMap<>();
         try {
-            GetIcatxEntityTypeResponse typeResponse = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(whoficEntityiri), projectId), new ExecutionContext(userId, "", CorrelationMDCUtil.getCorrelationId())).get();
+            GetIcatxEntityTypeResponse typeResponse = entityTypesExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(whoficEntityiri), projectId), new ExecutionContext(userId, "", CorrelationMDCUtil.getCorrelationId()))
+                    .get(5, TimeUnit.SECONDS);
             List<TableConfiguration> tableConfiguration = tableConfigurationRepo.getTableConfigurationByEntityType(typeResponse.icatxEntityTypes());
 
             if (tableConfiguration == null) {
@@ -213,7 +216,7 @@ public class ProjectChangesManager {
                     .collect(Collectors.toMap(orderedAxisList::get, index -> index));
 
             return orderedAxisMap;
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
