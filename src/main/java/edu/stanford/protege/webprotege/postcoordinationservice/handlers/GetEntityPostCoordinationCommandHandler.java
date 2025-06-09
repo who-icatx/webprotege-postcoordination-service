@@ -48,7 +48,7 @@ public class GetEntityPostCoordinationCommandHandler implements CommandHandler<G
         try {
             List<String> entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(request.entityIRI()), request.projectId()), executionContext)
                     .get(5, TimeUnit.SECONDS).icatxEntityTypes();
-
+            LOGGER.info("Fetched entity type for {} : {} ", request.entityIRI(), entityTypes);
             GetEntityPostCoordinationResponse processedSpec = postCoordService.fetchHistory(request.entityIRI(), request.projectId(),  entityTypes);
 
             return Mono.just(processedSpec);
