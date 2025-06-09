@@ -139,6 +139,7 @@ public class ProjectChangesManager {
 
     public Set<ProjectChangeForEntity> getProjectChangesForCustomScaleHistories(ProjectId projectId, List<EntityCustomScalesValuesHistory> entityCustomScaleHistories) {
         Map<String, String> entityIrisAndNames = new HashMap<>();
+
         Set<CustomScaleRevisionWithEntity> scaleRevisions = entityCustomScaleHistories.stream()
                 .flatMap(history ->
                         history.getPostCoordinationCustomScalesRevisions()
