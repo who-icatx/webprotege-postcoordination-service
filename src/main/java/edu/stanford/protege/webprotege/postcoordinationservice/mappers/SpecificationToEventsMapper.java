@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 public class SpecificationToEventsMapper {
 
 
-    public static List<PostCoordinationSpecificationEvent> convertFromSpecification(PostCoordinationSpecification specification) {
+    public static List<PostCoordinationSpecificationEvent> convertFromSpecification(PostCoordinationSpecification specification, Set<String> allowedAxis) {
         List<PostCoordinationSpecificationEvent> response = new ArrayList<>();
 
-        response.addAll(specification.getAllowedAxes().stream().map(axis -> new AddToAllowedAxisEvent(axis, specification.getLinearizationView())).toList());
-        response.addAll(specification.getDefaultAxes().stream().map(axis -> new AddToDefaultAxisEvent(axis, specification.getLinearizationView())).toList());
-        response.addAll(specification.getRequiredAxes().stream().map(axis -> new AddToRequiredAxisEvent(axis, specification.getLinearizationView())).toList());
-        response.addAll(specification.getNotAllowedAxes().stream().map(axis -> new AddToNotAllowedAxisEvent(axis, specification.getLinearizationView())).toList());
+        response.addAll(specification.getAllowedAxes().stream().filter(allowedAxis::contains).map(axis -> new AddToAllowedAxisEvent(axis, specification.getLinearizationView())).toList());
+        response.addAll(specification.getDefaultAxes().stream().filter(allowedAxis::contains).map(axis -> new AddToDefaultAxisEvent(axis, specification.getLinearizationView())).toList());
+        response.addAll(specification.getRequiredAxes().stream().filter(allowedAxis::contains).map(axis -> new AddToRequiredAxisEvent(axis, specification.getLinearizationView())).toList());
+        response.addAll(specification.getNotAllowedAxes().stream().filter(allowedAxis::contains).map(axis -> new AddToNotAllowedAxisEvent(axis, specification.getLinearizationView())).toList());
 
         return response;
     }

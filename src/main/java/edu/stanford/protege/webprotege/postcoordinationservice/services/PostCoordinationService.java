@@ -63,8 +63,11 @@ public class PostCoordinationService {
 
     public void createFirstSpecificationImport(String documentLocation, ProjectId projectId, UserId userId) {
         var stream = documentRepository.fetchPostCoordinationSpecifications(documentLocation);
+        Set<String> availableAxes = configRepository.getALlTableConfiguration().stream()
+                .flatMap(c -> c.getPostCoordinationAxes().stream())
+                .collect(Collectors.toSet());
         readWriteLock.executeWriteLock(() -> {
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId)));
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedHistories(projectId, userId, availableAxes)));
         });
     }
 
@@ -103,14 +106,14 @@ public class PostCoordinationService {
     }
 
 
-    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId) {
+    private Consumer<List<WhoficEntityPostCoordinationSpecification>> createBatchProcessorForSavingPaginatedHistories(ProjectId projectId, UserId userId, Set<String> availableAxes) {
         return page -> {
             if (isNotEmpty(page)) {
                 Set<EntityPostCoordinationHistory> histories = new HashSet<>();
                 for (WhoficEntityPostCoordinationSpecification specification : page) {
                     Set<PostCoordinationViewEvent> events = specification.postcoordinationSpecifications().stream()
                             .map(spec ->
-                                    new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec))
+                                    new PostCoordinationViewEvent(spec.getLinearizationView(), SpecificationToEventsMapper.convertFromSpecification(spec, availableAxes))
                             )
                             .filter(spec -> !spec.axisEvents().isEmpty())
                             .collect(Collectors.toSet());
@@ -264,20 +267,39 @@ public class PostCoordinationService {
     public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, List<String> entityTypes) {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
+        Set<String> postCoordinationAxis  = configurations.stream()
+                .filter(config -> entityTypes.contains(config.getEntityType()))
+                .flatMap(config -> config.getPostCoordinationAxes().stream())
+                .collect(Collectors.toSet());
+
         return this.repository.getExistingHistoryOrderedByRevision(entityIri, projectId)
                 .map(history -> {
                             history.getPostCoordinationRevisions().add(0, PostCoordinationSpecificationRevision.createDefaultInitialRevision(
                                     entityTypes,
                                     definitionList,
                                     configurations));
-                            return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
+
+                            return new GetEntityPostCoordinationResponse(entityIri, filterExtraSpecifications(postCoordinationAxis, eventProcessor.processHistory(history)));
                         }
                 )
                 .orElseGet(() -> {
                     var specs = Arrays.asList(PostCoordinationSpecificationRevision.createDefaultInitialRevision(entityTypes, definitionList, configurations));
                     var history = new EntityPostCoordinationHistory(entityIri, projectId.id(), specs);
-                    return new GetEntityPostCoordinationResponse(entityIri, eventProcessor.processHistory(history));
+                    return new GetEntityPostCoordinationResponse(entityIri, filterExtraSpecifications(postCoordinationAxis, eventProcessor.processHistory(history)));
                 });
     }
 
+
+    private WhoficEntityPostCoordinationSpecification filterExtraSpecifications(Set<String> allowedPostCoordAxis,
+                                                                                WhoficEntityPostCoordinationSpecification processedSpec) {
+        List<PostCoordinationSpecification> filteredSpecs = processedSpec.postcoordinationSpecifications().stream()
+                .map(rawSpec -> {
+                    List<String> allowedAxes = rawSpec.getAllowedAxes().stream().filter(allowedPostCoordAxis::contains).toList();
+                    List<String> defaultAxes = rawSpec.getDefaultAxes().stream().filter(allowedPostCoordAxis::contains).toList();
+                    List<String> notAllowedAxes = rawSpec.getNotAllowedAxes().stream().filter(allowedPostCoordAxis::contains).toList();
+                    List<String> requiredAxes =  rawSpec.getRequiredAxes().stream().filter(allowedPostCoordAxis::contains).toList();
+                    return new PostCoordinationSpecification(rawSpec.getLinearizationView(), allowedAxes, defaultAxes, notAllowedAxes, requiredAxes);
+                }).toList();
+        return new WhoficEntityPostCoordinationSpecification(processedSpec.whoficEntityIri(), processedSpec.entityType(), filteredSpecs);
+    }
 }
