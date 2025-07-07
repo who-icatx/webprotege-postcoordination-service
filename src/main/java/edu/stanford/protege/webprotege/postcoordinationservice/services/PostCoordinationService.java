@@ -13,6 +13,8 @@ import edu.stanford.protege.webprotege.postcoordinationservice.model.*;
 import edu.stanford.protege.webprotege.postcoordinationservice.repositories.*;
 import org.bson.Document;
 import org.semanticweb.owlapi.model.IRI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,6 +31,8 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 @Service
 public class PostCoordinationService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(PostCoordinationService.class);
     private final PostCoordinationRepository repository;
     private final PostCoordinationTableConfigRepository configRepository;
     private final LinearizationService linearizationService;
@@ -249,19 +253,31 @@ public class PostCoordinationService {
         return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
     }
 
-    public GetEntityCustomScaleValueResponse fetchCustomScalesHistory(String entityIri, ProjectId projectId) {
-        return this.repository.getExistingCustomScaleHistoryOrderedByRevision(entityIri, projectId)
-                .map(history -> {
-                    Date lastRevisionDate = null;
-                    if (!history.getPostCoordinationCustomScalesRevisions().isEmpty()) {
-                        long lastRevisionTimestamp = history.getPostCoordinationCustomScalesRevisions().get(history.getPostCoordinationCustomScalesRevisions().size() - 1).timestamp();
-                        lastRevisionDate = Date.from(Instant.ofEpochMilli(lastRevisionTimestamp));
-                    }
-                    WhoficCustomScalesValues scales = eventProcessor.processCustomScaleHistory(history);
-                    return new GetEntityCustomScaleValueResponse(lastRevisionDate, scales);
-                })
-                .orElseGet(() -> new GetEntityCustomScaleValueResponse(null, new WhoficCustomScalesValues(entityIri, Collections.emptyList())));
+    public GetEntityCustomScaleValueResponse fetchCustomScalesHistory(String entityIri, ProjectId projectId, ExecutionContext executionContext) {
+        List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
 
+        try {
+            List<String> entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(entityIri), projectId), executionContext)
+                    .get(5, TimeUnit.SECONDS).icatxEntityTypes();
+            return this.repository.getExistingCustomScaleHistoryOrderedByRevision(entityIri, projectId)
+                    .map(history -> {
+                        Date lastRevisionDate = null;
+                        if (!history.getPostCoordinationCustomScalesRevisions().isEmpty()) {
+                            long lastRevisionTimestamp = history.getPostCoordinationCustomScalesRevisions().get(history.getPostCoordinationCustomScalesRevisions().size() - 1).timestamp();
+                            lastRevisionDate = Date.from(Instant.ofEpochMilli(lastRevisionTimestamp));
+                        }
+                        WhoficCustomScalesValues scales = eventProcessor.processCustomScaleHistory(history);
+                        Set<String> postCoordinationAxis  = configurations.stream()
+                                .filter(config -> entityTypes.contains(config.getEntityType()))
+                                .flatMap(config -> config.getPostCoordinationAxes().stream())
+                                .collect(Collectors.toSet());
+                        return new GetEntityCustomScaleValueResponse(lastRevisionDate, filterExtraAxis(scales, postCoordinationAxis));
+                    })
+                    .orElseGet(() -> new GetEntityCustomScaleValueResponse(null, new WhoficCustomScalesValues(entityIri, Collections.emptyList())));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOGGER.error("Error fetching entity types",e);
+            throw new MessageProcessingException("Error fetching entity types", e);
+        }
     }
 
     public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, List<String> entityTypes) {
@@ -290,6 +306,12 @@ public class PostCoordinationService {
     }
 
 
+    private WhoficCustomScalesValues filterExtraAxis(WhoficCustomScalesValues rawCustomScales, Set<String> allowedPostCoordAxis) {
+        List<PostCoordinationScaleCustomization> filteredScales = rawCustomScales.scaleCustomizations().stream().filter(rawCustomization ->
+            allowedPostCoordAxis.contains(rawCustomization.getPostcoordinationAxis())
+        ).toList();
+        return new WhoficCustomScalesValues(rawCustomScales.whoficEntityIri(), filteredScales);
+    }
     private WhoficEntityPostCoordinationSpecification filterExtraSpecifications(Set<String> allowedPostCoordAxis,
                                                                                 WhoficEntityPostCoordinationSpecification processedSpec) {
         List<PostCoordinationSpecification> filteredSpecs = processedSpec.postcoordinationSpecifications().stream()

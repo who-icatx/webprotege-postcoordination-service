@@ -32,7 +32,7 @@ public class GetEntityCustomScaleValuesCommandHandler implements CommandHandler<
 
     @Override
     public Mono<GetEntityCustomScaleValueResponse> handleRequest(GetEntityCustomScaleValuesRequest request, ExecutionContext executionContext) {
-        GetEntityCustomScaleValueResponse response = postCoordService.fetchCustomScalesHistory(request.entityIRI(), request.projectId());
+        GetEntityCustomScaleValueResponse response = postCoordService.fetchCustomScalesHistory(request.entityIRI(), request.projectId(), executionContext);
 
         return Mono.just(response);
     }
