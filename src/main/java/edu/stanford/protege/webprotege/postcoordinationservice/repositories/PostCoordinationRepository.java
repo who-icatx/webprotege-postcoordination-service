@@ -38,10 +38,45 @@ public class PostCoordinationRepository {
     }
 
     public void bulkWriteDocuments(List<? extends WriteModel<Document>> listOfWriteModelDocument, String collectionName) {
-        readWriteLock.executeWriteLock(() -> {
-            var collection = mongoTemplate.getCollection(collectionName);
-            collection.bulkWrite(listOfWriteModelDocument);
-        });
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                LOGGER.info("Attempting bulk write to collection: {} with {} documents (attempt {}/{})", 
+                           collectionName, listOfWriteModelDocument.size(), retryCount + 1, maxRetries);
+                
+                readWriteLock.executeWriteLock(() -> {
+                    var collection = mongoTemplate.getCollection(collectionName);
+                    var result = collection.bulkWrite(listOfWriteModelDocument);
+                    LOGGER.info("Bulk write successful to collection: {}. Inserted: {}, Modified: {}", 
+                               collectionName, result.getInsertedCount(), result.getModifiedCount());
+                });
+                
+                LOGGER.info("Successfully completed bulk write to collection: {}", collectionName);
+                return; // Success, exit the retry loop
+                
+            } catch (Exception e) {
+                retryCount++;
+                LOGGER.error("Error during bulk write to collection: {} (attempt {}/{}): {}", 
+                           collectionName, retryCount, maxRetries, e.getMessage(), e);
+                
+                if (retryCount >= maxRetries) {
+                    LOGGER.error("Failed to perform bulk write to collection: {} after {} attempts", collectionName, maxRetries);
+                    throw new RuntimeException("Failed to perform bulk write to collection: " + collectionName + " after " + maxRetries + " attempts", e);
+                }
+                
+                // Wait before retrying (exponential backoff)
+                try {
+                    long waitTime = (long) Math.pow(2, retryCount) * 1000; // 2s, 4s, 8s
+                    LOGGER.info("Waiting {} ms before retry for bulk write to collection: {}", waitTime, collectionName);
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for bulk write retry", ie);
+                }
+            }
+        }
     }
 
     public void addSpecificationRevision(String whoficEntityIri, ProjectId projectId, PostCoordinationSpecificationRevision specificationRevision) {
@@ -90,10 +125,43 @@ public class PostCoordinationRepository {
 
 
     public void writeDocument(Document document, String collectionName) {
-        readWriteLock.executeWriteLock(() -> {
-            var collection = mongoTemplate.getCollection(collectionName);
-            collection.insertOne(document);
-        });
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                LOGGER.info("Attempting to write document to collection: {} (attempt {}/{})", 
+                           collectionName, retryCount + 1, maxRetries);
+                
+                readWriteLock.executeWriteLock(() -> {
+                    var collection = mongoTemplate.getCollection(collectionName);
+                    collection.insertOne(document);
+                });
+                
+                LOGGER.info("Successfully wrote document to collection: {}", collectionName);
+                return; // Success, exit the retry loop
+                
+            } catch (Exception e) {
+                retryCount++;
+                LOGGER.error("Error writing document to collection: {} (attempt {}/{}): {}", 
+                           collectionName, retryCount, maxRetries, e.getMessage(), e);
+                
+                if (retryCount >= maxRetries) {
+                    LOGGER.error("Failed to write document to collection: {} after {} attempts", collectionName, maxRetries);
+                    throw new RuntimeException("Failed to write document to collection: " + collectionName + " after " + maxRetries + " attempts", e);
+                }
+                
+                // Wait before retrying (exponential backoff)
+                try {
+                    long waitTime = (long) Math.pow(2, retryCount) * 1000; // 2s, 4s, 8s
+                    LOGGER.info("Waiting {} ms before retry for document write to collection: {}", waitTime, collectionName);
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for document write retry", ie);
+                }
+            }
+        }
     }
 
     public Optional<EntityPostCoordinationHistory> findHistoryByEntityIriAndProjectId(String entityIri, ProjectId projectId) {
