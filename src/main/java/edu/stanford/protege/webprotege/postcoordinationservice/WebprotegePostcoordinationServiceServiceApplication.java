@@ -21,9 +21,11 @@ public class WebprotegePostcoordinationServiceServiceApplication {
 
     @Bean
     MinioClient minioClient(MinioProperties properties) {
-        return MinioClient.builder()
+        MinioClient minioClient = MinioClient.builder()
                           .credentials(properties.getAccessKey(), properties.getSecretKey())
                           .endpoint(properties.getEndPoint())
                           .build();
+        minioClient.setTimeout(100000, 100000, 100000);
+        return minioClient;
     }
 }
