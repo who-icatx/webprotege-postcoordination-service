@@ -77,12 +77,35 @@ public class PostCoordinationService {
 
 
     public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
-        try {
-            var stream = documentRepository.fetchCustomScalesValues(documentLocation);
-            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
-        } catch (Exception e) {
-            LOGGER.error("Error while processing custom scales ", e);
-            throw new RuntimeException("Error while processing custom scales ", e);
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                LOGGER.info("Attempting to fetch custom scales from location: {}", documentLocation);
+                var stream = documentRepository.fetchCustomScalesValues(documentLocation);
+                stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+                LOGGER.info("Successfully processed custom scales from location: {}", documentLocation);
+                return; // Success, exit the retry loop
+            } catch (Exception e) {
+                retryCount++;
+                LOGGER.error("Error while processing custom scales (attempt {}/{}): {}", retryCount, maxRetries, e.getMessage(), e);
+                
+                if (retryCount >= maxRetries) {
+                    LOGGER.error("Failed to process custom scales after {} attempts", maxRetries);
+                    throw new RuntimeException("Error while processing custom scales after " + maxRetries + " attempts", e);
+                }
+                
+                // Wait before retrying (exponential backoff)
+                try {
+                    long waitTime = (long) Math.pow(2, retryCount) * 1000; // 2s, 4s, 8s
+                    LOGGER.info("Waiting {} ms before retry", waitTime);
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for retry", ie);
+                }
+            }
         }
     }
 

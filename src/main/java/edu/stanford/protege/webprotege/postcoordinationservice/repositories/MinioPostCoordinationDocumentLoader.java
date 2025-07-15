@@ -36,6 +36,7 @@ public class MinioPostCoordinationDocumentLoader {
 
     public InputStream fetchPostCoordinationDocument(@Nonnull String location) throws StorageException {
         try {
+            LOGGER.info("Fetching document from MinIO: bucket={}, object={}", minioProperties.getBucketName(), location);
             return minioClient.getObject(GetObjectArgs.builder()
                     .bucket(minioProperties.getBucketName())
                     .object(location)
@@ -43,10 +44,13 @@ public class MinioPostCoordinationDocumentLoader {
         } catch (ErrorResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
                  IOException | InvalidResponseException | InvalidKeyException | InternalException |
                  InsufficientDataException e) {
+            LOGGER.error("MinIO error while fetching document from bucket={}, object={}: {}", 
+                        minioProperties.getBucketName(), location, e.getMessage(), e);
             throw new StorageException("Problem reading linearization document object from storage", e);
         } catch (Exception e) {
-            LOGGER.error("Error on fetching postcoordination document " , e);
-            throw new RuntimeException(e);
+            LOGGER.error("Unexpected error while fetching postcoordination document from bucket={}, object={}: {}", 
+                        minioProperties.getBucketName(), location, e.getMessage(), e);
+            throw new RuntimeException("Unexpected error while fetching document", e);
         }
     }
 }
