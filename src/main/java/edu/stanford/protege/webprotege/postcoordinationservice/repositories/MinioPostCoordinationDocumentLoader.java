@@ -5,6 +5,8 @@ import edu.stanford.protege.webprotege.postcoordinationservice.config.MinioPrope
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.errors.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
@@ -20,6 +22,8 @@ import java.security.NoSuchAlgorithmException;
  */
 @Component
 public class MinioPostCoordinationDocumentLoader {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(MinioPostCoordinationDocumentLoader.class);
 
     private final MinioClient minioClient;
 
@@ -40,6 +44,9 @@ public class MinioPostCoordinationDocumentLoader {
                  IOException | InvalidResponseException | InvalidKeyException | InternalException |
                  InsufficientDataException e) {
             throw new StorageException("Problem reading linearization document object from storage", e);
+        } catch (Exception e) {
+            LOGGER.error("Error on fetching postcoordination document " , e);
+            throw new RuntimeException(e);
         }
     }
 }
