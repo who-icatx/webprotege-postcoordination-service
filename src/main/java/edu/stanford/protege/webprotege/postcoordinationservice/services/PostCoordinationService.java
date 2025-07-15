@@ -77,34 +77,43 @@ public class PostCoordinationService {
 
 
     public void crateFirstCustomScalesValuesImport(String documentLocation, ProjectId projectId, UserId userId) {
-        var stream = documentRepository.fetchCustomScalesValues(documentLocation);
-        stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+        try {
+            var stream = documentRepository.fetchCustomScalesValues(documentLocation);
+            stream.collect(StreamUtils.batchCollector(500, createBatchProcessorForSavingPaginatedCustomScales(projectId, userId)));
+        } catch (Exception e) {
+            LOGGER.error("Error while processing custom scales ", e);
+            throw new RuntimeException("Error while processing custom scales ", e);
+        }
     }
 
     private Consumer<List<WhoficCustomScalesValues>> createBatchProcessorForSavingPaginatedCustomScales(ProjectId projectId,
                                                                                                         UserId userId) {
         return page -> {
-            if (isNotEmpty(page)) {
-                Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
-                for (WhoficCustomScalesValues specification : page) {
-                    Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.convertToFirstImportEvents(specification);
-                    PostCoordinationCustomScalesRevision revision = PostCoordinationCustomScalesRevision.create(userId, events);
-                    EntityCustomScalesValuesHistory history = new EntityCustomScalesValuesHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
-                    histories.add(history);
-                }
-                var documents = histories.stream()
-                        .map(history -> {
-                            Document doc = objectMapper.convertValue(history, Document.class);
-                            return new ReplaceOneModel<>(
-                                    new Document(EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI, history.getWhoficEntityIri())
-                                            .append(EntityCustomScalesValuesHistory.PROJECT_ID, history.getProjectId()),
-                                    doc,
-                                    new ReplaceOptions().upsert(true)
-                            );
-                        })
-                        .toList();
+            try {
+                if (isNotEmpty(page)) {
+                    Set<EntityCustomScalesValuesHistory> histories = new HashSet<>();
+                    for (WhoficCustomScalesValues specification : page) {
+                        Set<PostCoordinationCustomScalesValueEvent> events = SpecificationToEventsMapper.convertToFirstImportEvents(specification);
+                        PostCoordinationCustomScalesRevision revision = PostCoordinationCustomScalesRevision.create(userId, events);
+                        EntityCustomScalesValuesHistory history = new EntityCustomScalesValuesHistory(specification.whoficEntityIri(), projectId.id(), List.of(revision));
+                        histories.add(history);
+                    }
+                    var documents = histories.stream()
+                            .map(history -> {
+                                Document doc = objectMapper.convertValue(history, Document.class);
+                                return new ReplaceOneModel<>(
+                                        new Document(EntityCustomScalesValuesHistory.WHOFIC_ENTITY_IRI, history.getWhoficEntityIri())
+                                                .append(EntityCustomScalesValuesHistory.PROJECT_ID, history.getProjectId()),
+                                        doc,
+                                        new ReplaceOptions().upsert(true)
+                                );
+                            })
+                            .toList();
 
-                repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
+                    repository.bulkWriteDocuments(documents, POSTCOORDINATION_CUSTOM_SCALES_COLLECTION);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error while processing page", e);
             }
         };
     }
@@ -267,7 +276,7 @@ public class PostCoordinationService {
                             lastRevisionDate = Date.from(Instant.ofEpochMilli(lastRevisionTimestamp));
                         }
                         WhoficCustomScalesValues scales = eventProcessor.processCustomScaleHistory(history);
-                        Set<String> postCoordinationAxis  = configurations.stream()
+                        Set<String> postCoordinationAxis = configurations.stream()
                                 .filter(config -> entityTypes.contains(config.getEntityType()))
                                 .flatMap(config -> config.getPostCoordinationAxes().stream())
                                 .collect(Collectors.toSet());
@@ -275,7 +284,7 @@ public class PostCoordinationService {
                     })
                     .orElseGet(() -> new GetEntityCustomScaleValueResponse(null, new WhoficCustomScalesValues(entityIri, Collections.emptyList())));
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOGGER.error("Error fetching entity types",e);
+            LOGGER.error("Error fetching entity types", e);
             throw new MessageProcessingException("Error fetching entity types", e);
         }
     }
@@ -283,7 +292,7 @@ public class PostCoordinationService {
     public GetEntityPostCoordinationResponse fetchHistory(String entityIri, ProjectId projectId, List<String> entityTypes) {
         List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
         List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
-        Set<String> postCoordinationAxis  = configurations.stream()
+        Set<String> postCoordinationAxis = configurations.stream()
                 .filter(config -> entityTypes.contains(config.getEntityType()))
                 .flatMap(config -> config.getPostCoordinationAxes().stream())
                 .collect(Collectors.toSet());
@@ -308,10 +317,11 @@ public class PostCoordinationService {
 
     private WhoficCustomScalesValues filterExtraAxis(WhoficCustomScalesValues rawCustomScales, Set<String> allowedPostCoordAxis) {
         List<PostCoordinationScaleCustomization> filteredScales = rawCustomScales.scaleCustomizations().stream().filter(rawCustomization ->
-            allowedPostCoordAxis.contains(rawCustomization.getPostcoordinationAxis())
+                allowedPostCoordAxis.contains(rawCustomization.getPostcoordinationAxis())
         ).toList();
         return new WhoficCustomScalesValues(rawCustomScales.whoficEntityIri(), filteredScales);
     }
+
     private WhoficEntityPostCoordinationSpecification filterExtraSpecifications(Set<String> allowedPostCoordAxis,
                                                                                 WhoficEntityPostCoordinationSpecification processedSpec) {
         List<PostCoordinationSpecification> filteredSpecs = processedSpec.postcoordinationSpecifications().stream()
@@ -319,7 +329,7 @@ public class PostCoordinationService {
                     List<String> allowedAxes = rawSpec.getAllowedAxes().stream().filter(allowedPostCoordAxis::contains).toList();
                     List<String> defaultAxes = rawSpec.getDefaultAxes().stream().filter(allowedPostCoordAxis::contains).toList();
                     List<String> notAllowedAxes = rawSpec.getNotAllowedAxes().stream().filter(allowedPostCoordAxis::contains).toList();
-                    List<String> requiredAxes =  rawSpec.getRequiredAxes().stream().filter(allowedPostCoordAxis::contains).toList();
+                    List<String> requiredAxes = rawSpec.getRequiredAxes().stream().filter(allowedPostCoordAxis::contains).toList();
                     return new PostCoordinationSpecification(rawSpec.getLinearizationView(), allowedAxes, defaultAxes, notAllowedAxes, requiredAxes);
                 }).toList();
         return new WhoficEntityPostCoordinationSpecification(processedSpec.whoficEntityIri(), processedSpec.entityType(), filteredSpecs);
