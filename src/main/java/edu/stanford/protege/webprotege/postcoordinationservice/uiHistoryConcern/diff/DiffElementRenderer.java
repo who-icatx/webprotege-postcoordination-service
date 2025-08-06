@@ -99,7 +99,7 @@ public class DiffElementRenderer<S extends Serializable> {
         changeList.forEach(event -> {
             String axisName = entityIrisAndNames.get(event.getPostCoordinationAxis());
 
-            stringBuilder.append("&nbsp;<span>");
+            stringBuilder.append("<span>");
             stringBuilder.append("Set ");
             stringBuilder.append(axisName);
             stringBuilder.append(" value to ");
@@ -109,6 +109,10 @@ public class DiffElementRenderer<S extends Serializable> {
             stringBuilder.append("</span>;&nbsp;");
         });
 
+		//delete the last ";&nbsp;"
+		if (stringBuilder.length() >= 7) {
+			stringBuilder.delete(stringBuilder.length() - 7, stringBuilder.length());
+		}
 
         return stringBuilder.toString();
     }
