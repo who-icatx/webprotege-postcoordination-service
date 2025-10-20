@@ -301,7 +301,14 @@ public class PostCoordinationService {
                         WhoficCustomScalesValues scales = eventProcessor.processCustomScaleHistory(history);
                         Set<String> postCoordinationAxis = configurations.stream()
                                 .filter(config -> entityTypes.contains(config.getEntityType()))
-                                .flatMap(config -> config.getPostCoordinationAxes().stream())
+                                .flatMap(config -> {
+                                        List<String> axes = new ArrayList<>(List.copyOf(config.getPostCoordinationAxes()));
+                                        axes.addAll(config.getCompositePostCoordinationAxes()
+                                                .stream().flatMap(c -> c.getSubAxis().stream()).toList());
+
+                                        return axes.stream();
+                                        }
+                                        )
                                 .collect(Collectors.toSet());
                         return new GetEntityCustomScaleValueResponse(lastRevisionDate, filterExtraAxis(scales, postCoordinationAxis));
                     })
