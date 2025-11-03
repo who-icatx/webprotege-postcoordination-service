@@ -185,7 +185,23 @@ public class PostCoordinationService {
         readWriteLock.executeWriteLock(() -> {
                     var existingHistoryOptional = this.repository.getExistingHistoryOrderedByRevision(newSpecification.whoficEntityIri(), projectId);
                     existingHistoryOptional.ifPresentOrElse(history -> {
+                                if(history.getPostCoordinationRevisions().stream().noneMatch(rev -> rev.userId().id().equals("initialRevision"))){
+                                    List<LinearizationDefinition> definitionList = linearizationService.getLinearizationDefinitions();
+                                    List<TableConfiguration> configurations = configRepository.getALlTableConfiguration();
+                                    List<String> entityTypes;
+                                    try {
+                                        entityTypes = entityTypeExecutor.execute(new GetIcatxEntityTypeRequest(IRI.create(newSpecification.whoficEntityIri()), projectId), new ExecutionContext(userId, "", CorrelationMDCUtil.getCorrelationId()))
+                                                .get(5, TimeUnit.SECONDS).icatxEntityTypes();
+                                    } catch (TimeoutException | InterruptedException | ExecutionException e) {
+                                        throw new MessageProcessingException("Error fetching entity types", e);
+                                    }
 
+                                    history.getPostCoordinationRevisions().add(0, PostCoordinationSpecificationRevision.createDefaultInitialRevision(
+                                            entityTypes,
+                                            definitionList,
+                                            configurations));
+
+                                }
                                 WhoficEntityPostCoordinationSpecification oldSpec = eventProcessor.processHistory(history);
                                 Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(oldSpec, newSpecification);
 
