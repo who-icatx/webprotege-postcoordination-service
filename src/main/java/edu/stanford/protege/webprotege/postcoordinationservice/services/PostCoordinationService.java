@@ -212,13 +212,16 @@ public class PostCoordinationService {
                                 }
                             }, () -> {
                                 EntityPostCoordinationHistory history = createNewSpecificationHistory(newSpecification, projectId, userId, changeRequestId);
-                                var savedHistory = repository.saveNewSpecificationHistory(history);
-                                if (!newSpecification.postcoordinationSpecifications().isEmpty()) {
-                                    savedHistory.getPostCoordinationRevisions()
-                                            .stream()
-                                            .findFirst()
-                                            .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision, changeRequestId, commitMessage));
+                                if(history != null) {
+                                    var savedHistory = repository.saveNewSpecificationHistory(history);
+                                    if (!newSpecification.postcoordinationSpecifications().isEmpty()) {
+                                        savedHistory.getPostCoordinationRevisions()
+                                                .stream()
+                                                .findFirst()
+                                                .ifPresent(revision -> newRevisionsEventEmitter.emitNewRevisionsEvent(projectId, savedHistory.getWhoficEntityIri(), revision, changeRequestId, commitMessage));
+                                    }
                                 }
+
                             }
                     );
                 }
@@ -296,7 +299,9 @@ public class PostCoordinationService {
 
         WhoficEntityPostCoordinationSpecification defaultSpec = eventProcessor.processHistory(new EntityPostCoordinationHistory(newSpec.whoficEntityIri(), projectId.id(), Arrays.asList(defaultRevision)));
         Set<PostCoordinationViewEvent> specEvents = SpecificationToEventsMapper.createEventsFromDiff(defaultSpec, newSpec);
-
+        if(specEvents.isEmpty()) {
+            return null;
+        }
         var newRevision = PostCoordinationSpecificationRevision.create(userId, specEvents, changeRequestId);
         return EntityPostCoordinationHistory.create(newSpec.whoficEntityIri(), projectId.id(), List.of(newRevision));
     }
